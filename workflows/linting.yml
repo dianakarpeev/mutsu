@@ -1,0 +1,17 @@
+name: Linting Workflow
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  testing:
+    name: Lint Check
+
+    steps:
+    - name: Run Kotlin Linter
+      run: ./gradlew ktlintStagingDebugCheck
+
+    - name: Run Android Linter
+      run: ./gradlew lintStagingDebug

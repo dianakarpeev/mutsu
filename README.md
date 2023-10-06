@@ -10,8 +10,12 @@ Mutsu is an Android application designed to simplify your grocery shopping exper
 - **Adjust:** Refine the generated list with ease by effortlessly adding or removing ingredients based on your pantry stock, ensuring it aligns with your needs!
 
 ## Quick-start
-How to install and launch your application. These should include instructions for:
-- (by Sprint 1) building and running your release from source code (i.e. your github repo)
+
+### Install application
+To install this application, download the code from this repository by either cloning the repo or just downloading it as a .zip. This can be done using by pressing the green 'Code' button on the right side of the screen. It will give you multiple options of how to download or clone this code. Keep track of where you are saving the files.
+
+### Launch application
+To launch this app, open the project you've cloned or downloaded in Android Studio. Once the project has loaded, there should be a button in the top right to run the app. Click this button and a phone emulator will start up and run the app.
 
 ## Sneakpeek
 - (by Sprint 1): Screenshots from each of the main screens of your application.

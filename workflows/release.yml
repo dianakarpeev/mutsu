@@ -1,0 +1,23 @@
+name: Release Workflow
+
+on:
+  pull_request:
+    types: 
+      -closed
+    
+jobs:
+  build-gradle-project:
+    steps:
+    - name: Checkout project sources
+      uses: actions/checkout@v3
+
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+
+    - name: Run build with Gradle Wrapper
+      run: ./gradlew build
+
+    - name: Set up JDK 1.17
+      uses: action/setup-java@v1
+      with:
+        java-version: 1.8

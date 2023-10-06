@@ -23,4 +23,4 @@ To launch this app, open the project you've cloned or downloaded in Android Stud
 ## Team Members
 Diana Karpeev - dianakarpeeva@gmail.com <br>
 Mel Hynes - hynesaiden02@gmail.com <br>
-Breanna De Forest - bdeforest01@gmail.com <br>
+Breanna de Forest - bdeforest01@gmail.com <br>

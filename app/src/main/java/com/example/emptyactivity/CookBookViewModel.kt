@@ -1,4 +1,4 @@
-package com.example.cookbookelectricboogaloo
+package com.example.emptyactivity
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf

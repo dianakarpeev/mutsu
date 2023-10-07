@@ -1,4 +1,4 @@
-package com.example.cookbookelectricboogaloo
+package com.example.emptyactivity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -36,7 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.cookbookelectricboogaloo.ui.theme.CookbookElectricBoogalooTheme
+import com.example.emptyactivity.ui.theme.CookbookElectricBoogalooTheme
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -66,6 +66,7 @@ import androidx.compose.foundation.layout.Box
 data class Recipe(val name: String)
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
+@Composable
 fun RecipeListScreen(){
     //determines which navigation bar to use based on the current window size
     val windowSizeClass = calculateWindowSizeClass(this)

@@ -21,7 +21,7 @@ jobs:
         java-version: '17'
     
     - name: Run Kotlin Linter
-      run: ./gradlew ktlintStagingDebugCheck
+      run: ./gradlew ktlintCheck
 
     - name: Run Android Linter
       run: ./gradlew lintStagingDebug

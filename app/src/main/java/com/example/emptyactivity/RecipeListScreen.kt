@@ -36,7 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.emptyactivity.ui.theme.CookbookElectricBoogalooTheme
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,23 +52,19 @@ import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.material3.Scaffold
 import androidx.compose.foundation.layout.Box
+import com.example.emptyactivity.ui.theme.EmptyActivityTheme
 
 data class Recipe(val name: String)
 
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
+
 @Composable
-fun RecipeListScreen(){
-    //determines which navigation bar to use based on the current window size
-    val windowSizeClass = calculateWindowSizeClass(this)
+fun RecipeListScreen(windowSizeClass: WindowSizeClass, modifier: Modifier = Modifier){
     CookbookApp(windowSizeClass)
 }
 
@@ -186,7 +181,7 @@ fun RecipeList(recipeList: List<Recipe>) {
 //Version of the app that uses the horizontal navigation bar
 @Composable
 fun CookBookPortrait(){
-    CookbookElectricBoogalooTheme {
+    EmptyActivityTheme {
         Scaffold(
             bottomBar = { BottomNavigation() }
         ) { padding ->
@@ -229,7 +224,7 @@ fun HomeScreen(modifier: Modifier = Modifier){
 //Version of the app that uses the vertical navigation bar
 @Composable
 fun CookBookLandscape(){
-    CookbookElectricBoogalooTheme {
+    EmptyActivityTheme {
         Surface(color = MaterialTheme.colorScheme.background){
             Row{
                 NavigationRail()

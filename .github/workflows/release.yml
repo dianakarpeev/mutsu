@@ -7,21 +7,23 @@ on:
     
 jobs:
   build-gradle-project:
-  runs-on: ubuntu-latest
+    name: Build Release Candidate
+    
+    runs-on: ubuntu-latest
     steps:
-    - name: Checkout project sources
-      uses: actions/checkout@v3
+     - name: Checkout project sources
+       uses: actions/checkout@v3
 
-    - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
+     - name: Setup Gradle
+       uses: gradle/gradle-build-action@v2
 
-    - name: Make ./gradlew executable
-      run: chmod +x ./gradlew
+     - name: Make ./gradlew executable
+       run: chmod +x ./gradlew
 
-    - name: Run build with Gradle Wrapper
-      run: ./gradlew build
+     - name: Run build with Gradle Wrapper
+       run: ./gradlew build
 
-    - name: Set up JDK 1.17
-      uses: action/setup-java@v1
-      with:
+     - name: Set up JDK 1.17
+       uses: action/setup-java@v1
+       with:
         java-version: 1.8

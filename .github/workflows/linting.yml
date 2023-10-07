@@ -8,10 +8,20 @@ on:
 jobs:
   testing:
     name: Lint Check
+    runs-on: ubuntu-latest
 
     steps:
+    - name: Clone Repo
+      uses: actions/checkout@v1
+      
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu' # See 'Supported distributions' for available options
+        java-version: '17'
+    
     - name: Run Kotlin Linter
-      run: ./gradlew ktlintStagingDebugCheck
+      run: ./gradlew ktlintCheck
 
     - name: Run Android Linter
-      run: ./gradlew lintStagingDebug
+      run: ./gradlew lintDebug

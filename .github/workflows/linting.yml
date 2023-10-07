@@ -13,6 +13,12 @@ jobs:
     steps:
     - name: Clone Repo
       uses: actions/checkout@v1
+      
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu' # See 'Supported distributions' for available options
+        java-version: '17'
     
     - name: Run Kotlin Linter
       run: ./gradlew ktlintStagingDebugCheck

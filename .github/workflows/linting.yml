@@ -8,6 +8,7 @@ on:
 jobs:
   testing:
     name: Lint Check
+    runs-on: ubuntu-latest
 
     steps:
     - name: Run Kotlin Linter

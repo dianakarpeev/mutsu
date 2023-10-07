@@ -25,17 +25,17 @@ import androidx.compose.ui.graphics.RectangleShape
 
 @Composable
 fun IngredientsScreen(modifier: Modifier = Modifier){
-    val ingredients = listOf<Ingredient>(
-        Ingredient("Flour"),
-        Ingredient("Apples"),
-        Ingredient("Sugar"),
-        Ingredient("Rice"),
-        Ingredient("Chicken"),
-        Ingredient("Peppers"),
-        Ingredient("Mayonnaise"),
-        Ingredient("Cherries"),
-        Ingredient("Salmon"),
-        Ingredient("Salt"),
+    val ingredients = listOf<FoodItem>(
+        FoodItem("Flour"),
+        FoodItem("Apples"),
+        FoodItem("Sugar"),
+        FoodItem("Rice"),
+        FoodItem("Chicken"),
+        FoodItem("Peppers"),
+        FoodItem("Mayonnaise"),
+        FoodItem("Cherries"),
+        FoodItem("Salmon"),
+        FoodItem("Salt"),
     )
 
     Column(modifier = modifier.verticalScroll(rememberScrollState())){
@@ -45,7 +45,7 @@ fun IngredientsScreen(modifier: Modifier = Modifier){
 }
 
 /* Data class for the ingredients. */
-data class Ingredient (val name: String)
+data class FoodItem (val name: String)
 
 /* Prints the instructions for the app at the top of the screen. */
 @Composable
@@ -61,7 +61,7 @@ fun Instructions(modifier: Modifier = Modifier){
 *  for each.
 */
 @Composable
-fun ShowAllIngredients(ingredients: List<Ingredient>, modifier: Modifier = Modifier){
+fun ShowAllIngredients(ingredients: List<FoodItem>, modifier: Modifier = Modifier){
     //variables for the ingredients you own
     var flourO by rememberSaveable { mutableStateOf<Int>(0) }
     var appleO by rememberSaveable { mutableStateOf<Int>(0) }
@@ -144,7 +144,7 @@ fun ShowAllIngredients(ingredients: List<Ingredient>, modifier: Modifier = Modif
 
 /* Actually sets up the ingredient name and button and all the logic to add them to either list. */
 @Composable
-fun IngredientButtonBox(ingredient: Ingredient, isAdded: Int, isClicked: () -> Unit, modifier: Modifier = Modifier){
+fun IngredientButtonBox(ingredient: FoodItem, isAdded: Int, isClicked: () -> Unit, modifier: Modifier = Modifier){
     Row(modifier = modifier
         .padding(6.dp)
         .background(MaterialTheme.colorScheme.tertiaryContainer)
@@ -169,7 +169,7 @@ fun IngredientButtonBox(ingredient: Ingredient, isAdded: Int, isClicked: () -> U
 
 /* Gets all the selected ingredients from the inventory or grocery list and prints them at the bottom of the screen. */
 @Composable
-fun AllSelectedIngredientsButton(selectedIngredients: List<Int>, ingredients: List<Ingredient>, message: String, modifier: Modifier = Modifier){
+fun AllSelectedIngredientsButton(selectedIngredients: List<Int>, ingredients: List<FoodItem>, message: String, modifier: Modifier = Modifier){
     var ingredientsString by rememberSaveable { mutableStateOf<String>("")}
 
     Column(modifier.padding(6.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){

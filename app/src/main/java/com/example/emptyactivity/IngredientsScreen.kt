@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -18,6 +19,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -26,16 +28,16 @@ import androidx.compose.ui.graphics.RectangleShape
 @Composable
 fun IngredientsScreen(modifier: Modifier = Modifier){
     val ingredients = listOf<FoodItem>(
-        FoodItem("Flour"),
-        FoodItem("Apples"),
-        FoodItem("Sugar"),
-        FoodItem("Rice"),
-        FoodItem("Chicken"),
-        FoodItem("Peppers"),
-        FoodItem("Mayonnaise"),
-        FoodItem("Cherries"),
-        FoodItem("Salmon"),
-        FoodItem("Salt"),
+        FoodItem("Flour", 0),
+        FoodItem("Apples", 0),
+        FoodItem("Sugar", 0),
+        FoodItem("Rice", 0),
+        FoodItem("Chicken", 0),
+        FoodItem("Peppers", 0),
+        FoodItem("Mayonnaise", 0),
+        FoodItem("Cherries", 0),
+        FoodItem("Salmon", 0),
+        FoodItem("Salt", 0),
     )
 
     Column(modifier = modifier.verticalScroll(rememberScrollState())){
@@ -45,14 +47,14 @@ fun IngredientsScreen(modifier: Modifier = Modifier){
 }
 
 /* Data class for the ingredients. */
-data class FoodItem (val name: String)
+data class FoodItem (val name: String, var quantityInCart: Int)
 
-/* Prints the instructions for the app at the top of the screen. */
+/* Prints the instructions for the page at the top of the screen. */
 @Composable
 fun Instructions(modifier: Modifier = Modifier){
     Column(){
-        Text(text = "Ingredients! Let's keep track of them!", style = MaterialTheme.typography.titleLarge, modifier = modifier.padding(6.dp))
-        Text(text = "More instructions about how it works here!", modifier = modifier.padding(6.dp))
+        Text(text = "Grocery List!", style = MaterialTheme.typography.titleLarge, modifier = modifier.padding(6.dp))
+        Text(text = "Here is your grocery list. Feel free to add or remove any ingredients found below.", modifier = modifier.padding(6.dp))
     }
 }
 
@@ -62,89 +64,132 @@ fun Instructions(modifier: Modifier = Modifier){
 */
 @Composable
 fun ShowAllIngredients(ingredients: List<FoodItem>, modifier: Modifier = Modifier){
-    //variables for the ingredients you own
-    var flourO by rememberSaveable { mutableStateOf<Int>(0) }
-    var appleO by rememberSaveable { mutableStateOf<Int>(0) }
-    var sugarO by rememberSaveable { mutableStateOf<Int>(0) }
-    var riceO by rememberSaveable { mutableStateOf<Int>(0) }
-    var chickenO by rememberSaveable { mutableStateOf<Int>(0) }
-    var pepperO by rememberSaveable { mutableStateOf<Int>(0) }
-    var mayonnaiseO by rememberSaveable { mutableStateOf<Int>(0) }
-    var cherryO by rememberSaveable { mutableStateOf<Int>(0) }
-    var salmonO by rememberSaveable { mutableStateOf<Int>(0) }
-    var saltO by rememberSaveable { mutableStateOf<Int>(0) }
+    var flour by rememberSaveable { mutableStateOf<Int>(0) }
+    var apple by rememberSaveable { mutableStateOf<Int>(0) }
+    var sugar by rememberSaveable { mutableStateOf<Int>(0) }
+    var rice by rememberSaveable { mutableStateOf<Int>(0) }
+    var chicken by rememberSaveable { mutableStateOf<Int>(0) }
+    var pepper by rememberSaveable { mutableStateOf<Int>(0) }
+    var mayonnaise by rememberSaveable { mutableStateOf<Int>(0) }
+    var cherry by rememberSaveable { mutableStateOf<Int>(0) }
+    var salmon by rememberSaveable { mutableStateOf<Int>(0) }
+    var salt by rememberSaveable { mutableStateOf<Int>(0) }
 
-    //variables for the ingredients you want to get more of
-    var flourW by rememberSaveable { mutableStateOf<Int>(0) }
-    var appleW by rememberSaveable { mutableStateOf<Int>(0) }
-    var sugarW by rememberSaveable { mutableStateOf<Int>(0) }
-    var riceW by rememberSaveable { mutableStateOf<Int>(0) }
-    var chickenW by rememberSaveable { mutableStateOf<Int>(0) }
-    var pepperW by rememberSaveable { mutableStateOf<Int>(0) }
-    var mayonnaiseW by rememberSaveable { mutableStateOf<Int>(0) }
-    var cherryW by rememberSaveable { mutableStateOf<Int>(0) }
-    var salmonW by rememberSaveable { mutableStateOf<Int>(0) }
-    var saltW by rememberSaveable { mutableStateOf<Int>(0) }
+    var statefulIngredients by rememberSaveable{ mutableStateOf(mutableListOf<Int>())}
 
-    Row(){
-        Column(modifier = modifier.fillMaxWidth(0.5F)){
-            Text(text = "Ingredients you own:", style = MaterialTheme.typography.titleLarge, modifier = modifier.padding(6.dp))
+    ingredients.forEach{
+        statefulIngredients.add(it.quantityInCart)
+    }
 
-            //flour
-            IngredientButtonBox(ingredient = ingredients[0], isAdded = flourO, isClicked = { flourO++ }, modifier = modifier.fillMaxWidth())
-            //apple
-            IngredientButtonBox(ingredient = ingredients[1], isAdded = appleO, isClicked = { appleO++ }, modifier = modifier.fillMaxWidth())
-            //sugar
-            IngredientButtonBox(ingredient = ingredients[2], isAdded = sugarO, isClicked = { sugarO++ }, modifier = modifier.fillMaxWidth())
-            //rice
-            IngredientButtonBox(ingredient = ingredients[3], isAdded = riceO, isClicked = { riceO++ }, modifier = modifier.fillMaxWidth())
-            //chicken
-            IngredientButtonBox(ingredient = ingredients[4], isAdded = chickenO, isClicked = { chickenO++ }, modifier = modifier.fillMaxWidth())
-            //pepper
-            IngredientButtonBox(ingredient = ingredients[5], isAdded = pepperO, isClicked = { pepperO++ }, modifier = modifier.fillMaxWidth())
-            //mayonnaise
-            IngredientButtonBox(ingredient = ingredients[6], isAdded = mayonnaiseO, isClicked = { mayonnaiseO++ }, modifier = modifier.fillMaxWidth())
-            //cherry
-            IngredientButtonBox(ingredient = ingredients[7], isAdded = cherryO, isClicked = { cherryO++ }, modifier = modifier.fillMaxWidth())
-            //salmon
-            IngredientButtonBox(ingredient = ingredients[8], isAdded = salmonO, isClicked = { salmonO++ }, modifier = modifier.fillMaxWidth())
-            //salt
-            IngredientButtonBox(ingredient = ingredients[9], isAdded = saltO, isClicked = { saltO++ }, modifier = modifier.fillMaxWidth())
+    Column(modifier = modifier.fillMaxWidth(),){
+        //flour
+        IngredientButtonBox(
+            ingredientName = ingredients[0].name,
+            ingredientQuantity = flour,
+            isAdded = { flour++ },
+            isRemoved = { if (flour > 0){flour--} },
+            modifier.fillMaxWidth(),)
+        //apple
+        IngredientButtonBox(
+            ingredientName = ingredients[1].name,
+            ingredientQuantity = apple,
+            isAdded = { apple++ },
+            isRemoved = { if (apple > 0){apple--} },
+            modifier.fillMaxWidth(),)
+        //sugar
+        IngredientButtonBox(
+            ingredientName = ingredients[2].name,
+            ingredientQuantity = sugar,
+            isAdded = { sugar++ },
+            isRemoved = { if (sugar > 0){sugar--} },
+            modifier.fillMaxWidth(),)
+        //rice
+        IngredientButtonBox(
+            ingredientName = ingredients[3].name,
+            ingredientQuantity = rice,
+            isAdded = { rice++ },
+            isRemoved = { if (rice > 0){rice--} },
+            modifier.fillMaxWidth(),)
+        //chicken
+        IngredientButtonBox(
+            ingredientName = ingredients[4].name,
+            ingredientQuantity = chicken,
+            isAdded = { chicken++ },
+            isRemoved = { if (chicken > 0){chicken--} },
+            modifier.fillMaxWidth(),)
+        //pepper
+        IngredientButtonBox(
+            ingredientName = ingredients[5].name,
+            ingredientQuantity = pepper,
+            isAdded = { pepper++ },
+            isRemoved = { if (pepper > 0){pepper--} },
+            modifier.fillMaxWidth(),)
+        //mayonnaise
+        IngredientButtonBox(
+            ingredientName = ingredients[6].name,
+            ingredientQuantity = mayonnaise,
+            isAdded = { mayonnaise++ },
+            isRemoved = { if (mayonnaise > 0){mayonnaise--} },
+            modifier.fillMaxWidth(),)
+        //cherry
+        IngredientButtonBox(
+            ingredientName = ingredients[7].name,
+            ingredientQuantity = cherry,
+            isAdded = { cherry++ },
+            isRemoved = { if (cherry > 0){cherry--} },
+            modifier.fillMaxWidth(),)
+        //salmon
+        IngredientButtonBox(
+            ingredientName = ingredients[8].name,
+            ingredientQuantity = salmon,
+            isAdded = { salmon++ },
+            isRemoved = { if (salmon > 0){salmon--} },
+            modifier.fillMaxWidth(),)
+        //salt
+        IngredientButtonBox(
+            ingredientName = ingredients[9].name,
+            ingredientQuantity = salt,
+            isAdded = { salt++ },
+            isRemoved = { if (salt > 0){salt--} },
+            modifier.fillMaxWidth(),)
 
-            AllSelectedIngredientsButton(selectedIngredients = listOf(flourO,appleO,sugarO,riceO,chickenO,pepperO,mayonnaiseO,cherryO,salmonO,saltO), ingredients = ingredients, message = "Update inventory", modifier = modifier)
+        var message by rememberSaveable { mutableStateOf<String>("")}
+        Button(
+            onClick = {
+                message = ""
+
+                ingredients[0].quantityInCart = flour
+                ingredients[1].quantityInCart = apple
+                ingredients[2].quantityInCart = sugar
+                ingredients[3].quantityInCart = rice
+                ingredients[4].quantityInCart = chicken
+                ingredients[5].quantityInCart = pepper
+                ingredients[6].quantityInCart = mayonnaise
+                ingredients[7].quantityInCart = cherry
+                ingredients[8].quantityInCart = salmon
+                ingredients[9].quantityInCart = salt
+
+                message += "Item in you grocery list:"
+
+                for(i in ingredients.indices){
+                    if (ingredients[i].quantityInCart > 0){
+                        var name = ingredients[i].name
+                        var quantity = ingredients[i].quantityInCart
+                        message += "\n  - x$quantity $name"
+                    }
+                }
+            },
+            modifier = modifier.padding(6.dp)
+        ){
+            Text(text = "Generate final grocery list")
         }
-        Column(modifier = modifier){
-            Text(text = "Ingredients to buy:", style = MaterialTheme.typography.titleLarge, modifier = modifier.padding(6.dp))
-
-            //flour
-            IngredientButtonBox(ingredient = ingredients[0], isAdded = flourW, isClicked = { flourW++ }, modifier = modifier.fillMaxWidth())
-            //apple
-            IngredientButtonBox(ingredient = ingredients[1], isAdded = appleW, isClicked = { appleW++ }, modifier = modifier.fillMaxWidth())
-            //sugar
-            IngredientButtonBox(ingredient = ingredients[2], isAdded = sugarW, isClicked = { sugarW++ }, modifier = modifier.fillMaxWidth())
-            //rice
-            IngredientButtonBox(ingredient = ingredients[3], isAdded = riceW, isClicked = { riceW++ }, modifier = modifier.fillMaxWidth())
-            //chicken
-            IngredientButtonBox(ingredient = ingredients[4], isAdded = chickenW, isClicked = { chickenW++ }, modifier = modifier.fillMaxWidth())
-            //pepper
-            IngredientButtonBox(ingredient = ingredients[5], isAdded = pepperW, isClicked = { pepperW++ }, modifier = modifier.fillMaxWidth())
-            //mayonnaise
-            IngredientButtonBox(ingredient = ingredients[6], isAdded = mayonnaiseW, isClicked = { mayonnaiseW++ }, modifier = modifier.fillMaxWidth())
-            //cherry
-            IngredientButtonBox(ingredient = ingredients[7], isAdded = cherryW, isClicked = { cherryW++ }, modifier = modifier.fillMaxWidth())
-            //salmon
-            IngredientButtonBox(ingredient = ingredients[8], isAdded = salmonW, isClicked = { salmonW++ }, modifier = modifier.fillMaxWidth())
-            //salt
-            IngredientButtonBox(ingredient = ingredients[9], isAdded = saltW, isClicked = { saltW++ }, modifier = modifier.fillMaxWidth())
-
-            AllSelectedIngredientsButton(selectedIngredients = listOf(flourW,appleW,sugarW,riceW,chickenW,pepperW,mayonnaiseW,cherryW,salmonW,saltW), ingredients = ingredients, message = "Update inventory", modifier = modifier)
-        }
+        Text(text = "$message")
     }
 }
 
 /* Actually sets up the ingredient name and button and all the logic to add them to either list. */
 @Composable
-fun IngredientButtonBox(ingredient: FoodItem, isAdded: Int, isClicked: () -> Unit, modifier: Modifier = Modifier){
+fun IngredientButtonBox(ingredientName: String, ingredientQuantity: Int, isAdded: () -> Unit, isRemoved: () -> Unit, modifier: Modifier = Modifier){
     Row(modifier = modifier
         .padding(6.dp)
         .background(MaterialTheme.colorScheme.tertiaryContainer)
@@ -155,42 +200,16 @@ fun IngredientButtonBox(ingredient: FoodItem, isAdded: Int, isClicked: () -> Uni
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically)
     {
-        Text(" " + ingredient.name, color = MaterialTheme.colorScheme.onTertiaryContainer)
-        Button(onClick = isClicked, modifier = Modifier.padding(0.dp,0.dp,6.dp,0.dp)) {
-            if (isAdded % 2 == 0){
+        Column(){
+            Text(" $ingredientName: $ingredientQuantity", color = MaterialTheme.colorScheme.onTertiaryContainer)
+        }
+        Row(){
+            Button(onClick = isAdded, modifier = Modifier.padding(0.dp,0.dp,6.dp,0.dp)) {
                 Text("+", color = MaterialTheme.colorScheme.onTertiary)
             }
-            else{
+            Button(onClick = isRemoved, modifier = Modifier.padding(0.dp,0.dp,6.dp,0.dp)) {
                 Text("-", color = MaterialTheme.colorScheme.onTertiary)
             }
         }
     }
 }
-
-/* Gets all the selected ingredients from the inventory or grocery list and prints them at the bottom of the screen. */
-@Composable
-fun AllSelectedIngredientsButton(selectedIngredients: List<Int>, ingredients: List<FoodItem>, message: String, modifier: Modifier = Modifier){
-    var ingredientsString by rememberSaveable { mutableStateOf<String>("")}
-
-    Column(modifier.padding(6.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
-        Button(onClick = {
-            ingredientsString = ""
-            for (i in 0..9){
-                if (ingredientsString != ""){
-                    ingredientsString += ", "
-                }
-                ingredientsString += ingredients[i].name
-            }
-        }){
-            Text(text = "$message", color = MaterialTheme.colorScheme.onTertiary)
-        }
-
-        Text(text = "$ingredientsString", color = MaterialTheme.colorScheme.onTertiaryContainer)
-    }
-}
-
-
-
-
-
-

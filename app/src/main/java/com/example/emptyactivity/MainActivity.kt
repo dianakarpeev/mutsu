@@ -78,7 +78,7 @@ class MainActivity : ComponentActivity() {
 
                         Column(modifier = Modifier.padding(paddingValues = it)) {
                             when (currentScreen) {
-                                "Home" -> MutsuHomeScreen()
+                                "Home" -> MutsuHomeScreen({ currentScreen = "Ingredients" })
                                 "Ingredients" -> IngredientsScreen()
                                 "Shopping List" -> foodCounter()
                                 "Recipe List" -> RecipeListScreen(windowSizeClass)

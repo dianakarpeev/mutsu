@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    var currentScreen by rememberSaveable { mutableStateOf("Ingredients") }
+                    var currentScreen by rememberSaveable { mutableStateOf("Home") }
                     Scaffold(
                         topBar = { TopAppBar(title = { Text("MyApp")})},
                         bottomBar = {

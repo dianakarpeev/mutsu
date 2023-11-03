@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
@@ -49,12 +50,15 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    var currentScreen by rememberSaveable { mutableStateOf("Ingredients") }
+                    var currentScreen by rememberSaveable { mutableStateOf("Home") }
                     Scaffold(
                         topBar = { TopAppBar(title = { Text("MyApp")})},
                         bottomBar = {
                             BottomAppBar {
                                 Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
+                                    IconButton(onClick = {currentScreen = "Home"} ) {
+                                        Icon(Icons.Filled.Home, contentDescription = "Home")
+                                    }
                                     IconButton(onClick = { currentScreen = "Ingredients"} ) {
                                         Icon(Icons.Filled.Star, contentDescription = "Menu")
                                     }
@@ -74,6 +78,8 @@ class MainActivity : ComponentActivity() {
 
                         Column(modifier = Modifier.padding(paddingValues = it)) {
                             when (currentScreen) {
+                                "Home" -> MutsuHomeScreen({ currentScreen = "About Us" })
+                                "About Us" -> AboutUsScreen()
                                 "Ingredients" -> IngredientsScreen()
                                 "Shopping List" -> foodCounter()
                                 "Recipe List" -> RecipeListScreen(windowSizeClass)

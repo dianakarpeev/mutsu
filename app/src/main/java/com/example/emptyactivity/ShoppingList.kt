@@ -1,5 +1,6 @@
 package com.example.emptyactivity
 
+import android.widget.PopupWindow
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,20 +11,24 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
 
 @Composable
 fun Hamburger(count: Int, increase: () -> Unit, decrease: () -> Unit) {
@@ -133,14 +138,43 @@ fun foodCounter () {
     val beefStewDecrease = {if(beefStewCount > 0) beefStewCount--}
     val baconAndEggsDecrease = {if(baconAndEggsCount> 0) baconAndEggsCount--}
 
+    var calculateIngredients: Boolean? by rememberSaveable {mutableStateOf(null)}
     var allIngredients by rememberSaveable {mutableStateOf(mutableListOf<Ingredient>())}
+
+    var confirmPop = remember { mutableStateOf(false) }
+    if (confirmPop.value) {
+        AlertDialog(
+            onDismissRequest = { },
+            title = { Text(text = "Confirm") },
+            text = { Text(text = "Are you sure you want to generate a shopping list?") },
+            confirmButton = {
+                Button(onClick = {
+                    allIngredients = generateList(hamburgerCount, beefStewCount, baconAndEggsCount,
+                        hamburgerDecrease, beefStewDecrease, baconAndEggsDecrease)
+                    confirmPop.value = false}) {
+                    Text(text = "Yes")
+                }
+            },
+            dismissButton = {
+                Button(onClick = {
+                    confirmPop.value = false}) {
+                    Text(text = "No")
+                }
+            }
+        )
+    }
+
+    //Create a popup window that the button will open
 
     Column {
         Hamburger(hamburgerCount, increase = {hamburgerCount++}, decrease = hamburgerDecrease )
         BeefStew(beefStewCount, increase = {beefStewCount++}, decrease = beefStewDecrease)
         BaconAndEggs(baconAndEggsCount, increase = {baconAndEggsCount++}, decrease = baconAndEggsDecrease)
-        Button(onClick = {allIngredients = generateList(hamburgerCount, beefStewCount, baconAndEggsCount,
-            hamburgerDecrease, beefStewDecrease, baconAndEggsDecrease)}) {
+        Button(onClick = {
+            if (hamburgerCount > 0 || beefStewCount > 0 || baconAndEggsCount > 0) {
+                confirmPop.value = true
+            }
+        }) {
             Text(text = "Generate Ingredients")
         }
 

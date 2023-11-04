@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -28,30 +27,24 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun RecipeInformation(modifier: Modifier = Modifier){
+    Column(modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center) {
+        ButtonRow()
+        RecipeForm()
+    }
+}
+
+@Composable
+fun RecipeForm(modifier: Modifier = Modifier){
     var recipeName by remember { mutableStateOf("") }
     var webURL by remember { mutableStateOf("") }
-
-    Row(modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End,
-        verticalAlignment = Alignment.CenterVertically
-    ){
-        Button(onClick = {}, modifier = modifier.padding(0.dp, 5.dp),) {
-            Text(text = "Edit")
-        }
-        Button(onClick = { }, modifier = modifier.padding(0.dp, 5.dp)) {
-            Text(text = "Delete")
-        }
-    }
 
     Column(modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
         //Recipe Name
-        Text(text = "Name")
-        TextField(
-            value = recipeName,
-            onValueChange = { recipeName = it }
-        )
+        UserInput("Name", recipeName)
         Spacer(modifier = Modifier.height(200.dp))
 
         //Ingredients
@@ -59,34 +52,59 @@ fun RecipeInformation(modifier: Modifier = Modifier){
         Spacer(modifier = Modifier.height(200.dp))
 
         //Web URL
-        Text(text = "Web URL")
-        TextField(
-            value = webURL,
-            onValueChange = { webURL = it }
-        )
+        UserInput("Web URL", webURL)
         Spacer(modifier = Modifier.height(200.dp))
 
         //Image
         Text(text = "Image")
-        Row(
+        PlaceHolder(modifier, "User image upload here.")
+    }
+}
+
+@Composable
+fun UserInput(label: String, input: String){
+    Text(text = label)
+    TextField(
+        value = input,
+        onValueChange = { }
+    )
+}
+
+@Composable
+fun PlaceHolder(modifier: Modifier = Modifier, text: String){
+    Row(
+        modifier = modifier
+            .padding(6.dp)
+            .background(MaterialTheme.colorScheme.tertiaryContainer)
+            .border(
+                BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimaryContainer),
+                shape = RectangleShape
+            ),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = text,
+            color = MaterialTheme.colorScheme.onTertiaryContainer,
             modifier = modifier
-                .padding(6.dp)
-                .background(MaterialTheme.colorScheme.tertiaryContainer)
-                .border(
-                    BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimaryContainer),
-                    shape = RectangleShape
-                ),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "*Need to add user image upload here*",
-                color = MaterialTheme.colorScheme.onTertiaryContainer,
-                modifier = modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.5f)
-                    .padding(12.dp)
-            )
+                .fillMaxWidth()
+                .fillMaxHeight(0.5f)
+                .padding(12.dp)
+        )
+    }
+}
+
+@Composable
+fun ButtonRow(modifier: Modifier = Modifier){
+    Row(modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        Button(onClick = {}, modifier = modifier.padding(0.dp, 5.dp)) {
+            Text(text = "Edit")
+        }
+        Button(onClick = { }, modifier = modifier.padding(0.dp, 5.dp)) {
+            Text(text = "Delete")
         }
     }
 }

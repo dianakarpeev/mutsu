@@ -18,9 +18,11 @@ To install this application, download the code from this repository by either cl
 To launch this app, open the project you've cloned or downloaded in Android Studio. Once the project has loaded, there should be a button in the top right to run the app. Click this button and a phone emulator will start up and run the app.
 
 ## Sneakpeek
-![Ingredients screen](./assets/screenshots/ingredients-screen-screenshot.png)
-![Recipe screen](./assets/screenshots/recipe-list-screenshot.png)
-![Meal screen](./assets/screenshots/food-screenshot.jpg)
+![Home](https://i.imgur.com/duYSLYD.png)<br>
+![Recipe Collection](https://i.imgur.com/Zas3N0Y.png)<br>
+![Recipe Information](https://i.imgur.com/O6eUhpe.png)<br>
+![Meal Plan](https://i.imgur.com/dOHyXAa.png)<br>
+![Grocery List](https://i.imgur.com/MgYKisn.png)<br>
 
 ## Team Members
 Diana Karpeev - dianakarpeeva@gmail.com <br>

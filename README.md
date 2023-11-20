@@ -23,6 +23,7 @@ To launch this app, open the project you've cloned or downloaded in Android Stud
 ![Recipe Information](https://i.imgur.com/O6eUhpe.png)
 ![Meal Plan](https://i.imgur.com/dOHyXAa.png)
 ![Grocery List](https://i.imgur.com/MgYKisn.png)
+![Placeholder](https://i.imgur.com/qVLUV0Z.png)
 
 ## Team Members
 Diana Karpeev - dianakarpeeva@gmail.com <br>

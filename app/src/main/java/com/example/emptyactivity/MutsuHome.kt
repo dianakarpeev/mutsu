@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun MutsuHomeScreen(changeScreen: () -> Unit, modifier: Modifier = Modifier){
+fun MutsuHomeScreen(goToAboutUs: () -> Unit, modifier: Modifier = Modifier){
     Column(modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center){
@@ -43,7 +43,7 @@ fun MutsuHomeScreen(changeScreen: () -> Unit, modifier: Modifier = Modifier){
             style = MaterialTheme.typography.titleLarge,
             modifier = modifier.padding(6.dp),)
         Text(text = "Your Grocery Companion", modifier,)
-        Button(onClick = changeScreen, modifier = modifier.padding(0.dp, 25.dp),) {
+        Button(onClick = goToAboutUs, modifier = modifier.padding(0.dp, 25.dp),) {
             Text(text = "To the About Us page!")
         }
     }

@@ -38,6 +38,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.emptyactivity.navigation.AboutUs
 import com.example.emptyactivity.navigation.GroceryList
 import com.example.emptyactivity.navigation.Home
 import com.example.emptyactivity.navigation.MealPlan
@@ -156,7 +157,11 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding)
                     ){
                         composable(route = Home.route){
-                            MutsuHomeScreen()
+                            MutsuHomeScreen(
+                                goToAboutUs = {
+                                    navController.navigateSingleTopTo(AboutUs.route)
+                                }
+                            )
                         }
                         composable(route = MealPlan.route){
                             foodCounter()
@@ -166,6 +171,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(route = GroceryList.route){
                             IngredientsScreen()
+                        }
+                        composable(route = AboutUs.route){
+                            AboutUsScreen()
                         }
                     }
                 }

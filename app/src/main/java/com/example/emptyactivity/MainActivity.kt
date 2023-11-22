@@ -103,7 +103,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class,
+        ExperimentalMaterial3Api::class)
     @Composable
     fun MutsuApp(){
         EmptyActivityTheme {
@@ -117,6 +118,8 @@ class MainActivity : ComponentActivity() {
                 val currentDestination = currentBackStack?.destination
 
                 //var currentScreen = mustuTabRowScreens.find { it.route == currentDestination?.route } ?. Home
+
+                val windowSizeClass = calculateWindowSizeClass(this)
 
                 Scaffold(
                     topBar = { TopAppBar(title = { Text("MyApp")})},
@@ -153,16 +156,16 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding)
                     ){
                         composable(route = Home.route){
-                            Home.screen()
+                            MutsuHomeScreen()
                         }
                         composable(route = MealPlan.route){
-                            MealPlan.screen()
+                            foodCounter()
                         }
                         composable(route = Recipes.route){
-                            Recipes.screen()
+                            RecipeListScreen(windowSizeClass)
                         }
                         composable(route = GroceryList.route){
-                            GroceryList.screen()
+                            IngredientsScreen()
                         }
                     }
                 }

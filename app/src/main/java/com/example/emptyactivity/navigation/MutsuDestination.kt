@@ -1,4 +1,4 @@
-package com.example.emptyactivity
+package com.example.emptyactivity.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -6,6 +6,11 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.emptyactivity.AboutUsScreen
+import com.example.emptyactivity.IngredientsScreen
+import com.example.emptyactivity.MutsuHomeScreen
+import com.example.emptyactivity.RecipeListScreen
+import com.example.emptyactivity.foodCounter
 
 interface MutsuDestination {
     val icon: ImageVector

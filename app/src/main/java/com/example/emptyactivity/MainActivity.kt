@@ -10,9 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -30,13 +27,19 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.ui.Modifier
 import com.example.emptyactivity.ui.theme.EmptyActivityTheme
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.emptyactivity.navigation.GroceryList
+import com.example.emptyactivity.navigation.Home
+import com.example.emptyactivity.navigation.MealPlan
+import com.example.emptyactivity.navigation.MutsuDestination
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class,
@@ -91,6 +94,42 @@ class MainActivity : ComponentActivity() {
 
 
                     //here is where we call the different screens
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun MutsuApp(){
+        EmptyActivityTheme {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                var currentScreen: MutsuDestination by remember { mutableStateOf(Home) }
+                val navController = rememberNavController()
+                Scaffold(
+                    topBar = { TopAppBar(title = { Text("MyApp")})},
+                ){innerPadding ->
+                    NavHost(
+                        navController = navController,
+                        startDestination = Home.route,
+                        modifier = Modifier.padding(innerPadding)
+                    ){
+                        composable(route = Home.route){
+                            Home.screen()
+                        }
+                        composable(route = MealPlan.route){
+                            MealPlan.screen()
+                        }
+                        composable(route = com.example.emptyactivity.navigation.RecipeList.route){
+                            com.example.emptyactivity.navigation.RecipeList.screen()
+                        }
+                        composable(route = GroceryList.route){
+                            GroceryList.screen()
+                        }
+                    }
                 }
             }
         }

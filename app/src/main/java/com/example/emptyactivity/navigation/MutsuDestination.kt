@@ -12,6 +12,11 @@ import com.example.emptyactivity.MutsuHomeScreen
 import com.example.emptyactivity.RecipeListScreen
 import com.example.emptyactivity.foodCounter
 
+/*
+ * Set up this file based on the following codelab:
+ * https://developer.android.com/codelabs/jetpack-compose-navigation#2
+ */
+
 interface MutsuDestination {
     val icon: ImageVector
     val route: String
@@ -36,7 +41,7 @@ object MealPlan : MutsuDestination {
     override val screen : @Composable () -> Unit = { foodCounter() }
 }
 
-object RecipeList : MutsuDestination {
+object Recipes : MutsuDestination {
     override val icon = Icons.Filled.Star
     override val route = "recipe-list"
     override val screen : @Composable () -> Unit = { RecipeListScreen() }
@@ -48,4 +53,4 @@ object AboutUs : MutsuDestination {
     override val screen : @Composable () -> Unit = { AboutUsScreen() }
 }
 
-val mustuTabRowScreens = listOf(Home, RecipeList, MealPlan, GroceryList)
+val mustuTabRowScreens = listOf(Home, Recipes, MealPlan, GroceryList)

@@ -33,13 +33,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.emptyactivity.navigation.GroceryList
 import com.example.emptyactivity.navigation.Home
 import com.example.emptyactivity.navigation.MealPlan
 import com.example.emptyactivity.navigation.MutsuDestination
+import com.example.emptyactivity.navigation.Recipes
+import com.example.emptyactivity.navigation.mustuTabRowScreens
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class,
@@ -107,10 +111,41 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background
             ) {
-                var currentScreen: MutsuDestination by remember { mutableStateOf(Home) }
                 val navController = rememberNavController()
+
+                val currentBackStack by navController.currentBackStackEntryAsState()
+                val currentDestination = currentBackStack?.destination
+
+                //var currentScreen = mustuTabRowScreens.find { it.route == currentDestination?.route } ?. Home
+
                 Scaffold(
                     topBar = { TopAppBar(title = { Text("MyApp")})},
+                    bottomBar = {
+                        BottomAppBar {
+                            Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
+                                IconButton(
+                                    onClick = { navController.navigateSingleTopTo(Home.route) }
+                                ){
+                                    Icon(Home.icon, contentDescription = "Home")
+                                }
+                                IconButton(
+                                    onClick = { navController.navigateSingleTopTo(GroceryList.route) }
+                                ){
+                                    Icon(GroceryList.icon, contentDescription = "Grocery List")
+                                }
+                                IconButton(
+                                    onClick = { navController.navigateSingleTopTo(MealPlan.route) }
+                                ){
+                                    Icon(MealPlan.icon, contentDescription = "Meal Plan")
+                                }
+                                IconButton(
+                                    onClick = { navController.navigateSingleTopTo(Recipes.route) }
+                                ) {
+                                    Icon(Recipes.icon, contentDescription = "Recipes")
+                                }
+                            }
+                        }
+                    }
                 ){innerPadding ->
                     NavHost(
                         navController = navController,
@@ -123,8 +158,8 @@ class MainActivity : ComponentActivity() {
                         composable(route = MealPlan.route){
                             MealPlan.screen()
                         }
-                        composable(route = com.example.emptyactivity.navigation.RecipeList.route){
-                            com.example.emptyactivity.navigation.RecipeList.screen()
+                        composable(route = Recipes.route){
+                            Recipes.screen()
                         }
                         composable(route = GroceryList.route){
                             GroceryList.screen()
@@ -135,3 +170,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+fun NavHostController.navigateSingleTopTo(route: String) =
+    this.navigate(route) { launchSingleTop = true }

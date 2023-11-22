@@ -52,55 +52,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            EmptyActivityTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    var currentScreen by rememberSaveable { mutableStateOf("Home") }
-                    Scaffold(
-                        topBar = { TopAppBar(title = { Text("MyApp")})},
-                        bottomBar = {
-                            BottomAppBar {
-                                Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
-                                    IconButton(onClick = {currentScreen = "Home"} ) {
-                                        Icon(Icons.Filled.Home, contentDescription = "Home")
-                                    }
-                                    IconButton(onClick = { currentScreen = "Ingredients"} ) {
-                                        Icon(Icons.Filled.Star, contentDescription = "Menu")
-                                    }
-                                    IconButton(onClick = { currentScreen = "Shopping List"} ) {
-                                        Icon(Icons.Filled.ShoppingCart, contentDescription = "Add")
-                                    }
-                                    IconButton(onClick = { currentScreen = "Recipe List" }) {
-                                        Icon(Icons.Filled.Menu, contentDescription = "Call")
-                                    }
-                                }
-                            }
-                        }
-                    ) {
-
-                        //determines which navigation bar to use based on the current window size
-                        val windowSizeClass = calculateWindowSizeClass(this)
-
-                        Column(modifier = Modifier.padding(paddingValues = it)) {
-                            when (currentScreen) {
-                                "Home" -> MutsuHomeScreen({ currentScreen = "About Us" })
-                                "About Us" -> AboutUsScreen()
-                                "Ingredients" -> IngredientsScreen()
-                                "Shopping List" -> foodCounter()
-                                "Recipe List" -> RecipeListScreen(windowSizeClass)
-                            }
-                        }
-
-
-                    }
-
-
-                    //here is where we call the different screens
-                }
-            }
+            MutsuApp()
         }
     }
 
@@ -117,8 +69,6 @@ class MainActivity : ComponentActivity() {
 
                 val currentBackStack by navController.currentBackStackEntryAsState()
                 val currentDestination = currentBackStack?.destination
-
-                //var currentScreen = mustuTabRowScreens.find { it.route == currentDestination?.route } ?. Home
 
                 val windowSizeClass = calculateWindowSizeClass(this)
 

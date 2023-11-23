@@ -98,7 +98,7 @@ fun ShowAllIngredients(ingredients: List<FoodItem>, increaseQuantity: (Int) -> U
                 ingredientName = it.name,
                 ingredientQuantity = it.quantityInCart,
                 isAdded = { increaseQuantity(index) },
-                isRemoved = { decreaseQuantity(index) },
+                isRemoved = { if (it.quantityInCart != 0) decreaseQuantity(index) },
                 modifier = modifier.fillMaxWidth())
         }
         /*

@@ -1,5 +1,6 @@
 package com.example.emptyactivity
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,10 +20,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.example.emptyactivity.ui.theme.EmptyActivityTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -37,7 +39,14 @@ import com.example.emptyactivity.navigation.RecipeInformation
 import com.example.emptyactivity.navigation.Recipes
 import com.example.emptyactivity.navigation.LoginRegister
 
+
+private const val USER_INGREDIENTS_COUNT = "user_ingredients"
+
 class MainActivity : ComponentActivity() {
+
+    val Context.DataStore by preferencesDataStore(
+        name = USER_INGREDIENTS_COUNT
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -59,6 +68,7 @@ class MainActivity : ComponentActivity() {
                 val currentBackStack by navController.currentBackStackEntryAsState()
                 val currentDestination = currentBackStack?.destination
 
+                val windowSizeClass = calculateWindowSizeClass(this)
                 val ingredientsViewModel : IngredientsViewModel = viewModel()
                 val recipeViewModel : RecipeViewModel = viewModel()
 

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -19,14 +18,20 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun IngredientsScreen(modifier: Modifier = Modifier){
+fun IngredientsScreen(viewModel: IngredientsViewModel = viewModel(), modifier: Modifier = Modifier){
+    //val viewModel : IngredientsViewModel = viewModel()
+
+    val ingredients by viewModel.ingredients.collectAsStateWithLifecycle()
+
+    /*
     val ingredients = listOf<FoodItem>(
         FoodItem("Flour", 0),
         FoodItem("Apples", 0),
@@ -38,11 +43,11 @@ fun IngredientsScreen(modifier: Modifier = Modifier){
         FoodItem("Cherries", 0),
         FoodItem("Salmon", 0),
         FoodItem("Salt", 0),
-    )
+    )*/
 
     Column(modifier = modifier.verticalScroll(rememberScrollState())){
         Instructions(modifier)
-        ShowAllIngredients(ingredients, modifier)
+        ShowAllIngredients(ingredients, { viewModel::increaseQuantity }, viewModel::decreaseQuantity, modifier)
     }
 }
 
@@ -63,7 +68,8 @@ fun Instructions(modifier: Modifier = Modifier){
 *  for each.
 */
 @Composable
-fun ShowAllIngredients(ingredients: List<FoodItem>, modifier: Modifier = Modifier){
+fun ShowAllIngredients(ingredients: List<FoodItem>, increaseQuantity: (Int) -> Unit, decreaseQuantity: (Int) -> Unit, modifier: Modifier = Modifier){
+    /*
     var flour by rememberSaveable { mutableStateOf<Int>(0) }
     var apple by rememberSaveable { mutableStateOf<Int>(0) }
     var sugar by rememberSaveable { mutableStateOf<Int>(0) }
@@ -80,8 +86,17 @@ fun ShowAllIngredients(ingredients: List<FoodItem>, modifier: Modifier = Modifie
     ingredients.forEach{
         statefulIngredients.add(it.quantityInCart)
     }
-
+*/
     Column(modifier = modifier.fillMaxWidth(),){
+        ingredients.forEachIndexed{ index, it ->
+            IngredientButtonBox(
+                ingredientName = it.name,
+                ingredientQuantity = it.quantityInCart,
+                isAdded = { increaseQuantity(index) },
+                isRemoved = { decreaseQuantity(index) },
+                modifier = modifier.fillMaxWidth())
+        }
+        /*
         //flour
         IngredientButtonBox(
             ingredientName = ingredients[0].name,
@@ -152,12 +167,14 @@ fun ShowAllIngredients(ingredients: List<FoodItem>, modifier: Modifier = Modifie
             isAdded = { salt++ },
             isRemoved = { if (salt > 0){salt--} },
             modifier.fillMaxWidth(),)
-
+        */
+        
         var message by rememberSaveable { mutableStateOf<String>("")}
         Button(
             onClick = {
                 message = ""
 
+                /*
                 ingredients[0].quantityInCart = flour
                 ingredients[1].quantityInCart = apple
                 ingredients[2].quantityInCart = sugar
@@ -168,7 +185,7 @@ fun ShowAllIngredients(ingredients: List<FoodItem>, modifier: Modifier = Modifie
                 ingredients[7].quantityInCart = cherry
                 ingredients[8].quantityInCart = salmon
                 ingredients[9].quantityInCart = salt
-
+*/
                 message += "Item in you grocery list:"
 
                 for(i in ingredients.indices){

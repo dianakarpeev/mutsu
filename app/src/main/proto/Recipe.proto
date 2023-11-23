@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+option java_package = "com.example.emptyactivity";
+option java_multiple_files = true;
+
+message IngredientName {
+  string name = 1;
+}
+
+message Ingredient {
+  string name = 1;
+  int32 portions = 2;
+}
+
+message Recipe {
+  string name = 1;
+  string referenceURL = 2;
+  //Some information for an image
+  //Some way of storing User
+  repeated Ingredient ingredients = 5;
+}
+
+message Username {
+  string username = 1;
+  //I somehow think that storing the password's a bad idea, but like. it might work???
+  string password = 2;
+  string displayName = 3;
+}
+
+message GroceryList {
+  //Some way of storing the User
+  //Some way of storing the timestamp
+
+  repeated Ingredient ingredients = 3;
+}

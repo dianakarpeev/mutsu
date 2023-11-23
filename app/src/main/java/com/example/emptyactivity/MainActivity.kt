@@ -36,8 +36,6 @@ import com.example.emptyactivity.navigation.MealPlan
 import com.example.emptyactivity.navigation.Recipes
 
 class MainActivity : ComponentActivity() {
-    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class,
-        ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

@@ -36,20 +36,6 @@ fun IngredientsScreen(viewModel: IngredientsViewModel = viewModel(), modifier: M
         viewModel.decreaseQuantity(it)
     }
 
-    /*
-    val ingredients = listOf<FoodItem>(
-        FoodItem("Flour", 0),
-        FoodItem("Apples", 0),
-        FoodItem("Sugar", 0),
-        FoodItem("Rice", 0),
-        FoodItem("Chicken", 0),
-        FoodItem("Peppers", 0),
-        FoodItem("Mayonnaise", 0),
-        FoodItem("Cherries", 0),
-        FoodItem("Salmon", 0),
-        FoodItem("Salt", 0),
-    )*/
-
     Column(modifier = modifier.verticalScroll(rememberScrollState())){
         Instructions(modifier)
         ShowAllIngredients(ingredients, increase, decrease, modifier)
@@ -74,24 +60,6 @@ fun Instructions(modifier: Modifier = Modifier){
 */
 @Composable
 fun ShowAllIngredients(ingredients: List<FoodItem>, increaseQuantity: (Int) -> Unit, decreaseQuantity: (Int) -> Unit, modifier: Modifier = Modifier){
-    /*
-    var flour by rememberSaveable { mutableStateOf<Int>(0) }
-    var apple by rememberSaveable { mutableStateOf<Int>(0) }
-    var sugar by rememberSaveable { mutableStateOf<Int>(0) }
-    var rice by rememberSaveable { mutableStateOf<Int>(0) }
-    var chicken by rememberSaveable { mutableStateOf<Int>(0) }
-    var pepper by rememberSaveable { mutableStateOf<Int>(0) }
-    var mayonnaise by rememberSaveable { mutableStateOf<Int>(0) }
-    var cherry by rememberSaveable { mutableStateOf<Int>(0) }
-    var salmon by rememberSaveable { mutableStateOf<Int>(0) }
-    var salt by rememberSaveable { mutableStateOf<Int>(0) }
-
-    var statefulIngredients by rememberSaveable{ mutableStateOf(mutableListOf<Int>())}
-
-    ingredients.forEach{
-        statefulIngredients.add(it.quantityInCart)
-    }
-*/
     Column(modifier = modifier.fillMaxWidth(),){
         ingredients.forEachIndexed{ index, it ->
             IngredientButtonBox(
@@ -101,96 +69,11 @@ fun ShowAllIngredients(ingredients: List<FoodItem>, increaseQuantity: (Int) -> U
                 isRemoved = { if (it.quantityInCart != 0) decreaseQuantity(index) },
                 modifier = modifier.fillMaxWidth())
         }
-        /*
-        //flour
-        IngredientButtonBox(
-            ingredientName = ingredients[0].name,
-            ingredientQuantity = flour,
-            isAdded = { flour++ },
-            isRemoved = { if (flour > 0){flour--} },
-            modifier.fillMaxWidth(),)
-        //apple
-        IngredientButtonBox(
-            ingredientName = ingredients[1].name,
-            ingredientQuantity = apple,
-            isAdded = { apple++ },
-            isRemoved = { if (apple > 0){apple--} },
-            modifier.fillMaxWidth(),)
-        //sugar
-        IngredientButtonBox(
-            ingredientName = ingredients[2].name,
-            ingredientQuantity = sugar,
-            isAdded = { sugar++ },
-            isRemoved = { if (sugar > 0){sugar--} },
-            modifier.fillMaxWidth(),)
-        //rice
-        IngredientButtonBox(
-            ingredientName = ingredients[3].name,
-            ingredientQuantity = rice,
-            isAdded = { rice++ },
-            isRemoved = { if (rice > 0){rice--} },
-            modifier.fillMaxWidth(),)
-        //chicken
-        IngredientButtonBox(
-            ingredientName = ingredients[4].name,
-            ingredientQuantity = chicken,
-            isAdded = { chicken++ },
-            isRemoved = { if (chicken > 0){chicken--} },
-            modifier.fillMaxWidth(),)
-        //pepper
-        IngredientButtonBox(
-            ingredientName = ingredients[5].name,
-            ingredientQuantity = pepper,
-            isAdded = { pepper++ },
-            isRemoved = { if (pepper > 0){pepper--} },
-            modifier.fillMaxWidth(),)
-        //mayonnaise
-        IngredientButtonBox(
-            ingredientName = ingredients[6].name,
-            ingredientQuantity = mayonnaise,
-            isAdded = { mayonnaise++ },
-            isRemoved = { if (mayonnaise > 0){mayonnaise--} },
-            modifier.fillMaxWidth(),)
-        //cherry
-        IngredientButtonBox(
-            ingredientName = ingredients[7].name,
-            ingredientQuantity = cherry,
-            isAdded = { cherry++ },
-            isRemoved = { if (cherry > 0){cherry--} },
-            modifier.fillMaxWidth(),)
-        //salmon
-        IngredientButtonBox(
-            ingredientName = ingredients[8].name,
-            ingredientQuantity = salmon,
-            isAdded = { salmon++ },
-            isRemoved = { if (salmon > 0){salmon--} },
-            modifier.fillMaxWidth(),)
-        //salt
-        IngredientButtonBox(
-            ingredientName = ingredients[9].name,
-            ingredientQuantity = salt,
-            isAdded = { salt++ },
-            isRemoved = { if (salt > 0){salt--} },
-            modifier.fillMaxWidth(),)
-        */
+
         var message by rememberSaveable { mutableStateOf<String>("")}
         Button(
             onClick = {
-                message = ""
-
-                /*
-                ingredients[0].quantityInCart = flour
-                ingredients[1].quantityInCart = apple
-                ingredients[2].quantityInCart = sugar
-                ingredients[3].quantityInCart = rice
-                ingredients[4].quantityInCart = chicken
-                ingredients[5].quantityInCart = pepper
-                ingredients[6].quantityInCart = mayonnaise
-                ingredients[7].quantityInCart = cherry
-                ingredients[8].quantityInCart = salmon
-                ingredients[9].quantityInCart = salt
-*/
-                message += "Item in you grocery list:"
+                message = "Item in you grocery list:"
 
                 for(i in ingredients.indices){
                     if (ingredients[i].quantityInCart > 0){

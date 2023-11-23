@@ -15,10 +15,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-data class User ( val username : String, val password : String, val name : String )
+data class User (var username : String, var password : String, var name : String )
 
 @Composable
 fun LoginRegisterScreen(modifier: Modifier = Modifier){
@@ -111,6 +110,58 @@ fun Login(users: MutableList<User>, modifier: Modifier = Modifier){
 }
 
 @Composable
-fun Register(users: List<User>, modifier: Modifier = Modifier){
-    Text("Now you can register")
+fun Register(users: MutableList<User>, modifier: Modifier = Modifier){
+    var username by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var passwordVerification by rememberSaveable { mutableStateOf("") }
+    var name by rememberSaveable { mutableStateOf("") }
+    var message by rememberSaveable { mutableStateOf("") }
+
+    Column(modifier.padding(15.dp)){
+        TextField(
+            value = username,
+            onValueChange = { username = it },
+            label = { Text("Enter a new username: ")}
+        )
+        TextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Enter a new password: ")}
+        )
+        TextField(
+            value = passwordVerification,
+            onValueChange = { passwordVerification = it },
+            label = { Text("Reenter your new password: ")}
+        )
+        TextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Enter a display name: ")}
+        )
+
+        Button(onClick = {
+            message = ""
+            if (username == "" || password == "" || passwordVerification == "" || name == ""){
+                message = "The username and password fields cannot be empty to be able to create an account."
+            }
+            for (u in users){
+                if (u.username == username){
+                    message = "This username is already taken. Try another one."
+                    break
+                }
+            }
+            if (message == ""){
+                if (password == passwordVerification){
+                    message = "Welcome $name! An account has been created with the username: $username"
+                    //add user to list of existing users here
+                }
+                else {
+                    message = "Both passwords must be the same to create an account."
+                }
+            }
+        }){
+            Text("Let's go!")
+        }
+        Text("$message")
+    }
 }

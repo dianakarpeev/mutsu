@@ -16,12 +16,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -68,9 +68,13 @@ data class TemporaryIngredient(
 @Composable
 fun RecipeInformation(modifier: Modifier = Modifier){
     val hardcodedIngredients = mutableListOf(
-        TemporaryIngredient(2, Measurements.CUP, "Sugar"),
-        TemporaryIngredient(500, Measurements.GRAM, "Flour"),
-        TemporaryIngredient(1, Measurements.TABLESPOON, "Salt")
+        TemporaryIngredient(6, Measurements.NONE, "Slices of bread"),
+        TemporaryIngredient(2, Measurements.CUP, "Milk"),
+        TemporaryIngredient(1, Measurements.CUP, "Sugar"),
+        TemporaryIngredient(4, Measurements.NONE, "Eggs"),
+        TemporaryIngredient(3, Measurements.TABLESPOON, "Butter"),
+        TemporaryIngredient(1/2, Measurements.TEASPOON, "Vanilla extract"),
+        TemporaryIngredient(1/4, Measurements.TEASPOON, "Cinnamon")
     )
 
     Box (
@@ -82,7 +86,7 @@ fun RecipeInformation(modifier: Modifier = Modifier){
                 .width(320.dp)
                 .fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
             ButtonRow()
             RecipeForm(existingIngredients = hardcodedIngredients)
@@ -101,13 +105,10 @@ fun RecipeForm(
     var displayInputRow by remember { mutableStateOf(false)}
     val toggleDisplayInputRow: () -> Unit = { displayInputRow = !displayInputRow }
 
-    val topSpacerHeight = 16
-
-    Spacer(modifier = Modifier.height(topSpacerHeight.dp))
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         //Recipe Name
         UserFieldInput(
@@ -117,13 +118,11 @@ fun RecipeForm(
         )
 
         //Ingredients
-        Text(text = "Ingredients")
-
         IngredientDisplay(
             existingIngredients = existingIngredients,
             toggleDisplayInputRow = toggleDisplayInputRow,
-            displayInputRow = displayInputRow)
-
+            displayInputRow = displayInputRow
+        )
 
         //Web URL
         UserFieldInput(
@@ -182,11 +181,10 @@ fun IngredientDisplay(
     toggleDisplayInputRow: () -> Unit,
     displayInputRow: Boolean
 ) {
-    val ingredientRows = generateIngredientRows(existingIngredients)
 
-    LazyColumn(modifier = Modifier.height(200.dp)) {
-        items(ingredientRows.size) { index ->
-            ingredientRows[index]
+    LazyColumn(modifier = Modifier.height(IntrinsicSize.Min)) {
+        items(existingIngredients) { ingredient ->
+            IngredientDisplayRow(ingredient = ingredient)
         }
 
         item{
@@ -203,25 +201,14 @@ fun IngredientDisplay(
 
 @Composable
 fun AddIngredientButton(onClick: () -> Unit) {
-    Column() {
+    Column {
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = onClick,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.LightGray,
-                contentColor = Color.White
-            ),
             shape = RectangleShape
         ) {
             Text("Add Ingredient")
         }
-    }
-}
-
-@Composable
-private fun generateIngredientRows(ingredients: List<TemporaryIngredient>): List<@Composable () -> Unit> {
-    return ingredients.map { ingredient ->
-        { IngredientDisplayRow(ingredient = ingredient) }
     }
 }
 
@@ -232,10 +219,13 @@ fun IngredientDisplayRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(ingredient.quantity.toString())
+        Spacer(modifier = Modifier.width(8.dp))
         Text(ingredient.measurement.abbreviation)
+        Spacer(modifier = Modifier.width(16.dp))
         Text(ingredient.name)
     }
 }

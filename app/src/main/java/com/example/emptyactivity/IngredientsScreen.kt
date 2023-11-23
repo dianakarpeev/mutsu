@@ -27,9 +27,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun IngredientsScreen(viewModel: IngredientsViewModel = viewModel(), modifier: Modifier = Modifier){
-    //val viewModel : IngredientsViewModel = viewModel()
-
     val ingredients by viewModel.ingredients.collectAsStateWithLifecycle()
+
+    val increase: (Int) -> Unit = {
+        viewModel.increaseQuantity(it)
+    }
+    val decrease: (Int) -> Unit = {
+        viewModel.decreaseQuantity(it)
+    }
 
     /*
     val ingredients = listOf<FoodItem>(
@@ -47,7 +52,7 @@ fun IngredientsScreen(viewModel: IngredientsViewModel = viewModel(), modifier: M
 
     Column(modifier = modifier.verticalScroll(rememberScrollState())){
         Instructions(modifier)
-        ShowAllIngredients(ingredients, { viewModel::increaseQuantity }, viewModel::decreaseQuantity, modifier)
+        ShowAllIngredients(ingredients, increase, decrease, modifier)
     }
 }
 
@@ -168,7 +173,6 @@ fun ShowAllIngredients(ingredients: List<FoodItem>, increaseQuantity: (Int) -> U
             isRemoved = { if (salt > 0){salt--} },
             modifier.fillMaxWidth(),)
         */
-        
         var message by rememberSaveable { mutableStateOf<String>("")}
         Button(
             onClick = {

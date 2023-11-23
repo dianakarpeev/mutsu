@@ -110,7 +110,7 @@ class MainActivity : ComponentActivity() {
                             RecipeListScreen(windowSizeClass)
                         }
                         composable(route = GroceryList.route){
-                            IngredientsScreen()
+                            IngredientsScreen(ingredientsViewModel)
                         }
                         composable(route = AboutUs.route){
                             AboutUsScreen()

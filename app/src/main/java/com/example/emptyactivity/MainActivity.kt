@@ -1,5 +1,6 @@
 package com.example.emptyactivity
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import com.example.emptyactivity.ui.theme.EmptyActivityTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -35,7 +37,14 @@ import com.example.emptyactivity.navigation.Home
 import com.example.emptyactivity.navigation.MealPlan
 import com.example.emptyactivity.navigation.Recipes
 
+
+private const val USER_INGREDIENTS_COUNT = "user_ingredients"
+
 class MainActivity : ComponentActivity() {
+
+    val Context.DataStore by preferencesDataStore(
+        name = USER_INGREDIENTS_COUNT
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

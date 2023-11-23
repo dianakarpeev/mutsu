@@ -4,22 +4,32 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +39,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,11 +73,20 @@ fun RecipeInformation(modifier: Modifier = Modifier){
         TemporaryIngredient(1, Measurements.TABLESPOON, "Salt")
     )
 
-    Column(modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center) {
-        ButtonRow()
-        RecipeForm(existingIngredients = hardcodedIngredients)
+    Box (
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier
+                .width(320.dp)
+                .fillMaxHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            ButtonRow()
+            RecipeForm(existingIngredients = hardcodedIngredients)
+        }
     }
 }
 
@@ -77,8 +98,10 @@ fun RecipeForm(
     var recipeName by remember { mutableStateOf(TextFieldValue()) }
     var webURL by remember { mutableStateOf(TextFieldValue()) }
 
+    var displayInputRow by remember { mutableStateOf(false)}
+    val toggleDisplayInputRow: () -> Unit = { displayInputRow = !displayInputRow }
+
     val topSpacerHeight = 16
-    val inBetweenSpacerHeight = 5
 
     Spacer(modifier = Modifier.height(topSpacerHeight.dp))
     Column(
@@ -87,39 +110,44 @@ fun RecipeForm(
         verticalArrangement = Arrangement.Center
     ) {
         //Recipe Name
-        UserInput(
+        UserFieldInput(
             "Name",
             recipeName,
             onValueChange = { recipeName = it }
         )
-        Spacer(modifier = Modifier.height(inBetweenSpacerHeight.dp))
 
         //Ingredients
         Text(text = "Ingredients")
-        IngredientDisplay(existingIngredients = existingIngredients)
-        Spacer(modifier = Modifier.height(inBetweenSpacerHeight.dp))
+
+        IngredientDisplay(
+            existingIngredients = existingIngredients,
+            toggleDisplayInputRow = toggleDisplayInputRow,
+            displayInputRow = displayInputRow)
+
 
         //Web URL
-        UserInput(
+        UserFieldInput(
             "Web URL",
             webURL,
             onValueChange = { webURL = it }
         )
-        Spacer(modifier = Modifier.height(inBetweenSpacerHeight.dp))
     }
 }
 
 @Composable
-fun UserInput(
+fun UserFieldInput(
     label: String,
     value: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit
+    onValueChange: (TextFieldValue) -> Unit,
+    modifier : Modifier = Modifier.fillMaxWidth(),
+    keyboardOptions : KeyboardOptions = KeyboardOptions.Default
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(text = label) },
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier,
+        keyboardOptions = keyboardOptions
     )
 }
 
@@ -138,6 +166,7 @@ fun ButtonRow(modifier: Modifier = Modifier){
         ) {
             Text(text = "Edit")
         }
+        Spacer(modifier = Modifier.width(16.dp))
         Button(
             onClick = { },
             modifier = modifier.padding(0.dp, 5.dp)
@@ -148,17 +177,20 @@ fun ButtonRow(modifier: Modifier = Modifier){
 }
 
 @Composable
-fun IngredientDisplay( existingIngredients: MutableList<TemporaryIngredient>) {
+fun IngredientDisplay(
+    existingIngredients: MutableList<TemporaryIngredient>,
+    toggleDisplayInputRow: () -> Unit,
+    displayInputRow: Boolean
+) {
     val ingredientRows = generateIngredientRows(existingIngredients)
-    var displayInputRow by remember { mutableStateOf(false) }
 
-    LazyColumn {
+    LazyColumn(modifier = Modifier.height(200.dp)) {
         items(ingredientRows.size) { index ->
             ingredientRows[index]
         }
 
         item{
-            AddIngredientButton(onClick = { displayInputRow = true})
+            AddIngredientButton(onClick = toggleDisplayInputRow)
         }
 
         if (displayInputRow){
@@ -171,10 +203,15 @@ fun IngredientDisplay( existingIngredients: MutableList<TemporaryIngredient>) {
 
 @Composable
 fun AddIngredientButton(onClick: () -> Unit) {
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column() {
         Button(
+            modifier = Modifier.fillMaxWidth(),
             onClick = onClick,
-            modifier = Modifier.fillMaxWidth()
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.LightGray,
+                contentColor = Color.White
+            ),
+            shape = RectangleShape
         ) {
             Text("Add Ingredient")
         }
@@ -205,42 +242,50 @@ fun IngredientDisplayRow(
 
 @Composable
 fun IngredientInputRow(existingIngredients : MutableList<TemporaryIngredient>) {
-    var ingredientQuantity by remember { mutableStateOf("") }
+    var ingredientQuantity by remember { mutableStateOf(TextFieldValue()) }
     var ingredientMeasurement by remember { mutableStateOf(Measurements.NONE) }
-    var ingredientName by remember { mutableStateOf("") }
+    var ingredientName by remember { mutableStateOf(TextFieldValue()) }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .height(IntrinsicSize.Min),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         //Quantity
-        UserInput(
-            label = "Quantity",
-            value = TextFieldValue(ingredientQuantity),
-            onValueChange = { ingredientQuantity = it.toString() }
+        UserFieldInput(
+            label = "Qty",
+            value = ingredientQuantity,
+            onValueChange = { ingredientQuantity = it },
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Number
+            ),
+            modifier = Modifier.width(80.dp)
         )
 
         //Measurement
         DropdownMeasurement(
-            onMeasurementSelected = {
-                selectedMeasurement -> ingredientMeasurement = selectedMeasurement
-            }
+            modifier = Modifier.width(100.dp)
         )
 
         //Name
-        UserInput(
+        UserFieldInput(
             label = "Name",
-            value = TextFieldValue(ingredientName),
-            onValueChange = { ingredientName = it.toString() })
+            value = ingredientName,
+            onValueChange = { ingredientName = it },
+            modifier = Modifier.width(150.dp)
+        )
 
         //Submit
         PlusButton( onClick = {
             existingIngredients.add(
                 TemporaryIngredient(
-                    ingredientQuantity.toInt(),
+                    ingredientQuantity
+                        .toString()
+                        .toInt(),
                     ingredientMeasurement,
-                    ingredientName
+                    ingredientName.toString()
                 )
             )
         } )
@@ -250,7 +295,7 @@ fun IngredientInputRow(existingIngredients : MutableList<TemporaryIngredient>) {
 @Composable
 fun PlusButton(
     onClick: () -> Unit,
-    size : Int = 15
+    size : Int = 60
 ) {
     val iconSize : Int = size - 5
 
@@ -270,25 +315,47 @@ fun PlusButton(
     }
 }
 
+//Taken from https://alexzh.com/jetpack-compose-dropdownmenu/
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMeasurement(onMeasurementSelected: (Measurements) -> Unit) {
+fun DropdownMeasurement(modifier: Modifier) {
     var expanded by remember { mutableStateOf(false) }
     var selectedMeasurement by remember { mutableStateOf(Measurements.NONE) }
 
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = { expanded = false },
-        modifier = Modifier.fillMaxWidth()
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentSize(Alignment.TopEnd)
     ) {
-        Measurements.values().forEach { measurement ->
-            DropdownMenuItem(
-                { Text(text = measurement.abbreviation) },
-                onClick = {
-                    selectedMeasurement = measurement
-                    onMeasurementSelected(measurement)
-                    expanded = false
-                }
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {expanded = !expanded},
+            modifier = modifier
+        ) {
+            TextField(
+                value = selectedMeasurement.abbreviation,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+                modifier = Modifier.menuAnchor()
             )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                Measurements.values().forEach { measurement ->
+                    DropdownMenuItem(
+                        { Text(text = measurement.abbreviation) },
+                        onClick = {
+                            selectedMeasurement = measurement
+                            expanded = false
+                        }
+                    )
+                }
+            }
         }
     }
 }

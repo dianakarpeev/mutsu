@@ -32,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.emptyactivity.navigation.AboutUs
 import com.example.emptyactivity.navigation.GroceryList
 import com.example.emptyactivity.navigation.Home
+import com.example.emptyactivity.navigation.LoginRegister
 import com.example.emptyactivity.navigation.MealPlan
 import com.example.emptyactivity.navigation.Recipes
 
@@ -85,6 +86,11 @@ class MainActivity : ComponentActivity() {
                                 ) {
                                     Icon(Recipes.icon, contentDescription = "Recipes")
                                 }
+                                IconButton(
+                                    onClick = { navController.navigateSingleTopTo(LoginRegister.route) }
+                                ) {
+                                    Icon(LoginRegister.icon, contentDescription = "Login/Register")
+                                }
                             }
                         }
                     }
@@ -112,6 +118,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(route = AboutUs.route){
                             AboutUsScreen()
+                        }
+                        composable(route = LoginRegister.route){
+                            LoginRegisterScreen()
                         }
                     }
                 }

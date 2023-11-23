@@ -1,6 +1,9 @@
 package com.example.emptyactivity.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
@@ -28,12 +31,12 @@ object Home : MutsuDestination {
 }
 
 object GroceryList : MutsuDestination {
-    override val icon = Icons.Filled.Star
+    override val icon = Icons.Filled.ShoppingCart
     override val route = "grocery-list"
 }
 
 object MealPlan : MutsuDestination {
-    override val icon = Icons.Filled.ShoppingCart
+    override val icon = Icons.Filled.DateRange
     override val route = "meal-plan"
 }
 
@@ -43,8 +46,13 @@ object Recipes : MutsuDestination {
 }
 
 object AboutUs : MutsuDestination {
-    override val icon = Icons.Filled.Star
+    override val icon = Icons.Filled.FavoriteBorder
     override val route = "about-us"
 }
 
-val mustuTabRowScreens = listOf(Home, Recipes, MealPlan, GroceryList)
+object LoginRegister : MutsuDestination {
+    override val icon = Icons.Filled.AccountCircle
+    override val route = "login-register"
+}
+
+val mustuTabRowScreens = listOf(Home, Recipes, MealPlan, GroceryList, LoginRegister)

@@ -8,20 +8,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-enum class ingredientName{
-    FLOUR,
-    RICE,
-    KETCHUP_CHIPS,
-    WHITE_BREAD,
-    HUMMUS,
-    APPLE_JUICE,
-    CHICKEN,
-    APPLES,
-    CUCUMBER,
-    TAPIOCA,
-    SALT
-}
-
 class IngredientsViewModel : ViewModel(){
     private val _ingredients = MutableStateFlow<List<FoodItem>>(emptyList())
     private val _editableList = instantiateIngredients()

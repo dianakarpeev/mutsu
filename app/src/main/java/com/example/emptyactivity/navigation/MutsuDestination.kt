@@ -4,13 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.emptyactivity.AboutUsScreen
-import com.example.emptyactivity.IngredientsScreen
-import com.example.emptyactivity.MutsuHomeScreen
-import com.example.emptyactivity.RecipeListScreen
-import com.example.emptyactivity.foodCounter
 
 /*
  * Set up this file based on the following codelab:
@@ -40,6 +34,11 @@ object MealPlan : MutsuDestination {
 object Recipes : MutsuDestination {
     override val icon = Icons.Filled.Star
     override val route = "recipe-list"
+}
+
+object RecipeInformation : MutsuDestination {
+    override val icon = Icons.Filled.Star
+    override val route = "recipe-information"
 }
 
 object AboutUs : MutsuDestination {

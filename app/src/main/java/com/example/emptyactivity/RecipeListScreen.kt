@@ -19,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -32,12 +33,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 
 @Composable
-fun RecipeListScreen(navController: NavHostController){
+fun RecipeListScreen(goToRecipeInformation: () -> Unit){
     var recipeName by remember { mutableStateOf("") }
-    val recipeViewModel: RecipeViewModel = RecipeViewModel()
+    val recipeViewModel = RecipeViewModel()
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -48,7 +48,7 @@ fun RecipeListScreen(navController: NavHostController){
             onAddButtonClick = {
                 if (recipeName.isNotEmpty()) {
                     addNewEmptyRecipe(recipeViewModel, recipeName)
-                    navController.navigate("recipe_information_route/$recipeName")
+                    goToRecipeInformation()
                     recipeName = ""
                 }
             },
@@ -60,7 +60,10 @@ fun RecipeListScreen(navController: NavHostController){
             title = "Existing Recipes",
             modifier = Modifier.weight(3f)
         ){
-            RecipeList(recipeViewModel.getAllRecipes())
+            RecipeList(
+                recipeViewModel.getAllRecipes(),
+                goToRecipeInformation
+            )
         }
     }
 }
@@ -134,8 +137,9 @@ fun Section(
  * Grid to display all recipe names entered by the user using cards.
  * If no recipes were entered, it'll display a simple text message.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipeList(recipeList: List<Recipe>) {
+fun RecipeList(recipeList: List<Recipe>, goToRecipeInformation: () -> Unit) {
     if (recipeList.isNotEmpty()){
         Box (
             modifier = Modifier
@@ -157,7 +161,8 @@ fun RecipeList(recipeList: List<Recipe>) {
                         ),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant
-                        )
+                        ),
+                        onClick = goToRecipeInformation
                     ) {
                         Text(
                             text = recipe.name,

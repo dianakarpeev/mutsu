@@ -32,6 +32,7 @@ import com.example.emptyactivity.navigation.AboutUs
 import com.example.emptyactivity.navigation.GroceryList
 import com.example.emptyactivity.navigation.Home
 import com.example.emptyactivity.navigation.MealPlan
+import com.example.emptyactivity.navigation.RecipeInformation
 import com.example.emptyactivity.navigation.Recipes
 import com.example.emptyactivity.ui.theme.EmptyActivityTheme
 
@@ -59,6 +60,7 @@ class MainActivity : ComponentActivity() {
 
                 val windowSizeClass = calculateWindowSizeClass(this)
                 val ingredientsViewModel : IngredientsViewModel = viewModel()
+                val recipeViewModel : RecipeViewModel = viewModel()
 
                 Scaffold(
                     topBar = { TopAppBar(title = { Text("MyApp")})},
@@ -105,13 +107,20 @@ class MainActivity : ComponentActivity() {
                             foodCounter()
                         }
                         composable(route = Recipes.route){
-                            RecipeListScreen(navController)
+                            RecipeListScreen(
+                                goToRecipeInformation = {
+                                    navController.navigateSingleTopTo(RecipeInformation.route)
+                                }
+                            )
                         }
                         composable(route = GroceryList.route){
                             IngredientsScreen(ingredientsViewModel)
                         }
                         composable(route = AboutUs.route){
                             AboutUsScreen()
+                        }
+                        composable(route = RecipeInformation.route){
+                            RecipeInformationScreen(recipeViewModel)
                         }
                     }
                 }

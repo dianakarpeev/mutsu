@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,8 +13,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -40,7 +37,7 @@ fun RecipeListScreen(goToRecipeInformation: () -> Unit){
     val recipeViewModel = RecipeViewModel()
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
     ) {
         RecipeInput(
             recipeName = recipeName,
@@ -142,13 +139,10 @@ fun Section(
 fun RecipeList(recipeList: List<Recipe>, goToRecipeInformation: () -> Unit) {
     if (recipeList.isNotEmpty()){
         Box (
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+            modifier = Modifier//.verticalScroll(rememberScrollState())
         ) {
             LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.fillMaxSize()
+                columns = GridCells.Fixed(2)
             ) {
                 items(recipeList) { recipe ->
                     Card(

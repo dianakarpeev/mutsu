@@ -85,7 +85,7 @@ fun RecipeInformationScreen(
 
     //To be able to edit a recipe, we need the original name to be able to find it
     //in the ViewModel
-    val originalRecipe = recipe;
+    val originalRecipe = recipe
 
     Box (
         modifier = Modifier.fillMaxSize(),

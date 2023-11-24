@@ -1,6 +1,7 @@
 package com.example.emptyactivity.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
@@ -34,7 +35,7 @@ object MealPlan : MutsuDestination {
 }
 
 object Recipes : MutsuDestination {
-    override val icon = Icons.Filled.Star
+    override val icon = Icons.Filled.Favorite
     override val route = "recipe-list"
 }
 

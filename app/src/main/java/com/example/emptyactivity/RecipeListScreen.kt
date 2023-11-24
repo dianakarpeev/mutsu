@@ -37,7 +37,7 @@ import androidx.navigation.NavHostController
 @Composable
 fun RecipeListScreen(navController: NavHostController){
     var recipeName by remember { mutableStateOf("") }
-    var recipeList by remember { mutableStateOf(mutableListOf<Recipe>()) }
+    val recipeViewModel: RecipeViewModel = RecipeViewModel()
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -47,6 +47,7 @@ fun RecipeListScreen(navController: NavHostController){
             onRecipeNameChange = { newRecipeName -> recipeName = newRecipeName },
             onAddButtonClick = {
                 if (recipeName.isNotEmpty()) {
+                    addNewEmptyRecipe(recipeViewModel, recipeName)
                     navController.navigate("recipe_information_route/$recipeName")
                     recipeName = ""
                 }
@@ -59,9 +60,18 @@ fun RecipeListScreen(navController: NavHostController){
             title = "Existing Recipes",
             modifier = Modifier.weight(3f)
         ){
-            RecipeList(recipeList)
+            RecipeList(recipeViewModel.getAllRecipes())
         }
     }
+}
+
+private fun addNewEmptyRecipe(recipeViewModel: RecipeViewModel, recipeName: String){
+    recipeViewModel.addRecipe(Recipe(
+        name = recipeName,
+        ingredients = mutableListOf(),
+        portionYield = 0,
+        webURL = null
+    ))
 }
 
 //Contains the textbox that accepts user input and the button that saves it!
@@ -125,7 +135,7 @@ fun Section(
  * If no recipes were entered, it'll display a simple text message.
  */
 @Composable
-fun RecipeList(recipeList: MutableList<Recipe>) {
+fun RecipeList(recipeList: List<Recipe>) {
     if (recipeList.isNotEmpty()){
         Box (
             modifier = Modifier

@@ -18,7 +18,6 @@ class RecipeViewModel : ViewModel() {
     private fun instantiateRecipes(): List<Recipe> {
         val recipeSeedData = mutableListOf<Recipe>()
 
-        // Example recipe data (replace this with your actual recipe data)
         recipeSeedData.add(
             Recipe(
                 "Pasta Carbonara",
@@ -82,7 +81,7 @@ class RecipeViewModel : ViewModel() {
             )
         )
 
-        return ingredientList;
+        return ingredientList
     }
 
     private fun getIngredientsForBreadPudding() : MutableList<TemporaryIngredient>{
@@ -148,6 +147,25 @@ class RecipeViewModel : ViewModel() {
     fun removeRecipe(recipe: Recipe) {
         viewModelScope.launch {
             _recipeList.value = _recipeList.value - recipe
+        }
+    }
+
+    fun getAllRecipes(): List<Recipe>{
+        return recipeList.value;
+    }
+
+    fun getRecipeByName(name: String): Recipe? {
+        return _recipeList.value.find { it.name == name }
+    }
+
+    fun editRecipe(recipeName: String, updatedRecipe: Recipe) {
+        viewModelScope.launch {
+            val newList = _recipeList.value.toMutableList()
+            val index = newList.indexOfFirst { it.name == recipeName }
+            if (index != -1) {
+                newList[index] = updatedRecipe
+                _recipeList.value = newList
+            }
         }
     }
 }

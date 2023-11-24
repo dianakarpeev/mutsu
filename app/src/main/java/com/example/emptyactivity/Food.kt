@@ -1,12 +1,17 @@
 package com.example.emptyactivity
 
+//import IngredientsName
+import android.content.Context
+import androidx.datastore.core.DataStore
+import kotlinx.coroutines.flow.Flow
+import java.io.InputStream
 
 
 data class Ingredient(val name: String, var portions : Int)
 
 
 //IngredientsName Class to serialize with Proto Datastore
-class IngredientsName() {
+class IngredientName() {
     private val ingredientMap = mutableMapOf<String, String>()
 
     init {
@@ -22,32 +27,47 @@ class IngredientsName() {
         ingredientMap["EGG"] = "Egg"
     }
 
-    private fun doesIngredientExist(ingredientName : String) : Boolean {
+    private fun doesIngredientExist(ingredientName: String): Boolean {
         return ingredientMap.containsKey(ingredientName)
     }
 
     //Given the value of an ingredient, return the key
-    fun getIngredientKey(ingredientName : String) : String {
+    fun getIngredientKey(ingredientName: String): String {
         //Replace spaces with underscores and make all letters uppercase
         ingredientName.replace(" ", "_").uppercase()
 
         return ingredientMap[ingredientName]!!
     }
+
     //Given the key of an ingredient, return the value
-    fun getIngredientName(ingredientKey : String) : String {
+    fun getIngredientName(ingredientKey: String): String {
         return ingredientMap[ingredientKey]!!
     }
 
     //If the ingredient doesn't exist, add it to the map
-    fun addIngredient(ingredientName : String) {
+    fun addIngredient(ingredientName: String) {
         if (!doesIngredientExist(ingredientName)) {
             val key = ingredientName.replace(" ", "_").uppercase()
             ingredientMap[key] = ingredientName
         }
     }
+
+    fun getAllValues(): MutableCollection<String> {
+        return ingredientMap.values
+    }
+
 }
 
-val ingredients = IngredientsName()
+class IngredientsNameRepository(private val dataStore: DataStore<IngredientsName>, context: Context) {
+
+}
+
+
+
+
+
+
+val ingredients = IngredientName()
 val testIngredient = Ingredient(ingredients.getIngredientName("BREAD"), 2)
 
 

@@ -8,14 +8,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class IngredientsViewModel : ViewModel(){
+class IngredientsViewModel(ingredientsNameRepository: IngredientsNameRepository) : ViewModel(){
+    private val ingredientsName = IngredientName()
+
+    private val ingredientsNameRepository = ingredientsNameRepository
+
     private val _ingredients = MutableStateFlow<List<FoodItem>>(emptyList())
-    private val _editableList = instantiateIngredients()
+    //private val _editableList = instantiateIngredients()
+    private  val _editableList = initializeWithMap()
 
     val ingredients: StateFlow<List<FoodItem>> = _ingredients.asStateFlow()
 
     init {
-        _ingredients.value = instantiateIngredients()
+        //_ingredients.value = instantiateIngredients()
+        _ingredients.value = initializeWithMap()
     }
 
     private fun instantiateIngredients() : List<FoodItem>{
@@ -31,6 +37,17 @@ class IngredientsViewModel : ViewModel(){
         list.add(FoodItem("Cucumber", 0))
         list.add(FoodItem("Tapioca", 0))
         list.add(FoodItem("Salt", 0))
+
+        return list
+    }
+
+    private fun initializeWithMap() : List<FoodItem> {
+        var ingredientNames = ingredientsName.getAllValues()
+        var list = mutableListOf<FoodItem>()
+
+        ingredientNames.forEach() {
+            list.add(FoodItem(it, 0))
+        }
 
         return list
     }

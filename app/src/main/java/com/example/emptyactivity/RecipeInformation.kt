@@ -43,6 +43,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 data class Recipe(
     var name: String,
@@ -72,10 +74,12 @@ data class TemporaryIngredient(
 
 @Composable
 fun RecipeInformation(
-    recipeName: String,
-    existingRecipe: Recipe?,
-    recipeList: MutableList<Recipe>
+    navController: NavHostController
 ){
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val arguments = navBackStackEntry?.arguments
+    val recipeName = arguments?.getString("recipeName") ?: ""
+
     val hardcodedIngredients = mutableListOf(
         TemporaryIngredient(6, Measurements.NONE, "Slices of bread"),
         TemporaryIngredient(2, Measurements.CUP, "Milk"),

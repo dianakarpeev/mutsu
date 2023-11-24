@@ -19,10 +19,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.ui.Modifier
-import com.example.emptyactivity.ui.theme.EmptyActivityTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -34,6 +33,7 @@ import com.example.emptyactivity.navigation.GroceryList
 import com.example.emptyactivity.navigation.Home
 import com.example.emptyactivity.navigation.MealPlan
 import com.example.emptyactivity.navigation.Recipes
+import com.example.emptyactivity.ui.theme.EmptyActivityTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,7 +105,7 @@ class MainActivity : ComponentActivity() {
                             foodCounter()
                         }
                         composable(route = Recipes.route){
-                            RecipeListScreen(windowSizeClass)
+                            RecipeListScreen(navController)
                         }
                         composable(route = GroceryList.route){
                             IngredientsScreen(ingredientsViewModel)

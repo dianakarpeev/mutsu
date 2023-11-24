@@ -18,9 +18,12 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -79,6 +83,10 @@ fun RecipeInformationScreen(
     val recipe = recipeViewModel.getRecipeByName(recipeName)
         ?: throw IllegalStateException("New recipe wasn't added properly to the ViewModel.")
 
+    //To be able to edit a recipe, we need the original name to be able to find it
+    //in the ViewModel
+    val originalRecipe = recipe;
+
     Box (
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -90,7 +98,11 @@ fun RecipeInformationScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
-            ButtonRow()
+            ButtonRow(
+                recipeViewModel = recipeViewModel,
+                recipe = recipe,
+                originalRecipe = originalRecipe
+            )
             RecipeForm(recipe = recipe)
         }
     }
@@ -113,7 +125,9 @@ fun RecipeForm(
         UserFieldInput(
             "Name",
             TextFieldValue(recipe.name),
-            onValueChange = { recipe.name = it.toString() }
+            onValueChange = { newValue ->
+                recipe.name = newValue.text
+            }
         )
 
         //Ingredients
@@ -127,7 +141,9 @@ fun RecipeForm(
         UserFieldInput(
             "Portion yield",
             TextFieldValue(recipe.portionYield.toString()),
-            onValueChange = { recipe.portionYield = it.toString().toInt()},
+            onValueChange = { newValue ->
+                recipe.portionYield = newValue.text.toIntOrNull() ?: 0
+            },
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number
             )
@@ -137,7 +153,9 @@ fun RecipeForm(
         UserFieldInput(
             "Web URL",
             TextFieldValue(recipe.webURL!!),
-            onValueChange = { recipe.webURL = it.toString() }
+            onValueChange = { newValue ->
+                recipe.webURL = newValue.text
+            }
         )
     }
 }
@@ -160,7 +178,12 @@ fun UserFieldInput(
 }
 
 @Composable
-fun ButtonRow(modifier: Modifier = Modifier){
+fun ButtonRow(
+    recipe: Recipe,
+    recipeViewModel: RecipeViewModel,
+    modifier: Modifier = Modifier,
+    originalRecipe: Recipe
+){
     val spacerHeight = 8
 
     Spacer(modifier = Modifier.height(spacerHeight.dp))
@@ -168,19 +191,34 @@ fun ButtonRow(modifier: Modifier = Modifier){
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ){
-        Button(
-            onClick = {},
-            modifier = modifier.padding(0.dp, 5.dp)
-        ) {
-            Text(text = "Edit")
-        }
+        RoundedIconButton(
+            //TODO: Input validation
+            onClick = { recipeViewModel.editRecipe(originalRecipe.name, recipe) },
+            icon = Icons.Default.Done,
+            contentDescription = "Checkmark")
+
         Spacer(modifier = Modifier.width(16.dp))
-        Button(
-            onClick = { },
-            modifier = modifier.padding(0.dp, 5.dp)
-        ) {
-            Text(text = "Delete")
-        }
+
+        RoundedIconButton(
+            //TODO: Delete recipe confirmation popup
+            onClick = { recipeViewModel.removeRecipe(recipe) },
+            icon = Icons.Default.Delete,
+            contentDescription = "Trashcan")
+    }
+}
+
+@Composable
+fun RoundedIconButton(
+    onClick: () -> Unit,
+    icon: ImageVector,
+    contentDescription: String,
+){
+    Button(
+        onClick = onClick,
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.padding(8.dp)
+    ) {
+        Icon(imageVector =  icon, contentDescription = contentDescription)
     }
 }
 

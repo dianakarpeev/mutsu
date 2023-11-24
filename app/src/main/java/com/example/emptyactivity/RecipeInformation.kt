@@ -73,7 +73,8 @@ data class TemporaryIngredient(
 @Composable
 fun RecipeInformation(
     recipeName: String,
-    existingRecipe: Recipe?
+    existingRecipe: Recipe?,
+    recipeList: MutableList<Recipe>
 ){
     val hardcodedIngredients = mutableListOf(
         TemporaryIngredient(6, Measurements.NONE, "Slices of bread"),

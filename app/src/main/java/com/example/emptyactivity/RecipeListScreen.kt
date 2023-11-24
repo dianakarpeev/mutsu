@@ -50,8 +50,36 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.emptyactivity.ui.theme.EmptyActivityTheme
 
 @Composable
-fun RecipeListScreen(windowSizeClass: WindowSizeClass, modifier: Modifier = Modifier){
-    CookbookApp(windowSizeClass)
+fun RecipeListScreen(modifier: Modifier = Modifier){
+    var recipeName by remember { mutableStateOf("") }
+    var recipeList : MutableList<Recipe>;
+
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        RecipeInput(
+            recipeName = recipeName,
+            onRecipeNameChange = { newRecipeName -> recipeName = newRecipeName },
+            onAddButtonClick = {
+                if (recipeName.isNotEmpty()) {
+                    RecipeInformation(
+                        recipeName = recipeName,
+                        existingRecipe = null,
+                        recipeList = recipeList)
+                    recipeName = ""
+                }
+            },
+            modifier = Modifier
+                .weight(1f)
+        )
+
+        Section(
+            title = "Existing Recipes",
+            modifier = Modifier.weight(3f)
+        ){
+            RecipeList(recipeList)
+        }
+    }
 }
 
 //Contains the textbox that accepts user input and the button that saves it!
@@ -115,7 +143,7 @@ fun Section(
  * If no recipes were entered, it'll display a simple text message.
  */
 @Composable
-fun RecipeList(recipeList: List<Recipe>) {
+fun RecipeList(recipeList: MutableList<Recipe>) {
     if (recipeList.isNotEmpty()){
         Box (
             modifier = Modifier
@@ -162,154 +190,3 @@ fun RecipeList(recipeList: List<Recipe>) {
         )
     }
 }
-
-//Version of the app that uses the horizontal navigation bar
-@Composable
-fun CookBookPortrait(){
-    EmptyActivityTheme {
-        Scaffold(
-            bottomBar = { BottomNavigation() }
-        ) { padding ->
-            HomeScreen(Modifier.padding(padding))
-        }
-    }
-}
-
-//Layout of the main screen, calls all elements
-@Composable
-fun HomeScreen(modifier: Modifier = Modifier){
-    val viewModel : CookbookViewModel = viewModel()
-    var recipeName by remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        RecipeInput(
-            recipeName = recipeName,
-            onRecipeNameChange = { newRecipeName -> recipeName = newRecipeName },
-            onAddButtonClick = {
-                if (recipeName.isNotEmpty()) {
-                    viewModel.addRecipe(Recipe(recipeName))
-                    recipeName = ""
-                }
-            },
-            modifier = Modifier
-                .weight(1f)
-        )
-
-        Section(
-            title = "Existing Recipes",
-            modifier = Modifier.weight(3f)
-        ){
-            RecipeList(viewModel.recipeList)
-        }
-    }
-}
-
-//Version of the app that uses the vertical navigation bar
-@Composable
-fun CookBookLandscape(){
-    EmptyActivityTheme {
-        Surface(color = MaterialTheme.colorScheme.background){
-            Row{
-                NavigationRail()
-                HomeScreen()
-            }
-        }
-    }
-}
-
-//Chooses the navigation bar to use depending on the current window size
-@Composable
-fun CookbookApp(windowSize: WindowSizeClass) {
-    when (windowSize.widthSizeClass) {
-        WindowWidthSizeClass.Compact -> {
-            CookBookPortrait()
-        }
-        WindowWidthSizeClass.Expanded -> {
-            CookBookLandscape()
-        }
-    }
-}
-
-@Composable
-private fun BottomNavigation(modifier: Modifier = Modifier) {
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        modifier = modifier
-    ) {
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = null
-                )
-            },
-            label = {
-                Text(
-                    text = "Favorites"
-                )
-            },
-            selected = true,
-            onClick = {}
-        )
-        NavigationBarItem(
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Home,
-                    contentDescription = null
-                )
-            },
-            label = {
-                Text(
-                    text = "Home"
-                )
-            },
-            selected = false,
-            onClick = {}
-        )
-    }
-}
-
-@Composable
-private fun NavigationRail(modifier: Modifier = Modifier) {
-    NavigationRail(
-        modifier = modifier.padding(start = 8.dp, end = 8.dp),
-        containerColor = MaterialTheme.colorScheme.background,
-    ) {
-        Column(
-            modifier = modifier.fillMaxHeight(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            NavigationRailItem(
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Favorite,
-                        contentDescription = null
-                    )
-                },
-                label = {
-                    Text("Favorites")
-                },
-                selected = true,
-                onClick = {}
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            NavigationRailItem(
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Home,
-                        contentDescription = null
-                    )
-                },
-                label = {
-                    Text("Home")
-                },
-                selected = false,
-                onClick = {}
-            )
-        }
-    }
-}
-

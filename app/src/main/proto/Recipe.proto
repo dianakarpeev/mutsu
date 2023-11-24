@@ -4,7 +4,7 @@ option java_package = "com.example.emptyactivity";
 option java_multiple_files = true;
 
 message IngredientName {
-  string name = 1;
+  map<string, string> names = 1;
 }
 
 message Ingredient {
@@ -20,6 +20,9 @@ message Recipe {
   repeated Ingredient ingredients = 5;
 }
 
+/*
+  Commenting out for now so Android Studio stops throwing a fit
+
 message Username {
   string username = 1;
   //I somehow think that storing the password's a bad idea, but like. it might work???
@@ -33,3 +36,5 @@ message GroceryList {
 
   repeated Ingredient ingredients = 3;
 }
+
+*/

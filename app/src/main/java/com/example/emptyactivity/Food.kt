@@ -60,6 +60,25 @@ class IngredientName() {
 
 class IngredientsNameRepository(private val dataStore: DataStore<IngredientsName>, context: Context) {
 
+    private val ingredients = IngredientName()
+
+    fun getIngredientsName(): Flow<IngredientsName> {
+        return dataStore.data
+    }
+
+    suspend fun addIngredient(ingredientName: String) {
+        ingredients.addIngredient(ingredientName)
+        //add to datastore
+    }
+
+    //Update the datastore with the new ingredient
+    suspend fun updateIngredientsName(ingredientName: String) {
+        dataStore.updateData { currentIngredientsName ->
+            currentIngredientsName.toBuilder()
+                //.putAllIngredients(ingredients)
+                .build()
+        }
+    }
 }
 
 

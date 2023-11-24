@@ -85,7 +85,8 @@ dependencies {
     // Proto DataStore
     implementation("androidx.datastore:datastore-core:1.0.0")
     implementation("androidx.datastore:datastore:1.0.0")
-    implementation ("com.google.protobuf:protobuf-javalite:3.19.4")
+    implementation ("com.google.protobuf:protobuf-lite:3.0.1")
+    compileOnly ("javax.annotation:javax.annotation-api:1.2")
 
 
 }

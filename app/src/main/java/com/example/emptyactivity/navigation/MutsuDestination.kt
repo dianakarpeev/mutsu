@@ -5,6 +5,8 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 
 /*
  * Set up this file based on the following codelab:
@@ -39,6 +41,12 @@ object Recipes : MutsuDestination {
 object RecipeInformation : MutsuDestination {
     override val icon = Icons.Filled.Star
     override val route = "recipe-information"
+
+    const val recipeNameArg = "recipe_name"
+    val routeWithArgs = "${route}/{${recipeNameArg}}"
+    val arguments = listOf(
+        navArgument(recipeNameArg) { type = NavType.StringType }
+    )
 }
 
 object AboutUs : MutsuDestination {

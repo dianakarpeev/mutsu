@@ -71,9 +71,13 @@ data class TemporaryIngredient(
 )
 
 @Composable
-fun RecipeInformationScreen(recipeViewModel: RecipeViewModel, recipeName: String){
+fun RecipeInformationScreen(
+    recipeViewModel: RecipeViewModel,
+    recipeName: String?
+){
+    if (recipeName == null) throw IllegalStateException("Recipe name is missing.")
     val recipe = recipeViewModel.getRecipeByName(recipeName)
-        ?: throw IllegalStateException("New recipe wasn't added properly to the ViewModel")
+        ?: throw IllegalStateException("New recipe wasn't added properly to the ViewModel.")
 
     Box (
         modifier = Modifier.fillMaxSize(),

@@ -119,8 +119,14 @@ class MainActivity : ComponentActivity() {
                         composable(route = AboutUs.route){
                             AboutUsScreen()
                         }
-                        composable(route = RecipeInformation.route){
-                            RecipeInformationScreen(recipeViewModel)
+                        composable(
+                            route = RecipeInformation.routeWithArgs,
+                            arguments = RecipeInformation.arguments
+                        ) { navBackStackEntry ->
+                            val recipeName =
+                                navBackStackEntry.arguments?.getString(RecipeInformation.recipeNameArg)
+
+                            RecipeInformationScreen(recipeViewModel, recipeName)
                         }
                     }
                 }

@@ -1,6 +1,62 @@
 package com.example.emptyactivity
 
+
+
 data class Ingredient(val name: String, var portions : Int)
+
+
+//IngredientsName Class to serialize with Proto Datastore
+class IngredientsName() {
+    private val ingredientMap = mutableMapOf<String, String>()
+
+    init {
+        ingredientMap["BREAD"] = "Bread"
+        ingredientMap["BEEF_PATTY"] = "Beef Patty"
+        ingredientMap["TOMATO"] = "Tomato"
+        ingredientMap["ONION"] = "Onion"
+        ingredientMap["CABBAGE"] = "Cabbage"
+        ingredientMap["BEEF"] = "Beef"
+        ingredientMap["CARROT"] = "Carrot"
+        ingredientMap["POTATO"] = "Potato"
+        ingredientMap["BACON"] = "Bacon"
+        ingredientMap["EGG"] = "Egg"
+    }
+
+    private fun doesIngredientExist(ingredientName : String) : Boolean {
+        return ingredientMap.containsKey(ingredientName)
+    }
+
+    //Given the value of an ingredient, return the key
+    fun getIngredientKey(ingredientName : String) : String {
+        //Replace spaces with underscores and make all letters uppercase
+        ingredientName.replace(" ", "_").uppercase()
+
+        return ingredientMap[ingredientName]!!
+    }
+    //Given the key of an ingredient, return the value
+    fun getIngredientName(ingredientKey : String) : String {
+        return ingredientMap[ingredientKey]!!
+    }
+
+    //If the ingredient doesn't exist, add it to the map
+    fun addIngredient(ingredientName : String) {
+        if (!doesIngredientExist(ingredientName)) {
+            val key = ingredientName.replace(" ", "_").uppercase()
+            ingredientMap[key] = ingredientName
+        }
+    }
+}
+
+val ingredients = IngredientsName()
+val testIngredient = Ingredient(ingredients.getIngredientName("BREAD"), 2)
+
+
+
+
+
+
+
+
 data class Meal(val name: String, val ingredients: List<Ingredient>)
 
 
@@ -28,3 +84,5 @@ val baconAndEggsIngredient = listOf(bread, bacon, eggs)
 val hamburgerMeal = Meal("Hamburger", hamburgerIngredient)
 val beefStewMeal = Meal("Beef Stew", beefStewIngredient)
 val baconAndEggsMeal = Meal("Bacon and Eggs", baconAndEggsIngredient)
+
+

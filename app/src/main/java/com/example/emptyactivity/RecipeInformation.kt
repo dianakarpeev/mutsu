@@ -42,8 +42,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+
+data class Recipe(
+    var name: String,
+    var ingredients: MutableList<TemporaryIngredient>,
+    var portionYield: Int,
+    var webURL: String?
+)
 
 enum class Measurements(val abbreviation: String) {
     TEASPOON("tsp"),
@@ -64,9 +70,11 @@ data class TemporaryIngredient(
     val name: String
 )
 
-@Preview
 @Composable
-fun RecipeInformation(modifier: Modifier = Modifier){
+fun RecipeInformation(
+    recipeName: String,
+    existingRecipe: Recipe?
+){
     val hardcodedIngredients = mutableListOf(
         TemporaryIngredient(6, Measurements.NONE, "Slices of bread"),
         TemporaryIngredient(2, Measurements.CUP, "Milk"),
@@ -75,6 +83,11 @@ fun RecipeInformation(modifier: Modifier = Modifier){
         TemporaryIngredient(3, Measurements.TABLESPOON, "Butter"),
         TemporaryIngredient(1/2, Measurements.TEASPOON, "Vanilla extract"),
         TemporaryIngredient(1/4, Measurements.TEASPOON, "Cinnamon")
+    )
+
+    var recipe = initializeRecipe(
+        recipeName = recipeName,
+        existingRecipe = existingRecipe
     )
 
     Box (
@@ -89,19 +102,31 @@ fun RecipeInformation(modifier: Modifier = Modifier){
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
             ButtonRow()
-            RecipeForm(existingIngredients = hardcodedIngredients)
+            RecipeForm(recipe = recipe)
         }
     }
+}
+
+fun initializeRecipe(
+    recipeName : String,
+    existingRecipe : Recipe?
+) : Recipe {
+    if (existingRecipe == null){
+        return Recipe(
+            name = recipeName,
+            ingredients = mutableListOf(),
+            portionYield = 0,
+            webURL = null
+        )
+    } else
+        return existingRecipe
 }
 
 @Composable
 fun RecipeForm(
     modifier: Modifier = Modifier,
-    existingIngredients: MutableList<TemporaryIngredient>
+    recipe: Recipe
 ) {
-    var recipeName by remember { mutableStateOf(TextFieldValue()) }
-    var webURL by remember { mutableStateOf(TextFieldValue()) }
-
     var displayInputRow by remember { mutableStateOf(false)}
     val toggleDisplayInputRow: () -> Unit = { displayInputRow = !displayInputRow }
 
@@ -113,22 +138,32 @@ fun RecipeForm(
         //Recipe Name
         UserFieldInput(
             "Name",
-            recipeName,
-            onValueChange = { recipeName = it }
+            TextFieldValue(recipe.name),
+            onValueChange = { recipe.name = it.toString() }
         )
 
         //Ingredients
         IngredientDisplay(
-            existingIngredients = existingIngredients,
+            existingIngredients = recipe.ingredients,
             toggleDisplayInputRow = toggleDisplayInputRow,
             displayInputRow = displayInputRow
+        )
+
+        //Portion Yield
+        UserFieldInput(
+            "Portion yield",
+            TextFieldValue(recipe.portionYield.toString()),
+            onValueChange = { recipe.portionYield = it.toString().toInt()},
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Number
+            )
         )
 
         //Web URL
         UserFieldInput(
             "Web URL",
-            webURL,
-            onValueChange = { webURL = it }
+            TextFieldValue(recipe.webURL!!),
+            onValueChange = { recipe.webURL = it.toString() }
         )
     }
 }

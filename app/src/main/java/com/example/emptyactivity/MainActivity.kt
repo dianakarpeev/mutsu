@@ -75,8 +75,8 @@ class MainActivity : ComponentActivity() {
 
                 val windowSizeClass = calculateWindowSizeClass(this)
 
-                val ingredientsViewModel = IngredientsViewModel(IngredientsNameRepository(this.ingredientsNameStore, this))
                 val recipeViewModel : RecipeViewModel = viewModel()
+                val ingredientsViewModel = IngredientsViewModel(IngredientsNameRepository(ingredientsNameStore, this))
 
                 Scaffold(
                     topBar = { TopAppBar(title = { Text("MyApp")})},

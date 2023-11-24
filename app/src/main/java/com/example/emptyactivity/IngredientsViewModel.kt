@@ -11,7 +11,6 @@ import kotlinx.coroutines.launch
 class IngredientsViewModel(ingredientsNameRepository: IngredientsNameRepository) : ViewModel(){
     private val ingredientsName = IngredientName()
 
-    private val ingredientsNameRepository = ingredientsNameRepository
 
     private val _ingredients = MutableStateFlow<List<FoodItem>>(emptyList())
     //private val _editableList = instantiateIngredients()

@@ -24,6 +24,8 @@ import androidx.compose.ui.Modifier
 import com.example.emptyactivity.ui.theme.EmptyActivityTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -36,18 +38,22 @@ import com.example.emptyactivity.navigation.GroceryList
 import com.example.emptyactivity.navigation.Home
 import com.example.emptyactivity.navigation.MealPlan
 import com.example.emptyactivity.navigation.Recipes
+import com.example.emptyactivity.serializers.IngredientsNameSerializer
 
 
-private const val USER_INGREDIENTS_COUNT = "user_ingredients"
+private const val INGREDIENTS_NAME_FILE = "ingredients_name"
 
 class MainActivity : ComponentActivity() {
 
-    val Context.DataStore by preferencesDataStore(
-        name = USER_INGREDIENTS_COUNT
+    private val Context.ingredientsNameStore : DataStore<IngredientsName> by dataStore(
+        fileName = INGREDIENTS_NAME_FILE,
+        serializer = IngredientsNameSerializer()
     )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+
             MutsuApp()
         }
     }
@@ -67,7 +73,9 @@ class MainActivity : ComponentActivity() {
                 val currentDestination = currentBackStack?.destination
 
                 val windowSizeClass = calculateWindowSizeClass(this)
-                val ingredientsViewModel : IngredientsViewModel = viewModel()
+
+
+                val ingredientsViewModel = IngredientsViewModel(IngredientsNameRepository(this.ingredientsNameStore, this))
 
                 Scaffold(
                     topBar = { TopAppBar(title = { Text("MyApp")})},

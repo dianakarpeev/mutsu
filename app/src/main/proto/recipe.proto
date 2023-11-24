@@ -3,10 +3,12 @@ syntax = "proto3";
 option java_package = "com.example.emptyactivity";
 option java_multiple_files = true;
 
-message IngredientName {
+
+message IngredientsName {
   map<string, string> names = 1;
 }
 
+/*
 message Ingredient {
   string name = 1;
   int32 portions = 2;
@@ -20,7 +22,7 @@ message Recipe {
   repeated Ingredient ingredients = 5;
 }
 
-/*
+
   Commenting out for now so Android Studio stops throwing a fit
 
 message Username {

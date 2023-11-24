@@ -1,4 +1,4 @@
-import com.google.protobuf.gradle.id
+import com.google.protobuf.gradle.*
 
 plugins {
     id("com.android.application")
@@ -50,6 +50,7 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
 }
 
 dependencies {
@@ -83,24 +84,29 @@ dependencies {
 
     // Proto DataStore
     implementation("androidx.datastore:datastore-core:1.0.0")
-    implementation("com.google.protobuf:protobuf-javalite:3.18.0")
-}
+    implementation("androidx.datastore:datastore:1.0.0")
+    implementation ("com.google.protobuf:protobuf-javalite:3.19.4")
 
+
+}
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.0.0"
+        artifact = "com.google.protobuf:protoc:3.19.4"
     }
-plugins {
+    plugins {
         id("lite") {
             artifact = "com.google.protobuf:protoc-gen-javalite:3.0.0"
         }
     }
     generateProtoTasks {
         all().forEach { task ->
-            task.plugins {
+            task.plugins{
                 id("lite")
             }
         }
     }
 }
+
+
+
 

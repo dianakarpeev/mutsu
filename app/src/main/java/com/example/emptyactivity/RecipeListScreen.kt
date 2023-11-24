@@ -32,7 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun RecipeListScreen(goToRecipeInformation: () -> Unit){
+fun RecipeListScreen(goToRecipeInformation: (String) -> Unit){
     var recipeName by remember { mutableStateOf("") }
     val recipeViewModel = RecipeViewModel()
 
@@ -45,7 +45,7 @@ fun RecipeListScreen(goToRecipeInformation: () -> Unit){
             onAddButtonClick = {
                 if (recipeName.isNotEmpty()) {
                     addNewEmptyRecipe(recipeViewModel, recipeName)
-                    goToRecipeInformation()
+                    goToRecipeInformation(recipeName)
                     recipeName = ""
                 }
             },
@@ -136,7 +136,7 @@ fun Section(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipeList(recipeList: List<Recipe>, goToRecipeInformation: () -> Unit) {
+fun RecipeList(recipeList: List<Recipe>, goToRecipeInformation: (String) -> Unit) {
     if (recipeList.isNotEmpty()){
         Box (
             modifier = Modifier//.verticalScroll(rememberScrollState())
@@ -156,7 +156,7 @@ fun RecipeList(recipeList: List<Recipe>, goToRecipeInformation: () -> Unit) {
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant
                         ),
-                        onClick = goToRecipeInformation
+                        onClick = { goToRecipeInformation }
                     ) {
                         Text(
                             text = recipe.name,

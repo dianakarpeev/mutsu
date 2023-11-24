@@ -108,8 +108,8 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(route = Recipes.route){
                             RecipeListScreen(
-                                goToRecipeInformation = {
-                                    navController.navigateSingleTopTo(RecipeInformation.route)
+                                goToRecipeInformation = {recipeName ->
+                                    navController.navigateToRecipeInformation(recipeName)
                                 }
                             )
                         }
@@ -137,3 +137,7 @@ class MainActivity : ComponentActivity() {
 
 fun NavHostController.navigateSingleTopTo(route: String) =
     this.navigate(route) { launchSingleTop = true }
+
+private fun NavHostController.navigateToRecipeInformation(recipeName: String) {
+    this.navigateSingleTopTo("${RecipeInformation.route}/$recipeName")
+}

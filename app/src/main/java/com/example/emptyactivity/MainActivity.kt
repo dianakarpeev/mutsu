@@ -40,6 +40,7 @@ import com.example.emptyactivity.navigation.MealPlan
 import com.example.emptyactivity.navigation.RecipeInformation
 import com.example.emptyactivity.navigation.Recipes
 import com.example.emptyactivity.navigation.LoginRegister
+import com.example.emptyactivity.repositories.IngredientsNameRepository
 import com.example.emptyactivity.serializers.IngredientsNameSerializer
 
 
@@ -47,7 +48,7 @@ private const val INGREDIENTS_NAME_FILE = "ingredients_name"
 
 class MainActivity : ComponentActivity() {
 
-    private val Context.ingredientsNameStore : DataStore<IngredientsName> by dataStore(
+     val Context.ingredientsNameStore : DataStore<IngredientsName> by dataStore(
         fileName = INGREDIENTS_NAME_FILE,
         serializer = IngredientsNameSerializer()
     )
@@ -74,6 +75,8 @@ class MainActivity : ComponentActivity() {
                 val currentDestination = currentBackStack?.destination
 
                 val windowSizeClass = calculateWindowSizeClass(this)
+
+
 
                 val recipeViewModel : RecipeViewModel = viewModel()
                 val ingredientsViewModel = IngredientsViewModel(IngredientsNameRepository(ingredientsNameStore, this))

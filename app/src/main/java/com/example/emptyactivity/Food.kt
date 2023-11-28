@@ -2,29 +2,46 @@ package com.example.emptyactivity
 
 //import IngredientsName
 import android.content.Context
-import androidx.datastore.core.DataStore
 import kotlinx.coroutines.flow.Flow
-import java.io.InputStream
+import kotlinx.coroutines.flow.toList
 
 
 data class Ingredient(val name: String, var portions : Int)
 
 
 //IngredientsName Class to serialize with Proto Datastore
-class IngredientName() {
-    private val ingredientMap = mutableMapOf<String, String>()
+class IngredientName(dataflow: Flow<IngredientsName>) {
+    private var ingredientMap = mutableMapOf<String, String>()
+    private var dataflow = dataflow
 
     init {
-        ingredientMap["BREAD"] = "Bread"
-        ingredientMap["BEEF_PATTY"] = "Beef Patty"
-        ingredientMap["TOMATO"] = "Tomato"
-        ingredientMap["ONION"] = "Onion"
-        ingredientMap["CABBAGE"] = "Cabbage"
-        ingredientMap["BEEF"] = "Beef"
-        ingredientMap["CARROT"] = "Carrot"
-        ingredientMap["POTATO"] = "Potato"
-        ingredientMap["BACON"] = "Bacon"
-        ingredientMap["EGG"] = "Egg"
+    }
+
+    suspend fun setMap() {
+        var data = dataflow.toList()[0].namesMap
+        ingredientMap = data
+        //seedMap()
+
+        if (ingredientMap.isEmpty()) {
+            seedMap()
+        } else {
+            addIngredient("Flour")
+        }
+    }
+
+    fun seedMap() {
+        if (ingredientMap.isEmpty()) {
+            ingredientMap["BREAD"] = "Bread"
+            ingredientMap["BEEF_PATTY"] = "Beef Patty"
+            ingredientMap["TOMATO"] = "Tomato"
+            ingredientMap["ONION"] = "Onion"
+            ingredientMap["CABBAGE"] = "Cabbage"
+            ingredientMap["BEEF"] = "Beef"
+            ingredientMap["CARROT"] = "Carrot"
+            ingredientMap["POTATO"] = "Potato"
+            ingredientMap["BACON"] = "Bacon"
+            ingredientMap["EGG"] = "Egg"
+        }
     }
 
     private fun doesIngredientExist(ingredientName: String): Boolean {
@@ -45,10 +62,11 @@ class IngredientName() {
     }
 
     //If the ingredient doesn't exist, add it to the map
-    fun addIngredient(ingredientName: String) {
+    suspend fun addIngredient(ingredientName: String) {
         if (!doesIngredientExist(ingredientName)) {
             val key = ingredientName.replace(" ", "_").uppercase()
             ingredientMap[key] = ingredientName
+            dataflow.toList()[0].namesMap[key] = ingredientName
         }
     }
 
@@ -56,41 +74,11 @@ class IngredientName() {
         return ingredientMap.values
     }
 
+    fun getIngredientMap(): MutableMap<String, String> {
+        return ingredientMap
+    }
+
 }
-
-class IngredientsNameRepository(private val dataStore: DataStore<IngredientsName>, context: Context) {
-
-    private val ingredients = IngredientName()
-
-    fun getIngredientsName(): Flow<IngredientsName> {
-        return dataStore.data
-    }
-
-    suspend fun addIngredient(ingredientName: String) {
-        ingredients.addIngredient(ingredientName)
-        //add to datastore
-    }
-
-    //Update the datastore with the new ingredient
-    suspend fun updateIngredientsName(ingredientName: String) {
-        dataStore.updateData { currentIngredientsName ->
-            currentIngredientsName.toBuilder()
-                //.putAllIngredients(ingredients)
-                .build()
-        }
-    }
-}
-
-
-
-
-
-
-val ingredients = IngredientName()
-val testIngredient = Ingredient(ingredients.getIngredientName("BREAD"), 2)
-
-
-
 
 
 

@@ -30,6 +30,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.Box
+import com.example.emptyactivity.ui.theme.EmptyActivityTheme
+
+data class Recipeee(val name: String)
+
 
 @Composable
 fun RecipeListScreen(goToRecipeInformation: (String) -> Unit){

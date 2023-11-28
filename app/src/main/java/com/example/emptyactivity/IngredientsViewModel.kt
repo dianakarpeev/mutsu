@@ -1,26 +1,40 @@
 package com.example.emptyactivity
 
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.emptyactivity.repositories.IngredientsNameRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class IngredientsViewModel(ingredientsNameRepository: IngredientsNameRepository) : ViewModel(){
-    private val ingredientsName = IngredientName()
-
+class IngredientsViewModel(dataStore : DataStore<IngredientsName>, context : Context) : ViewModel(){
+    private val ingredientsName = IngredientsNameRepository(dataStore, context)
 
     private val _ingredients = MutableStateFlow<List<FoodItem>>(emptyList())
-    //private val _editableList = instantiateIngredients()
-    private  val _editableList = initializeWithMap()
 
     val ingredients: StateFlow<List<FoodItem>> = _ingredients.asStateFlow()
+    var _editableList : List<FoodItem> = emptyList()
 
     init {
-        //_ingredients.value = instantiateIngredients()
-        _ingredients.value = initializeWithMap()
+        viewModelScope.launch {
+
+            var mapOf : Map<String, String> = ingredientsName.ingredientsNameFlow.first()
+
+            if (mapOf.isEmpty()){
+                _ingredients.value = instantiateIngredients()
+            }
+
+            initializeIngredients(mapOf)
+        }
+
     }
 
     private fun instantiateIngredients() : List<FoodItem>{
@@ -40,15 +54,16 @@ class IngredientsViewModel(ingredientsNameRepository: IngredientsNameRepository)
         return list
     }
 
-    private fun initializeWithMap() : List<FoodItem> {
-        var ingredientNames = ingredientsName.getAllValues()
-        var list = mutableListOf<FoodItem>()
+     fun initializeIngredients(map : Map<String, String>) : Unit {
+        var foodList = mutableListOf<FoodItem>()
+        viewModelScope.launch {
+            for (i in map){
+                foodList.add(FoodItem(i.value, 0))
+            }
 
-        ingredientNames.forEach() {
-            list.add(FoodItem(it, 0))
+            _editableList = foodList
+            _ingredients.update { ings -> copyList() }
         }
-
-        return list
     }
 
     fun increaseQuantity(index: Int){

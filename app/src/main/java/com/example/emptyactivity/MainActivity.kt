@@ -26,8 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
-import androidx.datastore.preferences.preferencesDataStore
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -38,6 +36,7 @@ import com.example.emptyactivity.navigation.GroceryList
 import com.example.emptyactivity.navigation.Home
 import com.example.emptyactivity.navigation.MealPlan
 import com.example.emptyactivity.navigation.Recipes
+import com.example.emptyactivity.repositories.IngredientsNameRepository
 import com.example.emptyactivity.serializers.IngredientsNameSerializer
 
 
@@ -45,7 +44,7 @@ private const val INGREDIENTS_NAME_FILE = "ingredients_name"
 
 class MainActivity : ComponentActivity() {
 
-    private val Context.ingredientsNameStore : DataStore<IngredientsName> by dataStore(
+     val Context.ingredientsNameStore : DataStore<IngredientsName> by dataStore(
         fileName = INGREDIENTS_NAME_FILE,
         serializer = IngredientsNameSerializer()
     )
@@ -76,7 +75,7 @@ class MainActivity : ComponentActivity() {
 
 
 
-                val ingredientsViewModel = IngredientsViewModel(IngredientsNameRepository(ingredientsNameStore, this))
+                val ingredientsViewModel = IngredientsViewModel(ingredientsNameStore, this)
 
                 Scaffold(
                     topBar = { TopAppBar(title = { Text("MyApp")})},

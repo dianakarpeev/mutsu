@@ -108,7 +108,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(route = Recipes.route){
                             RecipeListScreen(
-                                goToRecipeInformation = {recipeName ->
+                                goToRecipeInformation = { recipeName ->
                                     navController.navigateToRecipeInformation(recipeName)
                                 }
                             )

@@ -46,7 +46,7 @@ fun RecipeListScreen(goToRecipeInformation: (String) -> Unit){
                 if (recipeName.isNotEmpty()) {
                     addNewEmptyRecipe(recipeViewModel, recipeName)
                     goToRecipeInformation(recipeName)
-                    recipeName = ""
+                    recipeName == ""
                 }
             },
             modifier = Modifier
@@ -65,7 +65,7 @@ fun RecipeListScreen(goToRecipeInformation: (String) -> Unit){
     }
 }
 
-private fun addNewEmptyRecipe(recipeViewModel: RecipeViewModel, recipeName: String){
+private fun addNewEmptyRecipe(recipeViewModel: RecipeViewModel, recipeName: String) {
     recipeViewModel.addRecipe(Recipe(
         name = recipeName,
         ingredients = mutableListOf(),
@@ -156,7 +156,7 @@ fun RecipeList(recipeList: List<Recipe>, goToRecipeInformation: (String) -> Unit
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant
                         ),
-                        onClick = { goToRecipeInformation }
+                        onClick = { goToRecipeInformation(recipe.name) }
                     ) {
                         Text(
                             text = recipe.name,

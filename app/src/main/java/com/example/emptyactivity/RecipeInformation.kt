@@ -1,23 +1,23 @@
 package com.example.emptyactivity
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -30,6 +30,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -43,9 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 
 data class Recipe(
@@ -81,7 +80,7 @@ fun RecipeInformationScreen(
 ){
     if (recipeName == null) throw IllegalStateException("Recipe name is missing.")
     val recipe = recipeViewModel.getRecipeByName(recipeName)
-        ?: throw IllegalStateException("New recipe wasn't added properly to the ViewModel.")
+        ?: throw IllegalStateException("New recipe wasn't added properly to the ViewModel. AFTER")
 
     //To be able to edit a recipe, we need the original name to be able to find it
     //in the ViewModel
@@ -96,7 +95,7 @@ fun RecipeInformationScreen(
                 .width(320.dp)
                 .fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(32.dp)
+            verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             ButtonRow(
                 recipeViewModel = recipeViewModel,
@@ -116,33 +115,39 @@ fun RecipeForm(
     var displayInputRow by remember { mutableStateOf(false)}
     val toggleDisplayInputRow: () -> Unit = { displayInputRow = !displayInputRow }
 
+    var nameState by remember { mutableStateOf(recipe.name) }
+    var portionState by remember { mutableStateOf(recipe.portionYield.toString()) }
+    var urlState by remember { mutableStateOf(recipe.webURL ?: "") }
+
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         //Recipe Name
         UserFieldInput(
-            "Name",
-            TextFieldValue(recipe.name),
-            onValueChange = { newValue ->
-                recipe.name = newValue.text
+            label = "Name",
+            value = nameState,
+            onValueChange = {
+                nameState = it
+                recipe.name = nameState
             }
         )
 
         //Ingredients
         IngredientDisplay(
-            existingIngredients = recipe.ingredients,
+            recipe = recipe,
             toggleDisplayInputRow = toggleDisplayInputRow,
             displayInputRow = displayInputRow
         )
 
         //Portion Yield
         UserFieldInput(
-            "Portion yield",
-            TextFieldValue(recipe.portionYield.toString()),
-            onValueChange = { newValue ->
-                recipe.portionYield = newValue.text.toIntOrNull() ?: 0
+            label = "Portion yield",
+            value = portionState,
+            onValueChange = {
+                portionState = it
+                recipe.portionYield = portionState.toInt()
             },
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number
@@ -151,10 +156,11 @@ fun RecipeForm(
 
         //Web URL
         UserFieldInput(
-            "Web URL",
-            TextFieldValue(recipe.webURL!!),
-            onValueChange = { newValue ->
-                recipe.webURL = newValue.text
+            label = "Web URL",
+            value = urlState,
+            onValueChange = {
+                urlState = it
+                recipe.webURL = urlState
             }
         )
     }
@@ -163,17 +169,18 @@ fun RecipeForm(
 @Composable
 fun UserFieldInput(
     label: String,
-    value: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit,
-    modifier : Modifier = Modifier.fillMaxWidth(),
-    keyboardOptions : KeyboardOptions = KeyboardOptions.Default
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier.fillMaxWidth(),
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(text = label) },
         modifier = modifier,
-        keyboardOptions = keyboardOptions
+        keyboardOptions = keyboardOptions,
+        maxLines = 1
     )
 }
 
@@ -184,63 +191,62 @@ fun ButtonRow(
     modifier: Modifier = Modifier,
     originalRecipe: Recipe
 ){
-    val spacerHeight = 8
-
-    Spacer(modifier = Modifier.height(spacerHeight.dp))
     Row(modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ){
-        RoundedIconButton(
+        IconButton(
             //TODO: Input validation
-            onClick = { recipeViewModel.editRecipe(originalRecipe.name, recipe) },
-            icon = Icons.Default.Done,
-            contentDescription = "Checkmark")
+            onClick = { recipeViewModel.editRecipe(originalRecipe.name, recipe) }
+        ) {
+            Icon(
+                imageVector = Icons.Default.Done,
+                contentDescription = "Save"
+            )
+        }
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(4.dp))
 
-        RoundedIconButton(
+        IconButton(
             //TODO: Delete recipe confirmation popup
-            onClick = { recipeViewModel.removeRecipe(recipe) },
-            icon = Icons.Default.Delete,
-            contentDescription = "Trashcan")
-    }
-}
-
-@Composable
-fun RoundedIconButton(
-    onClick: () -> Unit,
-    icon: ImageVector,
-    contentDescription: String,
-){
-    Button(
-        onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.padding(8.dp)
-    ) {
-        Icon(imageVector =  icon, contentDescription = contentDescription)
+            onClick = { recipeViewModel.removeRecipe(recipe) }
+        ) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "Delete"
+            )
+        }
     }
 }
 
 @Composable
 fun IngredientDisplay(
-    existingIngredients: MutableList<TemporaryIngredient>,
+    recipe: Recipe,
     toggleDisplayInputRow: () -> Unit,
     displayInputRow: Boolean
 ) {
 
-    LazyColumn(modifier = Modifier.height(IntrinsicSize.Min)) {
-        items(existingIngredients) { ingredient ->
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier
+            .background(Color(244, 244, 244))
+            .defaultMinSize(150.dp)
+            .clip(shape = RoundedCornerShape(12.dp))
+            .heightIn(150.dp, 500.dp)
+            .padding(25.dp)
+    ) {
+        items(recipe.ingredients) { ingredient ->
             IngredientDisplayRow(ingredient = ingredient)
-        }
-
-        item{
-            AddIngredientButton(onClick = toggleDisplayInputRow)
         }
 
         if (displayInputRow){
             item {
-                IngredientInputRow(existingIngredients)
+                IngredientInputRow(recipe)
+            }
+        }
+        else {
+            item{
+                AddIngredientButton(onClick = toggleDisplayInputRow)
             }
         }
     }
@@ -265,8 +271,7 @@ fun IngredientDisplayRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(ingredient.quantity.toString())
@@ -278,10 +283,10 @@ fun IngredientDisplayRow(
 }
 
 @Composable
-fun IngredientInputRow(existingIngredients : MutableList<TemporaryIngredient>) {
-    var ingredientQuantity by remember { mutableStateOf(TextFieldValue()) }
+fun IngredientInputRow(recipe: Recipe) {
+    var ingredientQuantity by remember { mutableStateOf("") }
     var ingredientMeasurement by remember { mutableStateOf(Measurements.NONE) }
-    var ingredientName by remember { mutableStateOf(TextFieldValue()) }
+    var ingredientName by remember { mutableStateOf("") }
 
     Row(
         modifier = Modifier
@@ -298,13 +303,10 @@ fun IngredientInputRow(existingIngredients : MutableList<TemporaryIngredient>) {
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number
             ),
-            modifier = Modifier.width(80.dp)
         )
 
         //Measurement
-        DropdownMeasurement(
-            modifier = Modifier.width(100.dp)
-        )
+        DropdownMeasurement(modifier = Modifier)
 
         //Name
         UserFieldInput(
@@ -315,40 +317,22 @@ fun IngredientInputRow(existingIngredients : MutableList<TemporaryIngredient>) {
         )
 
         //Submit
-        PlusButton( onClick = {
-            existingIngredients.add(
-                TemporaryIngredient(
-                    ingredientQuantity
-                        .toString()
-                        .toInt(),
-                    ingredientMeasurement,
-                    ingredientName.toString()
+        IconButton(
+            onClick = {
+                recipe.ingredients.add(
+                    TemporaryIngredient(
+                        ingredientQuantity.toInt(),
+                        ingredientMeasurement,
+                        ingredientName
+                    )
                 )
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add new ingredient to recipe"
             )
-        } )
-    }
-}
-
-@Composable
-fun PlusButton(
-    onClick: () -> Unit,
-    size : Int = 60
-) {
-    val iconSize : Int = size - 5
-
-    Box(
-        modifier = Modifier
-            .size(size.dp)
-            .clip(CircleShape)
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            imageVector = Icons.Default.Add,
-            contentDescription = null,
-            tint = Color.White,
-            modifier = Modifier.size(iconSize.dp)
-        )
+        }
     }
 }
 

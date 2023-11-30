@@ -107,12 +107,12 @@ fun RecipeInformationScreen(
      * recipe. Temporary fix until the datastore is implemented in this screen.
      */
     val recipe = recipeViewModel.getRecipeByName(recipeName)
-        ?: Recipe(
-            name = recipeName,
-            ingredients = mutableListOf(),
-            portionYield = 0,
-            webURL = null
-        )
+        ?: createEmptyRecipe(recipeName)
+
+    //TODO: Replace temporary hardcoded values with responsive behavior
+    //Temporary hardcoded values - to be modified when implementing responsive behavior
+    val columnWidth = 320.dp;
+    val spaceBetweenElements = 2.dp;
 
     Box (
         modifier = Modifier.fillMaxSize(),
@@ -120,10 +120,10 @@ fun RecipeInformationScreen(
     ) {
         Column(
             modifier = Modifier
-                .width(320.dp)
+                .width(columnWidth)
                 .fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(2.dp)
+            verticalArrangement = Arrangement.spacedBy(spaceBetweenElements)
         ) {
             //Save and delete buttons
             ButtonRow(
@@ -137,6 +137,15 @@ fun RecipeInformationScreen(
             RecipeForm(recipe = recipe)
         }
     }
+}
+
+private fun createEmptyRecipe(recipeName: String): Recipe{
+    return Recipe(
+        name = recipeName,
+        ingredients = mutableListOf(),
+        portionYield = 0,
+        webURL = null
+    )
 }
 
 @Composable
@@ -161,10 +170,13 @@ fun RecipeForm(
     val invalidStringErrorMessage by remember { mutableStateOf("Please enter a valid string")}
     val invalidIntegerErrorMessage by remember { mutableStateOf("Please enter a valid positive number") }
 
+    //Temporary hardcoded values - to be modified when implementing responsive behavior
+    val spaceBetweenInputFields = 20.dp
+
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        verticalArrangement = Arrangement.spacedBy(spaceBetweenInputFields)
     ) {
         //Recipe Name
         UserFieldInput(
@@ -176,7 +188,8 @@ fun RecipeForm(
                 if (isNameValid) { recipe.name = nameState }
             },
             isInvalid = !isNameValid,
-            errorMessage = invalidStringErrorMessage
+            errorMessage = invalidStringErrorMessage,
+            modifier = Modifier.fillMaxWidth()
         )
 
         //Ingredients
@@ -199,7 +212,8 @@ fun RecipeForm(
             errorMessage = invalidIntegerErrorMessage,
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number
-            )
+            ),
+            modifier = Modifier.fillMaxWidth()
         )
 
         //Web URL
@@ -209,7 +223,8 @@ fun RecipeForm(
             onValueChange = {
                 urlState = it
                 recipe.webURL = urlState
-            }
+            },
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
@@ -281,7 +296,7 @@ private fun isValidPositiveInteger(string: String): Boolean {
  *
  * @param label Label to display on top of the text box
  * @param value Value the field corresponds to
- * @param onValueChange Actions to take when the value of the textbox is changed
+ * @param onValueChange Actions to take when the value of the text box is changed
  * @param isInvalid Whether the user input is valid or not. If true, displays an error message.
  * @param errorMessage Error message to display if the input is invalid.
  * @param keyboardOptions Keyboard options for specific cases. For example, when you want the user to
@@ -297,6 +312,9 @@ fun UserFieldInput(
     errorMessage: String = "Invalid input",
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
+    //Temporary hardcoded values - to be modified when implementing responsive behavior
+    val rightPadding = 100.dp
+
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -312,7 +330,7 @@ fun UserFieldInput(
             color = Color.Red,
             fontSize = 12.sp,
             textAlign = TextAlign.Left,
-            modifier = Modifier.padding(end = 100.dp)
+            modifier = Modifier.padding(end = rightPadding)
         )
     }
 }
@@ -342,6 +360,9 @@ fun ButtonRow(
 
     var confirmedDelete by remember { mutableStateOf(false) }
 
+    //Temporary hardcoded values - to be modified when implementing responsive behavior
+    val spaceBetweenButtons = 4.dp
+
     Row(modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
@@ -355,7 +376,7 @@ fun ButtonRow(
             )
         }
 
-        Spacer(modifier = Modifier.width(4.dp))
+        Spacer(modifier = Modifier.width(spaceBetweenButtons))
 
         IconButton(
             onClick = { showDeleteDialog = true }
@@ -416,29 +437,38 @@ fun IngredientDisplay(
     toggleDisplayInputRow: () -> Unit,
     displayInputRow: Boolean
 ) {
+    //Temporary hardcoded values - to be modified when implementing responsive behavior
+    val veryLightGray = Color(244, 244, 244)
+    val roundedCornerRadius = 12.dp
+    val minColumnHeight = 150.dp
+    val maxColumnHeight = 500.dp
+    val columnPadding = 25.dp
+    val spaceBetweenIngredients = 10.dp
+    val spacerHeight = 20.dp
 
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+    Column(
         modifier = Modifier
-            .background(Color(244, 244, 244))
-            .defaultMinSize(150.dp)
-            .clip(shape = RoundedCornerShape(12.dp))
-            .heightIn(150.dp, 500.dp)
-            .padding(25.dp)
+            .background(veryLightGray)
+            .defaultMinSize(minColumnHeight)
+            .clip(shape = RoundedCornerShape(roundedCornerRadius))
+            .heightIn(minColumnHeight, maxColumnHeight)
+            .padding(columnPadding)
     ) {
-        items(recipe.ingredients) { ingredient ->
-            IngredientDisplayRow(ingredient = ingredient)
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(spaceBetweenIngredients)
+        ) {
+            items(recipe.ingredients) { ingredient ->
+                IngredientDisplayRow(ingredient = ingredient)
+            }
         }
 
-        if (displayInputRow){
-            item {
-                IngredientInputRow(recipe)
-            }
-        }
-        else {
-            item{
-                AddIngredientButton(onClick = toggleDisplayInputRow)
-            }
+        Spacer(Modifier.height(spacerHeight))
+
+        // AddIngredientButton or IngredientInputRow
+        if (displayInputRow) {
+            IngredientInputRow(recipe)
+        } else {
+            AddIngredientButton(onClick = toggleDisplayInputRow)
         }
     }
 }
@@ -449,7 +479,8 @@ fun AddIngredientButton(onClick: () -> Unit) {
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = onClick,
-            shape = RectangleShape
+            shape = RectangleShape,
+            enabled = false
         ) {
             Text("Add Ingredient")
         }
@@ -463,16 +494,21 @@ fun AddIngredientButton(onClick: () -> Unit) {
 fun IngredientDisplayRow(
     ingredient: TemporaryIngredient
 ) {
+    //Temporary hardcoded values - to be modified when implementing responsive behavior
+    val spacerWidth = 16.dp
+
     Row(
         modifier = Modifier
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(ingredient.quantity.toString())
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(ingredient.measurement.abbreviation)
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(ingredient.name)
+        Text(ingredient.quantity.toString(), modifier = Modifier.weight(0.5f))
+        Text(ingredient.measurement.abbreviation, modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier
+            .weight(0.5f)
+            .width(spacerWidth)
+        )
+        Text(ingredient.name, modifier = Modifier.weight(3f))
     }
 }
 
@@ -484,6 +520,10 @@ fun IngredientInputRow(recipe: Recipe) {
     var ingredientQuantity by remember { mutableStateOf("") }
     val ingredientMeasurement by remember { mutableStateOf(Measurements.NONE) }
     var ingredientName by remember { mutableStateOf("") }
+
+    //Temporary hardcoded values - to be modified when implementing responsive behavior
+    val quantityFieldWidth = 75.dp
+    val nameFieldWidth = 150.dp
 
     Row(
         modifier = Modifier
@@ -497,9 +537,10 @@ fun IngredientInputRow(recipe: Recipe) {
             label = "Qty",
             value = ingredientQuantity,
             onValueChange = { ingredientQuantity = it },
+            modifier = Modifier.width(quantityFieldWidth),
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number
-            ),
+            )
         )
 
         //Measurement
@@ -510,7 +551,7 @@ fun IngredientInputRow(recipe: Recipe) {
             label = "Name",
             value = ingredientName,
             onValueChange = { ingredientName = it },
-            modifier = Modifier.width(150.dp)
+            modifier = Modifier.width(nameFieldWidth),
         )
 
         //Submit

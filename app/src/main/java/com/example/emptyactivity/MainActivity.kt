@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -36,15 +35,15 @@ import androidx.navigation.compose.rememberNavController
 import com.example.emptyactivity.navigation.AboutUs
 import com.example.emptyactivity.navigation.GroceryList
 import com.example.emptyactivity.navigation.Home
+import com.example.emptyactivity.navigation.LoginRegister
 import com.example.emptyactivity.navigation.MealPlan
 import com.example.emptyactivity.navigation.RecipeInformation
-import com.example.emptyactivity.navigation.Recipes
 import com.example.emptyactivity.navigation.LoginRegister
 import com.example.emptyactivity.repositories.IngredientsNameRepository
 import com.example.emptyactivity.serializers.IngredientsNameSerializer
 
 
-private const val INGREDIENTS_NAME_FILE = "ingredients_name"
+
 
 class MainActivity : ComponentActivity() {
 
@@ -151,7 +150,11 @@ class MainActivity : ComponentActivity() {
                             val recipeName =
                                 navBackStackEntry.arguments?.getString(RecipeInformation.recipeNameArg)
 
-                            RecipeInformationScreen(recipeViewModel, recipeName)
+                            RecipeInformationScreen(
+                                recipeViewModel = recipeViewModel,
+                                recipeName = recipeName,
+                                goToRecipeList = { navController.navigateSingleTopTo(Recipes.route) }
+                            )
                         }
                         composable(route = LoginRegister.route){
                             LoginRegisterScreen()
@@ -169,4 +172,3 @@ fun NavHostController.navigateSingleTopTo(route: String) =
 private fun NavHostController.navigateToRecipeInformation(recipeName: String) {
     this.navigateSingleTopTo("${RecipeInformation.route}/$recipeName")
 }
-

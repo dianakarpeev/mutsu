@@ -24,6 +24,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
@@ -37,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -81,11 +84,17 @@ data class TemporaryIngredient(
 @Composable
 fun RecipeInformationScreen(
     recipeViewModel: RecipeViewModel,
-    recipeName: String?
+    recipeName: String?,
+    goToRecipeList: () -> Unit
 ){
     if (recipeName == null) throw IllegalStateException("Recipe name is missing.")
     val recipe = recipeViewModel.getRecipeByName(recipeName)
-        ?: throw IllegalStateException("New recipe wasn't added properly to the ViewModel. AFTER")
+        ?: Recipe(
+            name = recipeName,
+            ingredients = mutableListOf(),
+            portionYield = 0,
+            webURL = null
+        )
 
     //To be able to edit a recipe, we need the original name to be able to find it
     //in the ViewModel
@@ -105,7 +114,8 @@ fun RecipeInformationScreen(
             ButtonRow(
                 recipeViewModel = recipeViewModel,
                 recipe = recipe,
-                originalRecipe = originalRecipe
+                originalRecipe = originalRecipe,
+                goToRecipeList = goToRecipeList
             )
             RecipeForm(recipe = recipe)
         }
@@ -187,30 +197,23 @@ fun RecipeForm(
 fun ConfirmPopup(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
+    confirmText: String,
     dialogTitle: String,
     dialogText: String,
     icon: ImageVector,
 ) {
     AlertDialog(
-        icon = {
-            Icon(icon, contentDescription = "Example Icon")
-        },
-        title = {
-            Text(text = dialogTitle)
-        },
-        text = {
-            Text(text = dialogText)
-        },
-        onDismissRequest = {
-            onDismissRequest()
-        },
+        icon = { Icon(icon, contentDescription = null) },
+        title = { Text(text = dialogTitle) },
+        text = { Text(text = dialogText) },
+        onDismissRequest = { onDismissRequest() },
         confirmButton = {
             TextButton(
                 onClick = {
                     onConfirmation()
                 }
             ) {
-                Text("Confirm")
+                Text(confirmText)
             }
         },
         dismissButton = {
@@ -219,7 +222,7 @@ fun ConfirmPopup(
                     onDismissRequest()
                 }
             ) {
-                Text("Dismiss")
+                Text("Cancel")
             }
         }
     )
@@ -240,7 +243,7 @@ fun UserFieldInput(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier.fillMaxWidth(),
+    modifier: Modifier = Modifier,
     isInvalid: Boolean = false,
     errorMessage: String = "Invalid input",
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
@@ -270,15 +273,20 @@ fun ButtonRow(
     recipe: Recipe,
     recipeViewModel: RecipeViewModel,
     modifier: Modifier = Modifier,
-    originalRecipe: Recipe
+    originalRecipe: Recipe,
+    goToRecipeList: () -> Unit
 ){
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showSaveDialog by remember { mutableStateOf(false) }
+
+    var confirmedDelete by remember { mutableStateOf(false) }
+
     Row(modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ){
         IconButton(
-            //TODO: Input validation
-            onClick = { recipeViewModel.editRecipe(originalRecipe.name, recipe) }
+            onClick = { showSaveDialog = true }
         ) {
             Icon(
                 imageVector = Icons.Default.Done,
@@ -289,14 +297,45 @@ fun ButtonRow(
         Spacer(modifier = Modifier.width(4.dp))
 
         IconButton(
-            //TODO: Delete recipe confirmation popup
-            onClick = { recipeViewModel.removeRecipe(recipe) }
+            onClick = { showDeleteDialog = true }
         ) {
             Icon(
                 imageVector = Icons.Default.Delete,
                 contentDescription = "Delete"
             )
         }
+    }
+
+    if (showDeleteDialog) {
+        if (confirmedDelete) {
+            LaunchedEffect(Unit) {
+                recipeViewModel.removeRecipe(recipe)
+                goToRecipeList()
+            }
+        } else {
+            ConfirmPopup(
+                onDismissRequest = { showDeleteDialog = false },
+                onConfirmation = { confirmedDelete = true },
+                dialogTitle = "Are you sure?",
+                dialogText = "Would you like to delete ${recipe.name}? This cannot be undone.",
+                icon = Icons.Default.Warning,
+                confirmText = "Delete"
+            )
+        }
+    }
+
+    if (showSaveDialog){
+        ConfirmPopup(
+            onDismissRequest = { showSaveDialog = true },
+            onConfirmation = {
+                recipeViewModel.editRecipe(originalRecipe.name, recipe)
+                goToRecipeList()
+            },
+            dialogTitle = "Save changes",
+            dialogText = "Would you like to save your changes to " + recipe.name + "?",
+            icon = Icons.Default.Edit,
+            confirmText = "Save"
+        )
     }
 }
 

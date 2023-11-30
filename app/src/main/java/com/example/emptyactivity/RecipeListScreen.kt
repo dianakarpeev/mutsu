@@ -104,7 +104,8 @@ fun RecipeInput(
             modifier = Modifier
                 .weight(1f)
                 .align(Alignment.CenterVertically)
-                .padding(vertical = 8.dp)
+                .padding(vertical = 8.dp),
+            enabled = false
         ) {
             Text("Add")
         }

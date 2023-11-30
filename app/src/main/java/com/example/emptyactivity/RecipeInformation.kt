@@ -1,5 +1,6 @@
 package com.example.emptyactivity
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,11 +42,11 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -113,8 +114,8 @@ fun RecipeInformationScreen(
 
     //TODO: Replace temporary hardcoded values with responsive behavior
     //Temporary hardcoded values - to be modified when implementing responsive behavior
-    val columnWidth = 350.dp;
-    val spaceBetweenElements = 2.dp;
+    val columnWidth = 350.dp
+    val spaceBetweenElements = 2.dp
 
     Box (
         modifier = Modifier.fillMaxSize(),
@@ -304,7 +305,6 @@ private fun isValidPositiveInteger(string: String): Boolean {
  * @param keyboardOptions Keyboard options for specific cases. For example, when you want the user to
  * only be able to input numbers.
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun UserFieldInput(
     label: String,
@@ -451,6 +451,9 @@ fun IngredientDisplay(
     val spaceBetweenIngredients = 10.dp
     val spacerHeight = 20.dp
 
+    // State to hold the list of ingredients
+    var ingredients by remember { mutableStateOf(recipe.ingredients.toMutableList()) }
+
     Column(
         modifier = Modifier
             .background(veryLightGray)
@@ -459,11 +462,14 @@ fun IngredientDisplay(
             .heightIn(minColumnHeight, maxColumnHeight)
             .padding(columnPadding)
     ) {
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(spaceBetweenIngredients)
-        ) {
-            items(recipe.ingredients) { ingredient ->
-                IngredientDisplayRow(ingredient = ingredient)
+        LazyColumn {
+            items(
+                items = ingredients,
+                key = { ingredient -> ingredient.name }
+            ) { ingredient ->
+                key(ingredient.name) {
+                    IngredientDisplayRow(ingredient = ingredient)
+                }
             }
         }
 
@@ -471,7 +477,13 @@ fun IngredientDisplay(
 
         // AddIngredientButton or IngredientInputRow
         if (displayInputRow) {
-            IngredientInputRow(recipe)
+            IngredientInputRow(
+                onIngredientAdded = { newIngredient ->
+                    ingredients = ingredients.toMutableList().apply {
+                        add(newIngredient)
+                    }
+                }
+            )
         } else {
             AddIngredientButton(onClick = toggleDisplayInputRow)
         }
@@ -520,9 +532,11 @@ fun IngredientDisplayRow(
  * Row of input fields for users to fill out when creating a new ingredient to be added to a recipe.
  */
 @Composable
-fun IngredientInputRow(recipe: Recipe) {
+fun IngredientInputRow(
+    onIngredientAdded: (TemporaryIngredient) -> Unit
+) {
     var ingredientQuantity by remember { mutableStateOf("") }
-    val ingredientMeasurement by remember { mutableStateOf(Measurements.NONE) }
+    var ingredientMeasurement by remember { mutableStateOf(Measurements.NONE) }
     var ingredientName by remember { mutableStateOf("") }
 
     //Temporary hardcoded values - to be modified when implementing responsive behavior
@@ -553,7 +567,11 @@ fun IngredientInputRow(recipe: Recipe) {
         DropdownMeasurement(
             modifier = Modifier
                 .weight(0.5f)
-                .fillMaxHeight()
+                .fillMaxHeight(),
+            onValueChange = {
+                Log.d("DEBUG", "Dropdown menu value has changed!")
+                ingredientMeasurement = it
+            }
         )
 
         //Name
@@ -570,12 +588,16 @@ fun IngredientInputRow(recipe: Recipe) {
             ),
             keyboardActions = KeyboardActions(
                 onDone = {
-                    addNewIngredient(
-                        recipe,
-                        ingredientQuantity,
-                        ingredientMeasurement,
-                        ingredientName
-                    )
+                    // Recompose IngredientsDisplay to show new changes
+                    onIngredientAdded(TemporaryIngredient(
+                        name = ingredientName,
+                        quantity = ingredientQuantity.toInt(),
+                        measurement = ingredientMeasurement
+                    ))
+
+                    // Reset input fields after adding ingredient
+                    ingredientQuantity = ""
+                    ingredientName = ""
                 }
             )
         )
@@ -602,7 +624,10 @@ private fun addNewIngredient(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownMeasurement(modifier: Modifier) {
+fun DropdownMeasurement(
+    modifier: Modifier,
+    onValueChange: (Measurements) -> Unit
+) {
     var expanded by remember { mutableStateOf(false) }
     var selectedMeasurement by remember { mutableStateOf(Measurements.NONE) }
 
@@ -636,6 +661,7 @@ fun DropdownMeasurement(modifier: Modifier) {
                         { Text(text = measurement.abbreviation) },
                         onClick = {
                             selectedMeasurement = measurement
+                            onValueChange(selectedMeasurement)
                             expanded = false
                         }
                     )

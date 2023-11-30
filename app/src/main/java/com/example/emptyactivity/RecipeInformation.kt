@@ -45,7 +45,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 data class Recipe(
     var name: String,
@@ -119,6 +121,12 @@ fun RecipeForm(
     var portionState by remember { mutableStateOf(recipe.portionYield.toString()) }
     var urlState by remember { mutableStateOf(recipe.webURL ?: "") }
 
+    var isNameValid by remember { mutableStateOf(true) }
+    var isPortionValid by remember { mutableStateOf(true) }
+
+    var invalidStringErrorMessage by remember { mutableStateOf("Please enter a valid string")}
+    var invalidIntegerErrorMessage by remember { mutableStateOf("Please enter a valid positive number") }
+
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -130,8 +138,11 @@ fun RecipeForm(
             value = nameState,
             onValueChange = {
                 nameState = it
-                recipe.name = nameState
-            }
+                isNameValid = isValidString(it)
+                if (isNameValid) { recipe.name = nameState }
+            },
+            isInvalid = !isNameValid,
+            errorMessage = invalidStringErrorMessage
         )
 
         //Ingredients
@@ -147,8 +158,11 @@ fun RecipeForm(
             value = portionState,
             onValueChange = {
                 portionState = it
-                recipe.portionYield = portionState.toInt()
+                isPortionValid = isValidPositiveInteger(it)
+                if (isPortionValid) { recipe.portionYield = it.toInt() }
             },
+            isInvalid = !isPortionValid,
+            errorMessage = invalidIntegerErrorMessage,
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number
             )
@@ -166,12 +180,24 @@ fun RecipeForm(
     }
 }
 
+fun isValidString(input: String): Boolean {
+    return input.isNotBlank()
+}
+
+private fun isValidPositiveInteger(string: String): Boolean {
+    return string.toIntOrNull()?.let { parsedInt ->
+        parsedInt > 0
+    } ?: false
+}
+
 @Composable
 fun UserFieldInput(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier.fillMaxWidth(),
+    isInvalid: Boolean = false,
+    errorMessage: String = "Invalid input",
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
     OutlinedTextField(
@@ -182,6 +208,16 @@ fun UserFieldInput(
         keyboardOptions = keyboardOptions,
         maxLines = 1
     )
+
+    if (isInvalid) {
+        Text(
+            text = errorMessage,
+            color = Color.Red,
+            fontSize = 12.sp,
+            textAlign = TextAlign.Left,
+            modifier = Modifier.padding(end = 100.dp)
+        )
+    }
 }
 
 @Composable

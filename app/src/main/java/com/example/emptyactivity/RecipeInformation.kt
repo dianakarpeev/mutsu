@@ -528,12 +528,14 @@ fun IngredientInputRow(recipe: Recipe) {
     //Temporary hardcoded values - to be modified when implementing responsive behavior
     val quantityFieldWidth = 75.dp
     val nameFieldWidth = 150.dp
+    val spaceInBetween = 13.dp
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(spaceInBetween)
     ) {
         //Quantity
         UserFieldInput(
@@ -541,18 +543,17 @@ fun IngredientInputRow(recipe: Recipe) {
             value = ingredientQuantity,
             onValueChange = { ingredientQuantity = it },
             modifier = Modifier
-                .height(IntrinsicSize.Min)
+                .fillMaxHeight()
                 .weight(1f)
                 .width(quantityFieldWidth),
             keyboardOptions = KeyboardOptions.Default.copy(
             )
         )
-
         //Measurement
         DropdownMeasurement(
             modifier = Modifier
-                .weight(1f)
-                .height(IntrinsicSize.Min)
+                .weight(0.5f)
+                .fillMaxHeight()
         )
 
         //Name
@@ -561,8 +562,8 @@ fun IngredientInputRow(recipe: Recipe) {
             value = ingredientName,
             onValueChange = { ingredientName = it },
             modifier = Modifier
-                .height(IntrinsicSize.Min)
-                .weight(1f)
+                .fillMaxHeight()
+                .weight(2f)
                 .width(nameFieldWidth),
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Done

@@ -46,7 +46,7 @@ fun RecipeListScreen(goToRecipeInformation: (String) -> Unit){
                 if (recipeName.isNotEmpty()) {
                     addNewEmptyRecipe(recipeViewModel, recipeName)
                     goToRecipeInformation(recipeName)
-                    recipeName == ""
+                    recipeName = ""
                 }
             },
             modifier = Modifier

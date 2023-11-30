@@ -24,6 +24,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
@@ -37,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,6 +62,7 @@ data class Recipe(
     var webURL: String?
 )
 
+//All the measurements a user can pick out of when creating a new ingredient to add to a recipe
 enum class Measurements(val abbreviation: String) {
     TEASPOON("tsp"),
     TABLESPOON("tbsp"),
@@ -78,18 +82,37 @@ data class TemporaryIngredient(
     val name: String
 )
 
+/**
+ * Screen where users can:
+ * - Fill out the missing information for a newly created recipe
+ * - Edit the information of an already created recipe
+ * - Delete a recipe
+ *
+ * @param recipeViewModel ViewModel that contains existing recipes and handles CRUD operations
+ * @param recipeName Name of the recipe to obtain information about (to prefill the form fields)
+ * @param goToRecipeList Navigation to the Recipe List screen. Used when the changes to the recipe
+ * are saved or when the recipe is deleted.
+ */
 @Composable
 fun RecipeInformationScreen(
     recipeViewModel: RecipeViewModel,
-    recipeName: String?
+    recipeName: String?,
+    goToRecipeList: () -> Unit
 ){
+    //The recipe name is passed through navigation arguments and may be null
     if (recipeName == null) throw IllegalStateException("Recipe name is missing.")
-    val recipe = recipeViewModel.getRecipeByName(recipeName)
-        ?: throw IllegalStateException("New recipe wasn't added properly to the ViewModel. AFTER")
 
-    //To be able to edit a recipe, we need the original name to be able to find it
-    //in the ViewModel
-    val originalRecipe = recipe
+    /**
+     * Obtain the recipe's information - if it doesn't exist in the ViewModel, create a new empty
+     * recipe. Temporary fix until the datastore is implemented in this screen.
+     */
+    val recipe = recipeViewModel.getRecipeByName(recipeName)
+        ?: createEmptyRecipe(recipeName)
+
+    //TODO: Replace temporary hardcoded values with responsive behavior
+    //Temporary hardcoded values - to be modified when implementing responsive behavior
+    val columnWidth = 350.dp;
+    val spaceBetweenElements = 2.dp;
 
     Box (
         modifier = Modifier.fillMaxSize(),
@@ -97,19 +120,32 @@ fun RecipeInformationScreen(
     ) {
         Column(
             modifier = Modifier
-                .width(350.dp)
+                .width(columnWidth)
                 .fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(2.dp)
+            verticalArrangement = Arrangement.spacedBy(spaceBetweenElements)
         ) {
+            //Save and delete buttons
             ButtonRow(
                 recipeViewModel = recipeViewModel,
                 recipe = recipe,
-                originalRecipe = originalRecipe
+                originalRecipe = recipe,
+                goToRecipeList = goToRecipeList
             )
+
+            //Form containing all the information for users to fill/edit
             RecipeForm(recipe = recipe)
         }
     }
+}
+
+private fun createEmptyRecipe(recipeName: String): Recipe{
+    return Recipe(
+        name = recipeName,
+        ingredients = mutableListOf(),
+        portionYield = 0,
+        webURL = null
+    )
 }
 
 @Composable
@@ -117,23 +153,30 @@ fun RecipeForm(
     modifier: Modifier = Modifier,
     recipe: Recipe
 ) {
+    //Variables to toggle the new ingredient input row's visibility to users.
     var displayInputRow by remember { mutableStateOf(false)}
     val toggleDisplayInputRow: () -> Unit = { displayInputRow = !displayInputRow }
 
+    //Fields other than ingredients for users to fill out.
     var nameState by remember { mutableStateOf(recipe.name) }
     var portionState by remember { mutableStateOf(recipe.portionYield.toString()) }
     var urlState by remember { mutableStateOf(recipe.webURL ?: "") }
 
+    //Displays an error message under the corresponding fields when false.
     var isNameValid by remember { mutableStateOf(true) }
     var isPortionValid by remember { mutableStateOf(true) }
 
-    var invalidStringErrorMessage by remember { mutableStateOf("Please enter a valid string")}
-    var invalidIntegerErrorMessage by remember { mutableStateOf("Please enter a valid positive number") }
+    //Error messages to display under corresponding fields when invalid.
+    val invalidStringErrorMessage by remember { mutableStateOf("Please enter a valid string")}
+    val invalidIntegerErrorMessage by remember { mutableStateOf("Please enter a valid positive number") }
+
+    //Temporary hardcoded values - to be modified when implementing responsive behavior
+    val spaceBetweenInputFields = 20.dp
 
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        verticalArrangement = Arrangement.spacedBy(spaceBetweenInputFields)
     ) {
         //Recipe Name
         UserFieldInput(
@@ -145,7 +188,8 @@ fun RecipeForm(
                 if (isNameValid) { recipe.name = nameState }
             },
             isInvalid = !isNameValid,
-            errorMessage = invalidStringErrorMessage
+            errorMessage = invalidStringErrorMessage,
+            modifier = Modifier.fillMaxWidth()
         )
 
         //Ingredients
@@ -168,7 +212,8 @@ fun RecipeForm(
             errorMessage = invalidIntegerErrorMessage,
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number
-            )
+            ),
+            modifier = Modifier.fillMaxWidth()
         )
 
         //Web URL
@@ -178,39 +223,43 @@ fun RecipeForm(
             onValueChange = {
                 urlState = it
                 recipe.webURL = urlState
-            }
+            },
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
 
+/**
+ * Displays a pop up message where users can dismiss or confirm the requested action.
+ *
+ * @param onDismissRequest Actions to take when the user clicks outside of the popup or the dismiss button
+ * @param onConfirmation Actions to take when the users click on the confirm button
+ * @param confirmText Text to display on the confirm button
+ * @param dialogTitle Header of the confirm pop-up window
+ * @param dialogText Message of the pop-up window
+ * @param icon Icon to display at the top of the pop-up window
+ */
 @Composable
 fun ConfirmPopup(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
+    confirmText: String,
     dialogTitle: String,
     dialogText: String,
     icon: ImageVector,
 ) {
     AlertDialog(
-        icon = {
-            Icon(icon, contentDescription = "Example Icon")
-        },
-        title = {
-            Text(text = dialogTitle)
-        },
-        text = {
-            Text(text = dialogText)
-        },
-        onDismissRequest = {
-            onDismissRequest()
-        },
+        icon = { Icon(icon, contentDescription = null) },
+        title = { Text(text = dialogTitle) },
+        text = { Text(text = dialogText) },
+        onDismissRequest = { onDismissRequest() },
         confirmButton = {
             TextButton(
                 onClick = {
                     onConfirmation()
                 }
             ) {
-                Text("Confirm")
+                Text(confirmText)
             }
         },
         dismissButton = {
@@ -219,32 +268,53 @@ fun ConfirmPopup(
                     onDismissRequest()
                 }
             ) {
-                Text("Dismiss")
+                Text("Cancel")
             }
         }
     )
 }
 
+/**
+ * Returns if a string is empty or not.
+ */
 fun isValidString(input: String): Boolean {
     return input.isNotBlank()
 }
 
+/**
+ * Returns true if a string can be converted to a non-null integer and is above zero.
+ */
 private fun isValidPositiveInteger(string: String): Boolean {
     return string.toIntOrNull()?.let { parsedInt ->
         parsedInt > 0
     } ?: false
 }
 
+/**
+ * Displays a text box for a user to fill. If the input is invalid, displays a error message
+ * underneath the text box.
+ *
+ * @param label Label to display on top of the text box
+ * @param value Value the field corresponds to
+ * @param onValueChange Actions to take when the value of the text box is changed
+ * @param isInvalid Whether the user input is valid or not. If true, displays an error message.
+ * @param errorMessage Error message to display if the input is invalid.
+ * @param keyboardOptions Keyboard options for specific cases. For example, when you want the user to
+ * only be able to input numbers.
+ */
 @Composable
 fun UserFieldInput(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier.fillMaxWidth(),
+    modifier: Modifier = Modifier,
     isInvalid: Boolean = false,
     errorMessage: String = "Invalid input",
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
+    //Temporary hardcoded values - to be modified when implementing responsive behavior
+    val rightPadding = 100.dp
+
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -260,25 +330,45 @@ fun UserFieldInput(
             color = Color.Red,
             fontSize = 12.sp,
             textAlign = TextAlign.Left,
-            modifier = Modifier.padding(end = 100.dp)
+            modifier = Modifier.padding(end = rightPadding)
         )
     }
 }
 
+/**
+ * Contains the buttons for a user to either:
+ * - Save the changes to the current recipe
+ * - Delete the current recipe
+ *
+ * Each button displays a confirmation popup before proceeding.
+ * @param recipe
+ * @param recipeViewModel
+ * @param originalRecipe Original state of the recipe when the user first came on this screen. Used
+ * for the ViewModel to find the recipe even if the name was edited.
+ * @param goToRecipeList Navigation to Recipe List screen once the action of a button was performed.
+ */
 @Composable
 fun ButtonRow(
     recipe: Recipe,
     recipeViewModel: RecipeViewModel,
     modifier: Modifier = Modifier,
-    originalRecipe: Recipe
+    originalRecipe: Recipe,
+    goToRecipeList: () -> Unit
 ){
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showSaveDialog by remember { mutableStateOf(false) }
+
+    var confirmedDelete by remember { mutableStateOf(false) }
+
+    //Temporary hardcoded values - to be modified when implementing responsive behavior
+    val spaceBetweenButtons = 4.dp
+
     Row(modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ){
         IconButton(
-            //TODO: Input validation
-            onClick = { recipeViewModel.editRecipe(originalRecipe.name, recipe) }
+            onClick = { showSaveDialog = true }
         ) {
             Icon(
                 imageVector = Icons.Default.Done,
@@ -286,11 +376,10 @@ fun ButtonRow(
             )
         }
 
-        Spacer(modifier = Modifier.width(4.dp))
+        Spacer(modifier = Modifier.width(spaceBetweenButtons))
 
         IconButton(
-            //TODO: Delete recipe confirmation popup
-            onClick = { recipeViewModel.removeRecipe(recipe) }
+            onClick = { showDeleteDialog = true }
         ) {
             Icon(
                 imageVector = Icons.Default.Delete,
@@ -298,37 +387,88 @@ fun ButtonRow(
             )
         }
     }
+
+    if (showDeleteDialog) {
+        if (confirmedDelete) {
+            LaunchedEffect(Unit) {
+                recipeViewModel.removeRecipe(recipe)
+                goToRecipeList()
+            }
+        } else {
+            ConfirmPopup(
+                onDismissRequest = { showDeleteDialog = false },
+                onConfirmation = { confirmedDelete = true },
+                dialogTitle = "Are you sure?",
+                dialogText = "Would you like to delete ${recipe.name}? This cannot be undone.",
+                icon = Icons.Default.Warning,
+                confirmText = "Delete"
+            )
+        }
+    }
+
+    if (showSaveDialog){
+        ConfirmPopup(
+            onDismissRequest = { showSaveDialog = true },
+            onConfirmation = {
+                recipeViewModel.editRecipe(originalRecipe.name, recipe)
+                goToRecipeList()
+            },
+            dialogTitle = "Save changes",
+            dialogText = "Would you like to save your changes to " + recipe.name + "?",
+            icon = Icons.Default.Edit,
+            confirmText = "Save"
+        )
+    }
 }
 
+/**
+ * Displays a list of the current recipe's ingredients as well as a button to add a new ingredient
+ * to the recipe. Once clicked, the button toggles a row of fields where users can add the missing
+ * information the new ingredient.
+ *
+ * @param recipe
+ * @param toggleDisplayInputRow Function to toggle the visibility of the new ingredient input row
+ * @param displayInputRow If true, displays the row of input fields to add a new ingredient to
+ *  * the recipe
+ */
 @Composable
 fun IngredientDisplay(
     recipe: Recipe,
     toggleDisplayInputRow: () -> Unit,
     displayInputRow: Boolean
 ) {
+    //Temporary hardcoded values - to be modified when implementing responsive behavior
+    val veryLightGray = Color(244, 244, 244)
+    val roundedCornerRadius = 12.dp
+    val minColumnHeight = 150.dp
+    val maxColumnHeight = 500.dp
+    val columnPadding = 25.dp
+    val spaceBetweenIngredients = 10.dp
+    val spacerHeight = 20.dp
 
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+    Column(
         modifier = Modifier
-            .background(Color(244, 244, 244))
-            .defaultMinSize(150.dp)
-            .clip(shape = RoundedCornerShape(12.dp))
-            .heightIn(150.dp, 500.dp)
-            .padding(25.dp)
+            .background(veryLightGray)
+            .defaultMinSize(minColumnHeight)
+            .clip(shape = RoundedCornerShape(roundedCornerRadius))
+            .heightIn(minColumnHeight, maxColumnHeight)
+            .padding(columnPadding)
     ) {
-        items(recipe.ingredients) { ingredient ->
-            IngredientDisplayRow(ingredient = ingredient)
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(spaceBetweenIngredients)
+        ) {
+            items(recipe.ingredients) { ingredient ->
+                IngredientDisplayRow(ingredient = ingredient)
+            }
         }
 
-        if (displayInputRow){
-            item {
-                IngredientInputRow(recipe)
-            }
-        }
-        else {
-            item{
-                AddIngredientButton(onClick = toggleDisplayInputRow)
-            }
+        Spacer(Modifier.height(spacerHeight))
+
+        // AddIngredientButton or IngredientInputRow
+        if (displayInputRow) {
+            IngredientInputRow(recipe)
+        } else {
+            AddIngredientButton(onClick = toggleDisplayInputRow)
         }
     }
 }
@@ -339,35 +479,51 @@ fun AddIngredientButton(onClick: () -> Unit) {
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = onClick,
-            shape = RectangleShape
+            shape = RectangleShape,
+            enabled = false
         ) {
             Text("Add Ingredient")
         }
     }
 }
 
+/**
+ * Displays a single ingredient's quantity, measurement and name.
+ */
 @Composable
 fun IngredientDisplayRow(
     ingredient: TemporaryIngredient
 ) {
+    //Temporary hardcoded values - to be modified when implementing responsive behavior
+    val spacerWidth = 16.dp
+
     Row(
         modifier = Modifier
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(ingredient.quantity.toString())
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(ingredient.measurement.abbreviation)
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(ingredient.name)
+        Text(ingredient.quantity.toString(), modifier = Modifier.weight(0.5f))
+        Text(ingredient.measurement.abbreviation, modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier
+            .weight(0.5f)
+            .width(spacerWidth)
+        )
+        Text(ingredient.name, modifier = Modifier.weight(3f))
     }
 }
 
+/**
+ * Row of input fields for users to fill out when creating a new ingredient to be added to a recipe.
+ */
 @Composable
 fun IngredientInputRow(recipe: Recipe) {
     var ingredientQuantity by remember { mutableStateOf("") }
-    var ingredientMeasurement by remember { mutableStateOf(Measurements.NONE) }
+    val ingredientMeasurement by remember { mutableStateOf(Measurements.NONE) }
     var ingredientName by remember { mutableStateOf("") }
+
+    //Temporary hardcoded values - to be modified when implementing responsive behavior
+    val quantityFieldWidth = 75.dp
+    val nameFieldWidth = 150.dp
 
     Row(
         modifier = Modifier
@@ -381,12 +537,11 @@ fun IngredientInputRow(recipe: Recipe) {
             label = "Qty",
             value = ingredientQuantity,
             onValueChange = { ingredientQuantity = it },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Number
-            ),
             modifier = Modifier
                 .weight(1f)
-                .width(75.dp)
+                .width(quantityFieldWidth),
+            keyboardOptions = KeyboardOptions.Default.copy(
+            )
         )
 
         //Measurement
@@ -397,7 +552,7 @@ fun IngredientInputRow(recipe: Recipe) {
             label = "Name",
             value = ingredientName,
             onValueChange = { ingredientName = it },
-            modifier = Modifier.width(150.dp)
+            modifier = Modifier.width(nameFieldWidth),
         )
 
         //Submit
@@ -420,13 +575,16 @@ fun IngredientInputRow(recipe: Recipe) {
     }
 }
 
-//Taken from https://alexzh.com/jetpack-compose-dropdownmenu/
+/**
+ * Dropdown menu that displays all measurement options to the user.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownMeasurement(modifier: Modifier) {
     var expanded by remember { mutableStateOf(false) }
     var selectedMeasurement by remember { mutableStateOf(Measurements.NONE) }
 
+    //Taken from https://alexzh.com/jetpack-compose-dropdownmenu/
     Box(
         modifier = Modifier
             .width(100.dp)

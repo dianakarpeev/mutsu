@@ -80,7 +80,7 @@ enum class Measurements(val abbreviation: String) {
 }
 
 data class TemporaryIngredient(
-    val quantity: Int,
+    val quantity: Double,
     val measurement: Measurements,
     val name: String
 )
@@ -448,7 +448,6 @@ fun IngredientDisplay(
     val minColumnHeight = 150.dp
     val maxColumnHeight = 350.dp
     val columnPadding = 25.dp
-    val spaceBetweenIngredients = 10.dp
     val spacerHeight = 20.dp
 
     // State to hold the list of ingredients
@@ -591,7 +590,7 @@ fun IngredientInputRow(
                     // Recompose IngredientsDisplay to show new changes
                     onIngredientAdded(TemporaryIngredient(
                         name = ingredientName,
-                        quantity = ingredientQuantity.toInt(),
+                        quantity = ingredientQuantity.toDouble(),
                         measurement = ingredientMeasurement
                     ))
 
@@ -602,21 +601,6 @@ fun IngredientInputRow(
             )
         )
     }
-}
-
-private fun addNewIngredient(
-    recipe: Recipe,
-    quantity: String,
-    measurement: Measurements,
-    name: String
-) {
-    recipe.ingredients.add(
-        TemporaryIngredient(
-            quantity.toInt(),
-            measurement,
-            name
-        )
-    )
 }
 
 /**

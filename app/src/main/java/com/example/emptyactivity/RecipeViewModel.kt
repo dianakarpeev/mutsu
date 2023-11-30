@@ -48,7 +48,7 @@ class RecipeViewModel : ViewModel() {
             TemporaryIngredient(
                 name = "Spaghetti",
                 measurement = Measurements.GRAM,
-                quantity = 500
+                quantity = 500.0
             )
         )
 
@@ -56,7 +56,7 @@ class RecipeViewModel : ViewModel() {
             TemporaryIngredient(
                 name = "Bacon",
                 measurement = Measurements.GRAM,
-                quantity = 200
+                quantity = 200.0
             )
         )
 
@@ -64,7 +64,7 @@ class RecipeViewModel : ViewModel() {
             TemporaryIngredient(
                 name = "Egg",
                 measurement = Measurements.NONE,
-                quantity = 2
+                quantity = 2.0
             )
         )
 
@@ -72,7 +72,7 @@ class RecipeViewModel : ViewModel() {
             TemporaryIngredient(
                 name = "Parmesan",
                 measurement = Measurements.CUP,
-                quantity = 1/2
+                quantity = 0.5
             )
         )
 
@@ -80,7 +80,7 @@ class RecipeViewModel : ViewModel() {
             TemporaryIngredient(
                 name = "Black pepper",
                 measurement = Measurements.TEASPOON,
-                quantity = 1
+                quantity = 1.0
             )
         )
 
@@ -88,13 +88,13 @@ class RecipeViewModel : ViewModel() {
     }
 
     private fun getIngredientsForBreadPudding() : MutableList<TemporaryIngredient>{
-        var ingredientList = mutableListOf<TemporaryIngredient>()
+        val ingredientList = mutableListOf<TemporaryIngredient>()
 
         ingredientList.add(
             TemporaryIngredient(
                 name = "Slices of bread",
                 measurement = Measurements.NONE,
-                quantity = 6
+                quantity = 6.0
             )
         )
 
@@ -102,7 +102,7 @@ class RecipeViewModel : ViewModel() {
             TemporaryIngredient(
                 name = "Egg",
                 measurement = Measurements.NONE,
-                quantity = 4
+                quantity = 4.0
             )
         )
 
@@ -110,7 +110,7 @@ class RecipeViewModel : ViewModel() {
             TemporaryIngredient(
                 name = "Butter",
                 measurement = Measurements.TABLESPOON,
-                quantity = 3
+                quantity = 3.0
             )
         )
 
@@ -118,7 +118,7 @@ class RecipeViewModel : ViewModel() {
             TemporaryIngredient(
                 name = "Milk",
                 measurement = Measurements.CUP,
-                quantity = 2
+                quantity = 2.0
             )
         )
 
@@ -126,7 +126,7 @@ class RecipeViewModel : ViewModel() {
             TemporaryIngredient(
                 name = "Cinnamon",
                 measurement = Measurements.TEASPOON,
-                quantity = 1/2
+                quantity = 0.5
             )
         )
 
@@ -134,7 +134,7 @@ class RecipeViewModel : ViewModel() {
             TemporaryIngredient(
                 name = "Vanilla extract",
                 measurement = Measurements.TEASPOON,
-                quantity = 1
+                quantity = 1.0
             )
         )
 
@@ -169,7 +169,7 @@ class RecipeViewModel : ViewModel() {
      * @return A list of all recipes.
      */
     fun getAllRecipes(): List<Recipe>{
-        return recipeList.value;
+        return recipeList.value
     }
 
     /**

@@ -19,9 +19,9 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
@@ -45,11 +45,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -302,6 +304,7 @@ private fun isValidPositiveInteger(string: String): Boolean {
  * @param keyboardOptions Keyboard options for specific cases. For example, when you want the user to
  * only be able to input numbers.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun UserFieldInput(
     label: String,
@@ -311,6 +314,7 @@ fun UserFieldInput(
     isInvalid: Boolean = false,
     errorMessage: String = "Invalid input",
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions : KeyboardActions = KeyboardActions()
 ) {
     //Temporary hardcoded values - to be modified when implementing responsive behavior
     val rightPadding = 100.dp
@@ -321,6 +325,7 @@ fun UserFieldInput(
         label = { Text(text = label) },
         modifier = modifier,
         keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
         maxLines = 1
     )
 
@@ -441,7 +446,7 @@ fun IngredientDisplay(
     val veryLightGray = Color(244, 244, 244)
     val roundedCornerRadius = 12.dp
     val minColumnHeight = 150.dp
-    val maxColumnHeight = 500.dp
+    val maxColumnHeight = 350.dp
     val columnPadding = 25.dp
     val spaceBetweenIngredients = 10.dp
     val spacerHeight = 20.dp
@@ -479,8 +484,7 @@ fun AddIngredientButton(onClick: () -> Unit) {
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = onClick,
-            shape = RectangleShape,
-            enabled = false
+            shape = RectangleShape
         ) {
             Text("Add Ingredient")
         }
@@ -529,7 +533,6 @@ fun IngredientInputRow(recipe: Recipe) {
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min),
-        horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
         //Quantity
@@ -538,6 +541,7 @@ fun IngredientInputRow(recipe: Recipe) {
             value = ingredientQuantity,
             onValueChange = { ingredientQuantity = it },
             modifier = Modifier
+                .height(IntrinsicSize.Min)
                 .weight(1f)
                 .width(quantityFieldWidth),
             keyboardOptions = KeyboardOptions.Default.copy(
@@ -545,34 +549,51 @@ fun IngredientInputRow(recipe: Recipe) {
         )
 
         //Measurement
-        DropdownMeasurement(modifier = Modifier)
+        DropdownMeasurement(
+            modifier = Modifier
+                .weight(1f)
+                .height(IntrinsicSize.Min)
+        )
 
         //Name
         UserFieldInput(
             label = "Name",
             value = ingredientName,
             onValueChange = { ingredientName = it },
-            modifier = Modifier.width(nameFieldWidth),
-        )
-
-        //Submit
-        IconButton(
-            onClick = {
-                recipe.ingredients.add(
-                    TemporaryIngredient(
-                        ingredientQuantity.toInt(),
+            modifier = Modifier
+                .height(IntrinsicSize.Min)
+                .weight(1f)
+                .width(nameFieldWidth),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    addNewIngredient(
+                        recipe,
+                        ingredientQuantity,
                         ingredientMeasurement,
                         ingredientName
                     )
-                )
-            }
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add new ingredient to recipe"
+                }
             )
-        }
+        )
     }
+}
+
+private fun addNewIngredient(
+    recipe: Recipe,
+    quantity: String,
+    measurement: Measurements,
+    name: String
+) {
+    recipe.ingredients.add(
+        TemporaryIngredient(
+            quantity.toInt(),
+            measurement,
+            name
+        )
+    )
 }
 
 /**

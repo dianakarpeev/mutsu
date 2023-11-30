@@ -97,7 +97,7 @@ fun RecipeInformationScreen(
     ) {
         Column(
             modifier = Modifier
-                .width(320.dp)
+                .width(350.dp)
                 .fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(2.dp)
@@ -384,6 +384,9 @@ fun IngredientInputRow(recipe: Recipe) {
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number
             ),
+            modifier = Modifier
+                .weight(1f)
+                .width(75.dp)
         )
 
         //Measurement
@@ -426,7 +429,7 @@ fun DropdownMeasurement(modifier: Modifier) {
 
     Box(
         modifier = Modifier
-            .fillMaxWidth()
+            .width(100.dp)
             .wrapContentSize(Alignment.TopEnd)
     ) {
         ExposedDropdownMenuBox(

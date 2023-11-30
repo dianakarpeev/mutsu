@@ -482,6 +482,7 @@ fun IngredientDisplay(
                         add(newIngredient)
                     }
                     toggleDisplayInputRow()
+                    recipe.ingredients.add(newIngredient)
                 }
             )
         } else {

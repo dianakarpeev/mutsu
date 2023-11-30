@@ -19,3 +19,25 @@ interface AuthRepository {
     suspend fun delete()
 }
 
+class AuthRepositoryFirebase(private val auth: FirebaseAuth) : AuthRepository {
+    private val currentUserStateFlow = MutableStateFlow(auth.currentUser?.toUser())
+
+    init {
+        auth.addAuthStateListener { firebaseAuth ->
+            currentUserStateFlow.value = firebaseAuth.currentUser?.toUser()
+        }
+    }
+
+    override fun currentUser(): StateFlow<Users?> {
+        return currentUserStateFlow
+    }
+
+    private fun FirebaseUser?.toUser(): Users? {
+        return this?.let {
+            if (it.email==null) null else
+                Users(
+                    email = it.email!!,
+                )
+        }
+    }
+}

@@ -22,6 +22,7 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import com.example.emptyactivity.ui.theme.EmptyActivityTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -34,7 +35,7 @@ import com.example.emptyactivity.navigation.Home
 import com.example.emptyactivity.navigation.MealPlan
 import com.example.emptyactivity.navigation.RecipeInformation
 import com.example.emptyactivity.navigation.Recipes
-import com.example.emptyactivity.ui.theme.EmptyActivityTheme
+import com.example.emptyactivity.navigation.LoginRegister
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,7 +59,6 @@ class MainActivity : ComponentActivity() {
                 val currentBackStack by navController.currentBackStackEntryAsState()
                 val currentDestination = currentBackStack?.destination
 
-                val windowSizeClass = calculateWindowSizeClass(this)
                 val ingredientsViewModel : IngredientsViewModel = viewModel()
                 val recipeViewModel : RecipeViewModel = viewModel()
 
@@ -86,6 +86,11 @@ class MainActivity : ComponentActivity() {
                                     onClick = { navController.navigateSingleTopTo(Recipes.route) }
                                 ) {
                                     Icon(Recipes.icon, contentDescription = "Recipes")
+                                }
+                                IconButton(
+                                    onClick = { navController.navigateSingleTopTo(LoginRegister.route) }
+                                ) {
+                                    Icon(LoginRegister.icon, contentDescription = "Login/Register")
                                 }
                             }
                         }
@@ -128,6 +133,9 @@ class MainActivity : ComponentActivity() {
 
                             RecipeInformationScreen(recipeViewModel, recipeName)
                         }
+                        composable(route = LoginRegister.route){
+                            LoginRegisterScreen()
+                        }
                     }
                 }
             }
@@ -141,3 +149,4 @@ fun NavHostController.navigateSingleTopTo(route: String) =
 private fun NavHostController.navigateToRecipeInformation(recipeName: String) {
     this.navigateSingleTopTo("${RecipeInformation.route}/$recipeName")
 }
+

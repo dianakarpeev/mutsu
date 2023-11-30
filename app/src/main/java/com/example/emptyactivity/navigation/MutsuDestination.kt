@@ -5,9 +5,21 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.emptyactivity.AboutUsScreen
+import com.example.emptyactivity.IngredientsScreen
+import com.example.emptyactivity.MutsuHomeScreen
+import com.example.emptyactivity.RecipeListScreen
+import com.example.emptyactivity.foodCounter
 
 /*
  * Set up this file based on the following codelab:
@@ -25,17 +37,17 @@ object Home : MutsuDestination {
 }
 
 object GroceryList : MutsuDestination {
-    override val icon = Icons.Filled.Star
+    override val icon = Icons.Filled.ShoppingCart
     override val route = "grocery-list"
 }
 
 object MealPlan : MutsuDestination {
-    override val icon = Icons.Filled.ShoppingCart
+    override val icon = Icons.Filled.DateRange
     override val route = "meal-plan"
 }
 
 object Recipes : MutsuDestination {
-    override val icon = Icons.Filled.Favorite
+    override val icon = Icons.Filled.Star
     override val route = "recipe-list"
 }
 
@@ -51,8 +63,13 @@ object RecipeInformation : MutsuDestination {
 }
 
 object AboutUs : MutsuDestination {
-    override val icon = Icons.Filled.Star
+    override val icon = Icons.Filled.FavoriteBorder
     override val route = "about-us"
 }
 
-val mustuTabRowScreens = listOf(Home, Recipes, MealPlan, GroceryList)
+object LoginRegister : MutsuDestination {
+    override val icon = Icons.Filled.AccountCircle
+    override val route = "login-register"
+}
+
+val mustuTabRowScreens = listOf(Home, Recipes, MealPlan, GroceryList, LoginRegister)

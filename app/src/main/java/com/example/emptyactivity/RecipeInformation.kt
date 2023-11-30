@@ -62,6 +62,7 @@ data class Recipe(
     var webURL: String?
 )
 
+//All the measurements a user can pick out of when creating a new ingredient to add to a recipe
 enum class Measurements(val abbreviation: String) {
     TEASPOON("tsp"),
     TABLESPOON("tbsp"),
@@ -81,13 +82,30 @@ data class TemporaryIngredient(
     val name: String
 )
 
+/**
+ * Screen where users can:
+ * - Fill out the missing information for a newly created recipe
+ * - Edit the information of an already created recipe
+ * - Delete a recipe
+ *
+ * @param recipeViewModel ViewModel that contains existing recipes and handles CRUD operations
+ * @param recipeName Name of the recipe to obtain information about (to prefill the form fields)
+ * @param goToRecipeList Navigation to the Recipe List screen. Used when the changes to the recipe
+ * are saved or when the recipe is deleted.
+ */
 @Composable
 fun RecipeInformationScreen(
     recipeViewModel: RecipeViewModel,
     recipeName: String?,
     goToRecipeList: () -> Unit
 ){
+    //The recipe name is passed through navigation arguments and may be null
     if (recipeName == null) throw IllegalStateException("Recipe name is missing.")
+
+    /**
+     * Obtain the recipe's information - if it doesn't exist in the ViewModel, create a new empty
+     * recipe. Temporary fix until the datastore is implemented in this screen.
+     */
     val recipe = recipeViewModel.getRecipeByName(recipeName)
         ?: Recipe(
             name = recipeName,
@@ -95,10 +113,6 @@ fun RecipeInformationScreen(
             portionYield = 0,
             webURL = null
         )
-
-    //To be able to edit a recipe, we need the original name to be able to find it
-    //in the ViewModel
-    val originalRecipe = recipe
 
     Box (
         modifier = Modifier.fillMaxSize(),
@@ -111,12 +125,15 @@ fun RecipeInformationScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
+            //Save and delete buttons
             ButtonRow(
                 recipeViewModel = recipeViewModel,
                 recipe = recipe,
-                originalRecipe = originalRecipe,
+                originalRecipe = recipe,
                 goToRecipeList = goToRecipeList
             )
+
+            //Form containing all the information for users to fill/edit
             RecipeForm(recipe = recipe)
         }
     }
@@ -127,18 +144,22 @@ fun RecipeForm(
     modifier: Modifier = Modifier,
     recipe: Recipe
 ) {
+    //Variables to toggle the new ingredient input row's visibility to users.
     var displayInputRow by remember { mutableStateOf(false)}
     val toggleDisplayInputRow: () -> Unit = { displayInputRow = !displayInputRow }
 
+    //Fields other than ingredients for users to fill out.
     var nameState by remember { mutableStateOf(recipe.name) }
     var portionState by remember { mutableStateOf(recipe.portionYield.toString()) }
     var urlState by remember { mutableStateOf(recipe.webURL ?: "") }
 
+    //Displays an error message under the corresponding fields when false.
     var isNameValid by remember { mutableStateOf(true) }
     var isPortionValid by remember { mutableStateOf(true) }
 
-    var invalidStringErrorMessage by remember { mutableStateOf("Please enter a valid string")}
-    var invalidIntegerErrorMessage by remember { mutableStateOf("Please enter a valid positive number") }
+    //Error messages to display under corresponding fields when invalid.
+    val invalidStringErrorMessage by remember { mutableStateOf("Please enter a valid string")}
+    val invalidIntegerErrorMessage by remember { mutableStateOf("Please enter a valid positive number") }
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -193,6 +214,16 @@ fun RecipeForm(
     }
 }
 
+/**
+ * Displays a pop up message where users can dismiss or confirm the requested action.
+ *
+ * @param onDismissRequest Actions to take when the user clicks outside of the popup or the dismiss button
+ * @param onConfirmation Actions to take when the users click on the confirm button
+ * @param confirmText Text to display on the confirm button
+ * @param dialogTitle Header of the confirm pop-up window
+ * @param dialogText Message of the pop-up window
+ * @param icon Icon to display at the top of the pop-up window
+ */
 @Composable
 fun ConfirmPopup(
     onDismissRequest: () -> Unit,
@@ -228,16 +259,34 @@ fun ConfirmPopup(
     )
 }
 
+/**
+ * Returns if a string is empty or not.
+ */
 fun isValidString(input: String): Boolean {
     return input.isNotBlank()
 }
 
+/**
+ * Returns true if a string can be converted to a non-null integer and is above zero.
+ */
 private fun isValidPositiveInteger(string: String): Boolean {
     return string.toIntOrNull()?.let { parsedInt ->
         parsedInt > 0
     } ?: false
 }
 
+/**
+ * Displays a text box for a user to fill. If the input is invalid, displays a error message
+ * underneath the text box.
+ *
+ * @param label Label to display on top of the text box
+ * @param value Value the field corresponds to
+ * @param onValueChange Actions to take when the value of the textbox is changed
+ * @param isInvalid Whether the user input is valid or not. If true, displays an error message.
+ * @param errorMessage Error message to display if the input is invalid.
+ * @param keyboardOptions Keyboard options for specific cases. For example, when you want the user to
+ * only be able to input numbers.
+ */
 @Composable
 fun UserFieldInput(
     label: String,
@@ -268,6 +317,18 @@ fun UserFieldInput(
     }
 }
 
+/**
+ * Contains the buttons for a user to either:
+ * - Save the changes to the current recipe
+ * - Delete the current recipe
+ *
+ * Each button displays a confirmation popup before proceeding.
+ * @param recipe
+ * @param recipeViewModel
+ * @param originalRecipe Original state of the recipe when the user first came on this screen. Used
+ * for the ViewModel to find the recipe even if the name was edited.
+ * @param goToRecipeList Navigation to Recipe List screen once the action of a button was performed.
+ */
 @Composable
 fun ButtonRow(
     recipe: Recipe,
@@ -339,6 +400,16 @@ fun ButtonRow(
     }
 }
 
+/**
+ * Displays a list of the current recipe's ingredients as well as a button to add a new ingredient
+ * to the recipe. Once clicked, the button toggles a row of fields where users can add the missing
+ * information the new ingredient.
+ *
+ * @param recipe
+ * @param toggleDisplayInputRow Function to toggle the visibility of the new ingredient input row
+ * @param displayInputRow If true, displays the row of input fields to add a new ingredient to
+ *  * the recipe
+ */
 @Composable
 fun IngredientDisplay(
     recipe: Recipe,
@@ -385,6 +456,9 @@ fun AddIngredientButton(onClick: () -> Unit) {
     }
 }
 
+/**
+ * Displays a single ingredient's quantity, measurement and name.
+ */
 @Composable
 fun IngredientDisplayRow(
     ingredient: TemporaryIngredient
@@ -402,10 +476,13 @@ fun IngredientDisplayRow(
     }
 }
 
+/**
+ * Row of input fields for users to fill out when creating a new ingredient to be added to a recipe.
+ */
 @Composable
 fun IngredientInputRow(recipe: Recipe) {
     var ingredientQuantity by remember { mutableStateOf("") }
-    var ingredientMeasurement by remember { mutableStateOf(Measurements.NONE) }
+    val ingredientMeasurement by remember { mutableStateOf(Measurements.NONE) }
     var ingredientName by remember { mutableStateOf("") }
 
     Row(
@@ -456,13 +533,16 @@ fun IngredientInputRow(recipe: Recipe) {
     }
 }
 
-//Taken from https://alexzh.com/jetpack-compose-dropdownmenu/
+/**
+ * Dropdown menu that displays all measurement options to the user.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownMeasurement(modifier: Modifier) {
     var expanded by remember { mutableStateOf(false) }
     var selectedMeasurement by remember { mutableStateOf(Measurements.NONE) }
 
+    //Taken from https://alexzh.com/jetpack-compose-dropdownmenu/
     Box(
         modifier = Modifier
             .fillMaxWidth()

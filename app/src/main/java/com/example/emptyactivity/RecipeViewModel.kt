@@ -1,5 +1,6 @@
 package com.example.emptyactivity
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -7,14 +8,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+//ViewModel responsible for managing Recipe data and CRUD operations.
 class RecipeViewModel : ViewModel() {
     private val _recipeList = MutableStateFlow<List<Recipe>>(emptyList())
-    val recipeList: StateFlow<List<Recipe>> = _recipeList.asStateFlow()
+    private val recipeList: StateFlow<List<Recipe>> = _recipeList.asStateFlow()
 
+    //Initializes the ViewModel with sample recipe data.
     init {
         _recipeList.value = instantiateRecipes()
     }
 
+    //Creates and returns a list of sample recipes.
     private fun instantiateRecipes(): List<Recipe> {
         val recipeSeedData = mutableListOf<Recipe>()
 
@@ -138,26 +142,55 @@ class RecipeViewModel : ViewModel() {
         return ingredientList
     }
 
+    /**
+     * Adds a new recipe to the recipe list.
+     *
+     * @param recipe The recipe to be added.
+     */
     fun addRecipe(recipe: Recipe) {
         viewModelScope.launch {
             _recipeList.value = _recipeList.value + recipe
         }
     }
 
+    /**
+     * Removes a recipe from the recipe list.
+     *
+     * @param recipe The recipe to be removed.
+     */
     fun removeRecipe(recipe: Recipe) {
         viewModelScope.launch {
             _recipeList.value = _recipeList.value - recipe
         }
     }
 
+    /**
+     * Retrieves all recipes from the recipe list.
+     *
+     * @return A list of all recipes.
+     */
     fun getAllRecipes(): List<Recipe>{
+        Log.d("DEBUG", "Public: " + recipeList.value.toString())
+        Log.d("DEBUG", "Private: " + _recipeList.value.toString())
         return recipeList.value;
     }
 
+    /**
+     * Retrieves a recipe by its name.
+     *
+     * @param name The name of the recipe to retrieve.
+     * @return The recipe with the specified name, or null if not found.
+     */
     fun getRecipeByName(name: String): Recipe? {
         return _recipeList.value.find { it.name == name }
     }
 
+    /**
+     * Updates an existing recipe in the recipe list.
+     *
+     * @param recipeName The name of the recipe to be updated.
+     * @param updatedRecipe The updated recipe information.
+     */
     fun editRecipe(recipeName: String, updatedRecipe: Recipe) {
         viewModelScope.launch {
             val newList = _recipeList.value.toMutableList()

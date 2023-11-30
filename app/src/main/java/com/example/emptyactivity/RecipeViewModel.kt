@@ -1,6 +1,5 @@
 package com.example.emptyactivity
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -170,8 +169,6 @@ class RecipeViewModel : ViewModel() {
      * @return A list of all recipes.
      */
     fun getAllRecipes(): List<Recipe>{
-        Log.d("DEBUG", "Public: " + recipeList.value.toString())
-        Log.d("DEBUG", "Private: " + _recipeList.value.toString())
         return recipeList.value;
     }
 

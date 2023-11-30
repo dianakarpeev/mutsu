@@ -1,6 +1,5 @@
 package com.example.emptyactivity
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
@@ -482,6 +482,7 @@ fun IngredientDisplay(
                     ingredients = ingredients.toMutableList().apply {
                         add(newIngredient)
                     }
+                    toggleDisplayInputRow()
                 }
             )
         } else {
@@ -543,6 +544,7 @@ fun IngredientInputRow(
     val quantityFieldWidth = 75.dp
     val nameFieldWidth = 150.dp
     val spaceInBetween = 13.dp
+    val dropdownMenuOffset = 7.dp
 
     Row(
         modifier = Modifier
@@ -566,12 +568,10 @@ fun IngredientInputRow(
         //Measurement
         DropdownMeasurement(
             modifier = Modifier
+                .offset(y = dropdownMenuOffset)
                 .weight(0.5f)
                 .fillMaxHeight(),
-            onValueChange = {
-                Log.d("DEBUG", "Dropdown menu value has changed!")
-                ingredientMeasurement = it
-            }
+            onValueChange = { ingredientMeasurement = it }
         )
 
         //Name

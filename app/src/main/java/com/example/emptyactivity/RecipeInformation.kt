@@ -111,7 +111,7 @@ fun RecipeInformationScreen(
 
     //TODO: Replace temporary hardcoded values with responsive behavior
     //Temporary hardcoded values - to be modified when implementing responsive behavior
-    val columnWidth = 320.dp;
+    val columnWidth = 350.dp;
     val spaceBetweenElements = 2.dp;
 
     Box (
@@ -537,9 +537,10 @@ fun IngredientInputRow(recipe: Recipe) {
             label = "Qty",
             value = ingredientQuantity,
             onValueChange = { ingredientQuantity = it },
-            modifier = Modifier.width(quantityFieldWidth),
+            modifier = Modifier
+                .weight(1f)
+                .width(quantityFieldWidth),
             keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Number
             )
         )
 
@@ -586,7 +587,7 @@ fun DropdownMeasurement(modifier: Modifier) {
     //Taken from https://alexzh.com/jetpack-compose-dropdownmenu/
     Box(
         modifier = Modifier
-            .fillMaxWidth()
+            .width(100.dp)
             .wrapContentSize(Alignment.TopEnd)
     ) {
         ExposedDropdownMenuBox(

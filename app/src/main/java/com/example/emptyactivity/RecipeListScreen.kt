@@ -31,28 +31,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
+/**
+ * Screen that displays a list of the user's existing recipes. Users can create recipes by entering
+ * a recipe name in the text box and submitting, which will take them to next screen to complete
+ * the newly created recipe's information.
+ *
+ * Users can also click on an existing recipe's card and be redirected to the corresponding recipe's
+ * information screen, where they can edit its information or delete it.
+ *
+ * @param goToRecipeInformation navigation to Recipe Information screen with the recipe name (of the
+ * recipe to be shown) as a navigation argument
+ */
 @Composable
 fun RecipeListScreen(goToRecipeInformation: (String) -> Unit){
-    var recipeName by remember { mutableStateOf("") }
     val recipeViewModel = RecipeViewModel()
 
     Column(
         modifier = Modifier
     ) {
-        RecipeInput(
-            recipeName = recipeName,
-            onRecipeNameChange = { newRecipeName -> recipeName = newRecipeName },
-            onAddButtonClick = {
-                if (recipeName.isNotEmpty()) {
-                    addNewEmptyRecipe(recipeViewModel, recipeName)
-                    goToRecipeInformation(recipeName)
-                    recipeName = ""
-                }
-            },
-            modifier = Modifier
-                .weight(1f)
-        )
+        //Region for users to create a new recipe
+        RecipeInput(recipeViewModel, goToRecipeInformation)
 
+        //Region for users to view a list of their existing recipes
         Section(
             title = "Existing Recipes",
             modifier = Modifier.weight(3f)
@@ -74,14 +74,17 @@ private fun addNewEmptyRecipe(recipeViewModel: RecipeViewModel, recipeName: Stri
     ))
 }
 
-//Contains the textbox that accepts user input and the button that saves it!
+/**
+ * Text box and button for users to create a new recipe. Once submitted, the user is redirected
+ * to a blank recipe form to fill out the rest of the recipe's information.
+ */
 @Composable
 fun RecipeInput(
-    recipeName: String,
-    onRecipeNameChange: (String) -> Unit,
-    onAddButtonClick: () -> Unit,
-    modifier : Modifier
+    recipeViewModel: RecipeViewModel,
+    goToRecipeInformation: (String) -> Unit
 ) {
+    var recipeName by remember { mutableStateOf("") }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -90,7 +93,7 @@ fun RecipeInput(
     ) {
         OutlinedTextField(
             value = recipeName,
-            onValueChange = { onRecipeNameChange(it) },
+            onValueChange = { recipeName = it },
             label = { Text("Add New Recipe") },
             placeholder = { Text("Recipe Name") },
             modifier = Modifier
@@ -100,11 +103,17 @@ fun RecipeInput(
         )
 
         Button(
-            onClick = { onAddButtonClick() },
+            onClick = {
+                if (recipeName.isNotEmpty()) {
+                    addNewEmptyRecipe(recipeViewModel, recipeName)
+                    goToRecipeInformation(recipeName)
+                    recipeName = ""
+            } },
             modifier = Modifier
                 .weight(1f)
                 .align(Alignment.CenterVertically)
-                .padding(vertical = 8.dp)
+                .padding(vertical = 8.dp),
+            enabled = false
         ) {
             Text("Add")
         }

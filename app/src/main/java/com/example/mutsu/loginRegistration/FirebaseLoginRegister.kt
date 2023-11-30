@@ -4,6 +4,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.tasks.await
 
 data class Users(var email: String)
 
@@ -38,6 +39,34 @@ class AuthRepositoryFirebase(private val auth: FirebaseAuth) : AuthRepository {
                 Users(
                     email = it.email!!,
                 )
+        }
+    }
+
+    override suspend fun signUp(email: String, password: String): Boolean {
+        return try {
+            auth.createUserWithEmailAndPassword(email, password).await()
+            return true
+        } catch (e: Exception) {
+            return false;
+        }
+    }
+
+    override suspend fun signIn(email: String, password: String): Boolean {
+        return try {
+            auth.signInWithEmailAndPassword(email, password).await()
+            return true;
+        } catch (e: Exception) {
+            return false;
+        }
+    }
+
+    override fun signOut() {
+        return auth.signOut()
+    }
+
+    override suspend fun delete() {
+        if (auth.currentUser != null) {
+            auth.currentUser!!.delete()
         }
     }
 }

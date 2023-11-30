@@ -29,6 +29,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.mutsu.loginRegistration.LoginRegisterScreen
 import com.example.mutsu.navigation.AboutUs
 import com.example.mutsu.navigation.GroceryList
 import com.example.mutsu.navigation.Home

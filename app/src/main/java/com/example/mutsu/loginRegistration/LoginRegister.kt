@@ -1,4 +1,4 @@
-package com.example.mutsu
+package com.example.mutsu.loginRegistration
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

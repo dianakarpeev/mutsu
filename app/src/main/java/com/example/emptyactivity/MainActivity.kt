@@ -56,6 +56,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+
             MutsuApp()
         }
     }
@@ -79,7 +80,7 @@ class MainActivity : ComponentActivity() {
 
 
                 val recipeViewModel : RecipeViewModel = viewModel()
-                val ingredientsViewModel = IngredientsViewModel(IngredientsNameRepository(ingredientsNameStore, this))
+                val ingredientsViewModel = IngredientsViewModel(ingredientsNameStore, this)
 
                 Scaffold(
                     topBar = { TopAppBar(title = { Text("MyApp")})},

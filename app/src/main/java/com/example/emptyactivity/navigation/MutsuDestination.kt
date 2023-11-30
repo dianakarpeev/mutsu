@@ -1,6 +1,12 @@
 package com.example.emptyactivity.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Star
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -43,6 +49,17 @@ object MealPlan : MutsuDestination {
 object Recipes : MutsuDestination {
     override val icon = Icons.Filled.Star
     override val route = "recipe-list"
+}
+
+object RecipeInformation : MutsuDestination {
+    override val icon = Icons.Filled.Star
+    override val route = "recipe-information"
+
+    const val recipeNameArg = "recipe_name"
+    val routeWithArgs = "${route}/{${recipeNameArg}}"
+    val arguments = listOf(
+        navArgument(recipeNameArg) { type = NavType.StringType }
+    )
 }
 
 object AboutUs : MutsuDestination {

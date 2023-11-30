@@ -1,4 +1,4 @@
-package com.example.emptyactivity
+package com.example.mutsu
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -20,7 +20,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.ui.Modifier
-import com.example.emptyactivity.ui.theme.EmptyActivityTheme
+import com.example.mutsu.ui.theme.MutsuTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -29,12 +29,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.emptyactivity.navigation.AboutUs
-import com.example.emptyactivity.navigation.GroceryList
-import com.example.emptyactivity.navigation.Home
-import com.example.emptyactivity.navigation.LoginRegister
-import com.example.emptyactivity.navigation.MealPlan
-import com.example.emptyactivity.navigation.Recipes
+import com.example.mutsu.navigation.AboutUs
+import com.example.mutsu.navigation.GroceryList
+import com.example.mutsu.navigation.Home
+import com.example.mutsu.navigation.LoginRegister
+import com.example.mutsu.navigation.MealPlan
+import com.example.mutsu.navigation.Recipes
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
         ExperimentalMaterial3Api::class)
     @Composable
     fun MutsuApp(){
-        EmptyActivityTheme {
+        MutsuTheme {
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background

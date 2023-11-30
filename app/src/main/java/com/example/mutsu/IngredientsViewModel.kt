@@ -1,4 +1,4 @@
-package com.example.emptyactivity
+package com.example.mutsu
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -1,4 +1,4 @@
-package com.example.emptyactivity
+package com.example.mutsu
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf

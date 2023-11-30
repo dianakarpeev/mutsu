@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.emptyactivity"
+    namespace = "com.example.mutsu"
     compileSdk = 33
 
     defaultConfig {
-        applicationId = "com.example.emptyactivity"
+        applicationId = "com.example.mutsu"
         minSdk = 24
         targetSdk = 33
         versionCode = 1

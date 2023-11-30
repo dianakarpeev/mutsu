@@ -1,4 +1,4 @@
-package com.example.emptyactivity
+package com.example.mutsu
 
 data class Ingredient(val name: String, var portions : Int)
 data class Meal(val name: String, val ingredients: List<Ingredient>)

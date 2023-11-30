@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "EmptyActivity"
+rootProject.name = "Mutsu"
 include(":app")

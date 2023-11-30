@@ -1,4 +1,4 @@
-package com.example.emptyactivity.navigation
+package com.example.mutsu.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -7,13 +7,7 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.emptyactivity.AboutUsScreen
-import com.example.emptyactivity.IngredientsScreen
-import com.example.emptyactivity.MutsuHomeScreen
-import com.example.emptyactivity.RecipeListScreen
-import com.example.emptyactivity.foodCounter
 
 /*
  * Set up this file based on the following codelab:

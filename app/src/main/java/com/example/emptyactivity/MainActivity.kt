@@ -35,14 +35,14 @@ import androidx.navigation.compose.rememberNavController
 import com.example.emptyactivity.navigation.AboutUs
 import com.example.emptyactivity.navigation.GroceryList
 import com.example.emptyactivity.navigation.Home
-import com.example.emptyactivity.navigation.LoginRegister
 import com.example.emptyactivity.navigation.MealPlan
 import com.example.emptyactivity.navigation.RecipeInformation
+import com.example.emptyactivity.navigation.Recipes
 import com.example.emptyactivity.navigation.LoginRegister
 import com.example.emptyactivity.repositories.IngredientsNameRepository
 import com.example.emptyactivity.serializers.IngredientsNameSerializer
 
-
+private const val INGREDIENTS_NAME_FILE = "ingredients_name"
 
 
 class MainActivity : ComponentActivity() {

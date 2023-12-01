@@ -33,6 +33,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.emptyactivity.RecipeListScreen
 import com.example.mutsu.loginRegistration.AuthViewModel
 import com.example.mutsu.loginRegistration.AuthViewModelFactory
 import com.example.mutsu.loginRegistration.LoginRegisterScreen

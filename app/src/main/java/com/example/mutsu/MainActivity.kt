@@ -22,6 +22,7 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.ui.Modifier
 import com.example.mutsu.ui.theme.MutsuTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -65,6 +66,7 @@ class MainActivity : ComponentActivity() {
                 val ingredientsViewModel : IngredientsViewModel = viewModel()
 
                 val authViewModel : AuthViewModel = viewModel(factory= AuthViewModelFactory())
+                var currentUser = authViewModel.currentUser().collectAsState()
 
                 Scaffold(
                     topBar = { TopAppBar(title = { Text("MyApp")})},
@@ -76,21 +78,26 @@ class MainActivity : ComponentActivity() {
                                 ){
                                     Icon(Home.icon, contentDescription = "Home")
                                 }
-                                IconButton(
-                                    onClick = { navController.navigateSingleTopTo(GroceryList.route) }
-                                ){
-                                    Icon(GroceryList.icon, contentDescription = "Grocery List")
+                                if (currentUser.value != null){
+                                    IconButton(
+                                        onClick = { navController.navigateSingleTopTo(Recipes.route) }
+                                    ) {
+                                        Icon(Recipes.icon, contentDescription = "Recipes")
+                                    }
+
+                                    IconButton(
+                                        onClick = { navController.navigateSingleTopTo(MealPlan.route) }
+                                    ){
+                                        Icon(MealPlan.icon, contentDescription = "Meal Plan")
+                                    }
+
+                                    IconButton(
+                                        onClick = { navController.navigateSingleTopTo(GroceryList.route) }
+                                    ){
+                                        Icon(GroceryList.icon, contentDescription = "Grocery List")
+                                    }
                                 }
-                                IconButton(
-                                    onClick = { navController.navigateSingleTopTo(MealPlan.route) }
-                                ){
-                                    Icon(MealPlan.icon, contentDescription = "Meal Plan")
-                                }
-                                IconButton(
-                                    onClick = { navController.navigateSingleTopTo(Recipes.route) }
-                                ) {
-                                    Icon(Recipes.icon, contentDescription = "Recipes")
-                                }
+
                                 IconButton(
                                     onClick = { navController.navigateSingleTopTo(LoginRegister.route) }
                                 ) {

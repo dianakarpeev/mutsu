@@ -3,15 +3,23 @@ package com.example.emptyactivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,6 +32,85 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
+@Composable
+fun ShoppingList(){
+    Header()
+}
+
+@Composable
+fun Header(){
+    Row(){
+        Text(
+            text = "Plan your meals!",
+            style = MaterialTheme.typography.titleMedium,
+        )
+        Icon(
+            imageVector = Icons.Default.DateRange,
+            contentDescription = null
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Icon(
+            painter = painterResource(id = R.drawable.receipt),
+            contentDescription = null
+        )
+    }
+}
+
+@Composable
+fun RecipeCard(
+    recipeName: String,
+    count: Int,
+    increase: () -> Unit,
+    decrease: () -> Unit
+){
+    Card {
+        Column(){
+            Text(recipeName)
+            Row(){
+                IconButton(
+                    onClick = increase,
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.background
+                    ),
+                    modifier = Modifier.padding(
+                        start = 0.dp,
+                        top = 0.dp,
+                        end = 6.dp,
+                        bottom = 0.dp
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add one $recipeName"
+                    )
+                }
+
+                Text(text = count.toString())
+
+                IconButton(
+                    onClick = decrease,
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.background
+                    ),
+                    modifier = Modifier.padding(
+                        start = 0.dp,
+                        top = 0.dp,
+                        end = 6.dp,
+                        bottom = 0.dp
+                    )
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.remove_icon),
+                        contentDescription = "Remove one $recipeName"
+                    )
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun Hamburger(count: Int, increase: () -> Unit, decrease: () -> Unit) {

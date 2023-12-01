@@ -36,10 +36,9 @@ import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.Scaffold
 import androidx.compose.foundation.layout.Box
-import com.example.emptyactivity.ui.theme.EmptyActivityTheme
-
-data class Recipeee(val name: String)
-
+import com.example.mutsu.Recipe
+import com.example.mutsu.RecipeViewModel
+import com.example.mutsu.ui.theme.MutsuTheme
 
 /**
  * Screen that displays a list of the user's existing recipes. Users can create recipes by entering
@@ -76,12 +75,14 @@ fun RecipeListScreen(goToRecipeInformation: (String) -> Unit){
 }
 
 private fun addNewEmptyRecipe(recipeViewModel: RecipeViewModel, recipeName: String) {
-    recipeViewModel.addRecipe(Recipe(
+    recipeViewModel.addRecipe(
+        Recipe(
         name = recipeName,
         ingredients = mutableListOf(),
         portionYield = 0,
         webURL = null
-    ))
+    )
+    )
 }
 
 /**
@@ -99,7 +100,7 @@ fun RecipeInput(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically
     ) {
         OutlinedTextField(
             value = recipeName,
@@ -118,7 +119,7 @@ fun RecipeInput(
                     addNewEmptyRecipe(recipeViewModel, recipeName)
                     goToRecipeInformation(recipeName)
                     recipeName = ""
-            } },
+                } },
             modifier = Modifier
                 .weight(1f)
                 .align(Alignment.CenterVertically)
@@ -189,7 +190,7 @@ fun RecipeList(recipeList: List<Recipe>, goToRecipeInformation: (String) -> Unit
                 }
             }
         }
-    } 
+    }
     else {
         Spacer(Modifier.height(16.dp))
         Text(

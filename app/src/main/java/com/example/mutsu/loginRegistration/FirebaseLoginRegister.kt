@@ -6,6 +6,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.tasks.await
 
+/*
+ * The code and logic in this file was copied/modified from Talib's notes and
+ * github repository code found here:
+ * https://github.com/tshussain/KotlinWithCompose
+ */
+
 data class Users(var email: String)
 
 interface AuthRepository {

@@ -2,16 +2,13 @@ package com.example.mutsu
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.dataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.emptyactivity.repositories.IngredientsNameRepository
+import com.example.mutsu.repositories.IngredientsNameRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.last
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 

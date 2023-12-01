@@ -4,27 +4,41 @@ option java_package = "com.example.emptyactivity";
 option java_multiple_files = true;
 
 
+//IngredientsName is used for storing Ingredients for the Grocery List.
 message IngredientsName {
   map<string, string> names = 1;
 }
 
-/*
-message Ingredient {
+//RecipeIngredient translates to RecipeInformation::TemporaryIngredient
+message recipeIngredient {
   string name = 1;
-  int32 portions = 2;
+  double quantity = 2;
+
+  //Translates to RecipeInformation::Measurements but without abbreviations
+  enum Measurements {
+    TEASPOON = 0;
+    TABLESPOON = 1;
+    CUP = 2;
+    POUND = 3;
+    GRAM = 4;
+    KILOGRAM = 5;
+    OUNCE = 6;
+    MILLILITER = 7;
+    LITER = 8;
+    NONE = 9;
+  }
 }
 
+//Translates to RecipeInformation::Recipe
 message Recipe {
   string name = 1;
-  string referenceURL = 2;
-  //Some information for an image
-  //Some way of storing User
-  repeated Ingredient ingredients = 5;
+  string webURL = 2;
+  int32 portion_yield = 3;
+  repeated recipeIngredient ingredients = 4;
 }
 
 
-  Commenting out for now so Android Studio stops throwing a fit
-
+/*
 message Username {
   string username = 1;
   //I somehow think that storing the password's a bad idea, but like. it might work???
@@ -38,5 +52,4 @@ message GroceryList {
 
   repeated Ingredient ingredients = 3;
 }
-
 */

@@ -1,5 +1,6 @@
 package com.example.mutsu
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,6 +25,8 @@ import com.example.mutsu.ui.theme.MutsuTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -36,14 +39,25 @@ import com.example.mutsu.loginRegistration.LoginRegisterScreen
 import com.example.mutsu.navigation.AboutUs
 import com.example.mutsu.navigation.GroceryList
 import com.example.mutsu.navigation.Home
-import com.example.mutsu.navigation.LoginRegister
 import com.example.mutsu.navigation.MealPlan
+import com.example.mutsu.navigation.RecipeInformation
 import com.example.mutsu.navigation.Recipes
+import com.example.mutsu.navigation.LoginRegister
+import com.example.mutsu.serializers.IngredientsNameSerializer
+
+private const val INGREDIENTS_NAME_FILE = "ingredients_name"
 
 class MainActivity : ComponentActivity() {
+
+     val Context.ingredientsNameStore : DataStore<IngredientsName> by dataStore(
+        fileName = INGREDIENTS_NAME_FILE,
+        serializer = IngredientsNameSerializer()
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+
             MutsuApp()
         }
     }
@@ -63,7 +77,11 @@ class MainActivity : ComponentActivity() {
                 val currentDestination = currentBackStack?.destination
 
                 val windowSizeClass = calculateWindowSizeClass(this)
-                val ingredientsViewModel : IngredientsViewModel = viewModel()
+
+
+
+                val recipeViewModel : RecipeViewModel = viewModel()
+                val ingredientsViewModel = IngredientsViewModel(ingredientsNameStore, this)
 
                 val authViewModel : AuthViewModel = viewModel(factory= AuthViewModelFactory())
                 var currentUser = authViewModel.currentUser().collectAsState()
@@ -123,13 +141,30 @@ class MainActivity : ComponentActivity() {
                             foodCounter()
                         }
                         composable(route = Recipes.route){
-                            RecipeListScreen(windowSizeClass)
+                            RecipeListScreen(
+                                goToRecipeInformation = { recipeName ->
+                                    navController.navigateToRecipeInformation(recipeName)
+                                }
+                            )
                         }
                         composable(route = GroceryList.route){
                             IngredientsScreen(ingredientsViewModel)
                         }
                         composable(route = AboutUs.route){
                             AboutUsScreen()
+                        }
+                        composable(
+                            route = RecipeInformation.routeWithArgs,
+                            arguments = RecipeInformation.arguments
+                        ) { navBackStackEntry ->
+                            val recipeName =
+                                navBackStackEntry.arguments?.getString(RecipeInformation.recipeNameArg)
+
+                            RecipeInformationScreen(
+                                recipeViewModel = recipeViewModel,
+                                recipeName = recipeName,
+                                goToRecipeList = { navController.navigateSingleTopTo(Recipes.route) }
+                            )
                         }
                         composable(route = LoginRegister.route){
                             LoginRegisterScreen(authViewModel)
@@ -143,3 +178,7 @@ class MainActivity : ComponentActivity() {
 
 fun NavHostController.navigateSingleTopTo(route: String) =
     this.navigate(route) { launchSingleTop = true }
+
+private fun NavHostController.navigateToRecipeInformation(recipeName: String) {
+    this.navigateSingleTopTo("${RecipeInformation.route}/$recipeName")
+}

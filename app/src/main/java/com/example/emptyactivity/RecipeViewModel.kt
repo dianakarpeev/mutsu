@@ -23,20 +23,24 @@ class RecipeViewModel(datastore : DataStore<StoredRecipe>, context: Context) : V
     private val _recipeList = MutableStateFlow<List<Recipe>>(emptyList())
     private val recipeList: StateFlow<List<Recipe>> = _recipeList.asStateFlow()
 
-    var list = mutableListOf<Recipe>()
+    var editableList = mutableListOf<Recipe>()
 
 
     //Initializes the ViewModel with sample recipe data.
     init {
-        var hardList = instantiateRecipes()
         //_recipeList.value = instantiateRecipes()
         viewModelScope.launch {
            val recipeData = storedRecipes.dataFlow
                .map { storedRecipe -> storedRecipes.parseRecipeData(storedRecipe) }
                .toList().forEach() { recipe ->
-                   list.add(recipe)
-                   addRecipe(recipe)
+                   editableList.add(recipe)
                }
+
+            if (editableList.isEmpty()) {
+                editableList = instantiateRecipes().toMutableList()
+            } else {
+                addRecipe()
+            }
         }
     }
 
@@ -59,7 +63,6 @@ class RecipeViewModel(datastore : DataStore<StoredRecipe>, context: Context) : V
             recipes.forEach { recipe ->
                 if (storedRecipes.getRecipeByName(recipe.name) == null) {
                     storedRecipes.putRecipe(recipe)
-                    addRecipe(recipe)
                 }
             }
         }
@@ -130,6 +133,11 @@ class RecipeViewModel(datastore : DataStore<StoredRecipe>, context: Context) : V
      *
      * @param recipe The recipe to be added.
      */
+    fun addRecipe() {
+            _recipeList.update { recipes -> emptyList() }
+            _recipeList.update { recipes -> copyList() }
+    }
+
     fun addRecipe(recipe: Recipe) {
         viewModelScope.launch {
             _recipeList.value = _recipeList.value + recipe
@@ -181,5 +189,16 @@ class RecipeViewModel(datastore : DataStore<StoredRecipe>, context: Context) : V
                 _recipeList.value = newList
             }
         }
+    }
+
+    private fun copyList() : List<Recipe> {
+        var list = mutableListOf<Recipe>()
+
+        for (i in editableList){
+            list.add(Recipe(i.name, i.ingredients, i.portionYield, i.webURL))
+        }
+
+        return list
+
     }
 }

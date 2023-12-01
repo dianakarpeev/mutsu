@@ -94,7 +94,7 @@ class MainActivity : ComponentActivity() {
                                     Image(
                                         painter = painterResource(R.drawable.applecore), // Replace with your image resource
                                         contentDescription = "Apple core icon",
-                                        modifier = Modifier.size(30.dp) // Adjust the size as needed
+                                        modifier = Modifier.size(50.dp) // Adjust the size as needed
                                     )
                                     Spacer(modifier = Modifier.width(10.dp)) // Add spacing between icon and title
                                     Text(

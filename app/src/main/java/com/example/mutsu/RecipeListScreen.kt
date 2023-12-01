@@ -1,12 +1,13 @@
-package com.example.emptyactivity
+package com.example.mutsu
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.size
@@ -14,10 +15,14 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -29,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -39,6 +45,7 @@ import androidx.compose.foundation.layout.Box
 import com.example.mutsu.Recipe
 import com.example.mutsu.RecipeViewModel
 import com.example.mutsu.ui.theme.MutsuTheme
+
 
 /**
  * Screen that displays a list of the user's existing recipes. Users can create recipes by entering
@@ -56,15 +63,26 @@ fun RecipeListScreen(goToRecipeInformation: (String) -> Unit){
     val recipeViewModel = RecipeViewModel()
 
     Column(
-        modifier = Modifier
+        modifier = Modifier.padding(20.dp)
     ) {
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            "Recipe Collection",
+            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.offset(x = 10.dp)
+        )
+
         //Region for users to create a new recipe
         RecipeInput(recipeViewModel, goToRecipeInformation)
 
         //Region for users to view a list of their existing recipes
         Section(
             title = "Existing Recipes",
-            modifier = Modifier.weight(3f)
+            modifier = Modifier
+                .weight(3f)
         ){
             RecipeList(
                 recipeViewModel.getAllRecipes(),
@@ -98,8 +116,7 @@ fun RecipeInput(
 
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         OutlinedTextField(
@@ -113,7 +130,7 @@ fun RecipeInput(
                 .padding(8.dp)
         )
 
-        Button(
+        IconButton(
             onClick = {
                 if (recipeName.isNotEmpty()) {
                     addNewEmptyRecipe(recipeViewModel, recipeName)
@@ -121,12 +138,18 @@ fun RecipeInput(
                     recipeName = ""
                 } },
             modifier = Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically)
-                .padding(vertical = 8.dp),
-            enabled = false
+                .align(Alignment.CenterVertically),
+            enabled = false,
+            colors = IconButtonDefaults.iconButtonColors(
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.background,
+                disabledContainerColor = MaterialTheme.colorScheme.secondary
+            )
         ) {
-            Text("Add")
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add new recipe"
+            )
         }
     }
 }
@@ -142,6 +165,8 @@ fun Section(
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .paddingFromBaseline(top = 40.dp, bottom = 16.dp)
                 .padding(horizontal = 16.dp)
@@ -170,22 +195,25 @@ fun RecipeList(recipeList: List<Recipe>, goToRecipeInformation: (String) -> Unit
                             .fillMaxWidth()
                             .size(width = 240.dp, height = 65.dp)
                             .padding(8.dp),
-                        elevation = CardDefaults.cardElevation(
-                            defaultElevation = 6.dp
-                        ),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            containerColor = MaterialTheme.colorScheme.surface
                         ),
                         onClick = { goToRecipeInformation(recipe.name) }
                     ) {
-                        Text(
-                            text = recipe.name,
+                        Box(
                             modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth()
-                                .wrapContentSize(Alignment.Center),
-                            textAlign = TextAlign.Center
-                        )
+                                .fillMaxSize()
+                                .wrapContentSize(Alignment.Center)
+                        ) {
+                            Text(
+                                text = recipe.name,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentSize(Alignment.Center),
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
                 }
             }

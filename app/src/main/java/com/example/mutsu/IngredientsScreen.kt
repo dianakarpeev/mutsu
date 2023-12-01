@@ -1,27 +1,37 @@
 package com.example.mutsu
 
-import androidx.compose.foundation.BorderStroke
+
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -36,8 +46,13 @@ fun IngredientsScreen(viewModel: IngredientsViewModel = viewModel(), modifier: M
         viewModel.decreaseQuantity(it)
     }
 
-    Column(modifier = modifier.verticalScroll(rememberScrollState())){
+    Column(
+        modifier = modifier
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp)
+    ){
         Instructions(modifier)
+        Spacer(modifier.height(10.dp))
         ShowAllIngredients(ingredients, increase, decrease, modifier)
     }
 }
@@ -49,8 +64,18 @@ data class FoodItem (val name: String, var quantityInCart: Int)
 @Composable
 fun Instructions(modifier: Modifier = Modifier){
     Column(){
-        Text(text = "Grocery List!", style = MaterialTheme.typography.titleLarge, modifier = modifier.padding(6.dp))
-        Text(text = "Here is your grocery list. Feel free to add or remove any ingredients found below.", modifier = modifier.padding(6.dp))
+        Text(
+            text = "Grocery List",
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.titleLarge,
+            modifier = modifier.padding(6.dp)
+        )
+        Text(
+            text = "Here is your grocery list. Feel free to add or remove any ingredients found below.",
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = modifier.padding(6.dp)
+        )
     }
 }
 
@@ -73,7 +98,7 @@ fun ShowAllIngredients(ingredients: List<FoodItem>, increaseQuantity: (Int) -> U
         var message by rememberSaveable { mutableStateOf<String>("")}
         Button(
             onClick = {
-                message = "Item in you grocery list:"
+                message = "Items in your grocery list:"
 
                 for(i in ingredients.indices){
                     if (ingredients[i].quantityInCart > 0){
@@ -83,36 +108,92 @@ fun ShowAllIngredients(ingredients: List<FoodItem>, increaseQuantity: (Int) -> U
                     }
                 }
             },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.tertiary,
+                contentColor = MaterialTheme.colorScheme.background
+            ),
             modifier = modifier.padding(6.dp)
         ){
-            Text(text = "Generate final grocery list")
+            Text(
+                text = "Generate List!",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Medium
+            )
         }
-        Text(text = "$message")
+        Text(
+            text = "$message",
+            color = MaterialTheme.colorScheme.onPrimary
+        )
     }
 }
 
 /* Actually sets up the ingredient name and button and all the logic to add them to either list. */
 @Composable
-fun IngredientButtonBox(ingredientName: String, ingredientQuantity: Int, isAdded: () -> Unit, isRemoved: () -> Unit, modifier: Modifier = Modifier){
-    Row(modifier = modifier
-        .padding(6.dp)
-        .background(MaterialTheme.colorScheme.tertiaryContainer)
-        .border(
-            BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimaryContainer),
-            shape = RectangleShape
-        ),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically)
-    {
-        Column(){
-            Text(" $ingredientName: $ingredientQuantity", color = MaterialTheme.colorScheme.onTertiaryContainer)
-        }
-        Row(){
-            Button(onClick = isAdded, modifier = Modifier.padding(0.dp,0.dp,6.dp,0.dp)) {
-                Text("+", color = MaterialTheme.colorScheme.onTertiary)
+fun IngredientButtonBox(
+    ingredientName: String,
+    ingredientQuantity: Int,
+    isAdded: () -> Unit,
+    isRemoved: () -> Unit,
+    modifier: Modifier = Modifier
+){
+    Box(
+        modifier = modifier
+            .padding(6.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(10.dp)
+            )
+    ) {
+        Row(
+            modifier = modifier.padding(horizontal = 20.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically)
+        {
+            Column(){
+                Text(
+                    "$ingredientQuantity $ingredientName",
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Medium
+                )
             }
-            Button(onClick = isRemoved, modifier = Modifier.padding(0.dp,0.dp,6.dp,0.dp)) {
-                Text("-", color = MaterialTheme.colorScheme.onTertiary)
+            Row(){
+                IconButton(
+                    onClick = isAdded,
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.background
+                    ),
+                    modifier = Modifier.padding(
+                        start = 0.dp,
+                        top = 0.dp,
+                        end = 6.dp,
+                        bottom = 0.dp
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add one $ingredientName"
+                    )
+                }
+
+                IconButton(
+                    onClick = isRemoved,
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.background
+                    ),
+                    modifier = Modifier.padding(
+                        start = 0.dp,
+                        top = 0.dp,
+                        end = 6.dp,
+                        bottom = 0.dp
+                    )
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.remove_icon),
+                        contentDescription = "Remove one $ingredientName"
+                    )
+                }
             }
         }
     }

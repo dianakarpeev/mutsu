@@ -38,6 +38,7 @@ import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.Scaffold
 import androidx.compose.foundation.layout.Box
 import androidx.datastore.core.DataStore
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.emptyactivity.ui.theme.EmptyActivityTheme
 
 /**
@@ -53,6 +54,7 @@ import com.example.emptyactivity.ui.theme.EmptyActivityTheme
  */
 @Composable
 fun RecipeListScreen(goToRecipeInformation: (String) -> Unit, recipeViewModel: RecipeViewModel) {
+    val recipes by recipeViewModel.recipeList.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier
@@ -66,7 +68,7 @@ fun RecipeListScreen(goToRecipeInformation: (String) -> Unit, recipeViewModel: R
             modifier = Modifier.weight(3f)
         ){
             RecipeList(
-                recipeViewModel.getAllRecipes(),
+                recipes,
                 goToRecipeInformation
             )
         }

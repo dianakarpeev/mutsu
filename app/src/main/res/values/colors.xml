@@ -7,6 +7,6 @@
     <color name="textColorPrimary">#000000</color>
     <color name="textColorSecondary">#7A5D5D</color>
     <color name="backgroundColor">#FFFCF4</color>
-    <color name="secondaryBackgroundColor">#FCF0DA</color>
+    <color name="secondaryBackgroundColor">#FAE8C6</color>
     <color name="dividerColor">#D7D1C2</color>
 </resources>

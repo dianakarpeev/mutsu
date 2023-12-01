@@ -21,6 +21,7 @@ private val DefaultColorScheme = lightColorScheme(
     onTertiary = Black,
     onBackground = LightBrown,
     onSurface = Brown,
+    errorContainer = DarkRed
 )
 
 @Composable

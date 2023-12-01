@@ -529,7 +529,7 @@ fun AddIngredientButton(onClick: () -> Unit) {
             onClick = onClick,
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary,
+                containerColor = MaterialTheme.colorScheme.errorContainer,
                 contentColor = MaterialTheme.colorScheme.background
             )
         ) {

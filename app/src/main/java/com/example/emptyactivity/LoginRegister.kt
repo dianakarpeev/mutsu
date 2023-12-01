@@ -31,7 +31,6 @@ fun LoginRegisterScreen(modifier: Modifier = Modifier){
     var optionShown by rememberSaveable { mutableStateOf("") }
 
     Column(Modifier.padding(15.dp), horizontalAlignment = Alignment.CenterHorizontally){
-        Text("Welcome. Click log in to access the entire app. If you don't already have an account, you can create one by clicking register.")
         Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround){
             Button(onClick = {
                 if (optionShown != "Login") {

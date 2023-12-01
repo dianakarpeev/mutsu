@@ -38,9 +38,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.foundation.layout.Box
 import com.example.emptyactivity.ui.theme.EmptyActivityTheme
 
-data class Recipeee(val name: String)
-
-
 /**
  * Screen that displays a list of the user's existing recipes. Users can create recipes by entering
  * a recipe name in the text box and submitting, which will take them to next screen to complete

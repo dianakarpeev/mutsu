@@ -559,7 +559,7 @@ fun IngredientDisplayRow(
     ) {
         Text(
             ingredient.quantity.toString(),
-            modifier = Modifier.weight(0.5f),
+            modifier = Modifier.weight(0.7f),
             color = MaterialTheme.colorScheme.onPrimary
         )
 

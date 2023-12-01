@@ -10,23 +10,12 @@ message IngredientsName {
 }
 
 //RecipeIngredient translates to RecipeInformation::TemporaryIngredient
-message recipeIngredient {
+message RecipeIngredient {
   string name = 1;
   double quantity = 2;
+  string measurement = 3;
 
-  //Translates to RecipeInformation::Measurements but without abbreviations
-  enum Measurements {
-    TEASPOON = 0;
-    TABLESPOON = 1;
-    CUP = 2;
-    POUND = 3;
-    GRAM = 4;
-    KILOGRAM = 5;
-    OUNCE = 6;
-    MILLILITER = 7;
-    LITER = 8;
-    NONE = 9;
-  }
+
 }
 
 //Translates to RecipeInformation::Recipe
@@ -34,7 +23,7 @@ message StoredRecipe {
   string name = 1;
   string webURL = 2;
   int32 portion_yield = 3;
-  repeated recipeIngredient ingredients = 4;
+  repeated RecipeIngredient ingredients = 4;
 }
 
 

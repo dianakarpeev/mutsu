@@ -1,12 +1,18 @@
 package com.example.mutsu.loginRegistration
 
+import android.graphics.drawable.Icon
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -117,13 +123,66 @@ fun LoginRegisterScreen(
         }
     }
     else {
+        var showPopUp by rememberSaveable { mutableStateOf(false) }
+
         Column(Modifier.padding(15.dp)){
             Text("Congrats! You are signed in!")
-            Button(onClick = { authViewModel.signOut() }){
-                Text("Sign out")
+            Row {
+                Button(onClick = { authViewModel.signOut() }){
+                    Text("Sign out")
+                }
+
+                Button(onClick = { showPopUp = true }){
+                    Text("Delete account")
+                }
+
+                if (showPopUp){
+                    ConfirmDeleteAccount(confirm = authViewModel::delete, dismiss = {showPopUp = false})
+                }
             }
         }
     }
+}
+
+/*
+ * got this code and modified it a bit from here:
+ * https://developer.android.com/jetpack/compose/components/dialog#alert
+ */
+@Composable
+fun ConfirmDeleteAccount(confirm: () -> Unit, dismiss: () -> Unit = {}){
+    AlertDialog(
+        icon = {
+            Icons.Filled.Delete
+        },
+        title = {
+            Text("Delete account")
+        },
+        text = {
+            Text("Are you sure you want to delete your account? You won't be able to undo this action.")
+        },
+        onDismissRequest = {
+            dismiss()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    dismiss()
+                    confirm()
+                }
+            ) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    dismiss()
+                }
+            ) {
+                Text("Dismiss")
+            }
+        }
+    )
 }
 
 @Composable

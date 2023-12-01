@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import java.util.regex.Pattern
 
 data class User (var username : String, var password : String, var name : String )
 
@@ -44,6 +45,10 @@ fun LoginRegisterScreen(
 */
     var optionShown by rememberSaveable { mutableStateOf("") }
     var currentUser = authViewModel.currentUser().collectAsState()
+
+    //i got the regex from gskinner from the following website:
+    //https://regexr.com/3e48o
+    var goodEmailRegex = Pattern.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\$")
 
     if (currentUser.value == null){
         Column(Modifier.padding(15.dp), horizontalAlignment = Alignment.CenterHorizontally){
@@ -75,6 +80,7 @@ fun LoginRegisterScreen(
             if (optionShown == "Login"){
                 var email by rememberSaveable { mutableStateOf("") }
                 var password by rememberSaveable { mutableStateOf("") }
+                var message by rememberSaveable { mutableStateOf("")}
 
                 Column(modifier.padding(15.dp)){
                     TextField(
@@ -87,8 +93,25 @@ fun LoginRegisterScreen(
                         onValueChange = { password = it },
                         label = { Text("Enter your password: ")}
                     )
+
+                    Text("$message")
+
                     Button(onClick = {
-                        authViewModel.signIn(email, password)
+                        var emailMatches = goodEmailRegex.matcher(email)
+
+                        if(email == "" || password == "" || email == " " || password == " "){
+                            message = "Both the email and password fields have to be filled out to register."
+                        }
+                        else if (!emailMatches.matches()) {
+                            message = "That is not a valid email address. Please try another."
+                        }
+                        else {
+                            authViewModel.signIn(email, password)
+
+                            if (currentUser.value == null){
+                                message = "The credentials you entered do not match any in our system. Please try again."
+                            }
+                        }
                     }){
                         Text("Login here")
                     }
@@ -99,6 +122,7 @@ fun LoginRegisterScreen(
             else if (optionShown == "Register"){
                 var email by rememberSaveable { mutableStateOf("") }
                 var password by rememberSaveable { mutableStateOf("") }
+                var message by rememberSaveable { mutableStateOf("")}
 
                 Column(modifier.padding(15.dp)){
                     TextField(
@@ -111,8 +135,28 @@ fun LoginRegisterScreen(
                         onValueChange = { password = it },
                         label = { Text("Enter your password: ")}
                     )
+
+                    Text("$message")
+
                     Button(onClick = {
-                        authViewModel.signUp(email, password)
+                        var emailMatches = goodEmailRegex.matcher(email)
+
+                        if(email == null || password == null || email == "" || password == "" || email == " " || password == " "){
+                            message = "Both the email and password fields have to be filled out to register."
+                        }
+                        else if (!emailMatches.matches()) {
+                            message = "That is not a valid email address. Please try another."
+                        }
+                        else if (password.length < 8) {
+                            message = "The password can't be less than 8 characters."
+                        }
+                        else{
+                            authViewModel.signUp(email, password)
+
+                            if (currentUser.value == null){
+                                message = "Sorry, we couldn't create an account with the credentials you entered. Please try again."
+                            }
+                        }
                     }){
                         Text("Register here")
                     }
@@ -123,6 +167,8 @@ fun LoginRegisterScreen(
         }
     }
     else {
+        Text("${currentUser.value}")
+
         var showPopUp by rememberSaveable { mutableStateOf(false) }
 
         Column(Modifier.padding(15.dp)){

@@ -30,7 +30,7 @@ message recipeIngredient {
 }
 
 //Translates to RecipeInformation::Recipe
-message Recipe {
+message StoredRecipe {
   string name = 1;
   string webURL = 2;
   int32 portion_yield = 3;

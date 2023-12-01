@@ -41,8 +41,10 @@ import com.example.emptyactivity.navigation.Recipes
 import com.example.emptyactivity.navigation.LoginRegister
 import com.example.emptyactivity.repositories.IngredientsNameRepository
 import com.example.emptyactivity.serializers.IngredientsNameSerializer
+import com.example.emptyactivity.serializers.RecipeSerializer
 
 private const val INGREDIENTS_NAME_FILE = "ingredients_name"
+private const val RECIPES_FILE = "recipes"
 
 
 class MainActivity : ComponentActivity() {
@@ -50,6 +52,10 @@ class MainActivity : ComponentActivity() {
      val Context.ingredientsNameStore : DataStore<IngredientsName> by dataStore(
         fileName = INGREDIENTS_NAME_FILE,
         serializer = IngredientsNameSerializer()
+    )
+    val Context.recipesStore : DataStore<StoredRecipe> by dataStore(
+        fileName = RECIPES_FILE,
+        serializer = RecipeSerializer()
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {

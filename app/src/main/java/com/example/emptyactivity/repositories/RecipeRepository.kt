@@ -2,18 +2,22 @@ package com.example.emptyactivity.repositories
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import com.example.emptyactivity.Ingredient
 import com.example.emptyactivity.Measurements
 import com.example.emptyactivity.Recipe
 import com.example.emptyactivity.RecipeIngredient
 import com.example.emptyactivity.StoredRecipe
 import com.example.emptyactivity.TemporaryIngredient
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 
 class RecipeRepository(private val dataStore: DataStore<StoredRecipe>, context: Context) {
+
+    val dataFlow = dataStore.data
+
 
     suspend fun getRecipeByName(name : String) : Recipe? {
         // Get data from dataStore
@@ -21,11 +25,16 @@ class RecipeRepository(private val dataStore: DataStore<StoredRecipe>, context: 
 
         val recipeData = dataFlow
             .filter { storedRecipe -> storedRecipe.name == name }
-            .map { storedRecipe -> parseRecipeData(storedRecipe) }
-            .first()
 
-        // Return Recipe
-        return recipeData
+        val recipe = recipeData.firstOrNull() ?: return null
+        return parseRecipeData(recipe)
+    }
+
+    suspend fun seedRecipes(recipes : List<Recipe>) {
+
+        recipes.forEach { recipe ->
+            putRecipe(recipe)
+        }
     }
 
     suspend fun getRecipeNames() : List<String> {
@@ -40,20 +49,13 @@ class RecipeRepository(private val dataStore: DataStore<StoredRecipe>, context: 
         return recipeNames
     }
 
-    suspend fun getAllRecipes() : List<Recipe> {
-        // Get data from dataStore
-        val dataFlow = dataStore.data
-
-        val recipes = dataFlow
-            .map { storedRecipe -> parseRecipeData(storedRecipe) }
-            .toList()
-
-        return recipes.filterNotNull()
-    }
-
     suspend fun putRecipe(recipe: Recipe) {
         // Get data from dataStore
         val dataFlow = dataStore.data
+
+        if (dataFlow.filter { storedRecipe -> storedRecipe.name == recipe.name }.firstOrNull() != null) {
+            return
+        }
 
         // Convert Recipe to StoredRecipe
         val storedRecipe = StoredRecipe.newBuilder()
@@ -69,7 +71,13 @@ class RecipeRepository(private val dataStore: DataStore<StoredRecipe>, context: 
             } )
             .build()
         // Put data into dataStore
-        dataFlow.map { storedRecipe }
+        dataStore.updateData { storedRecipe }
+    }
+
+    suspend fun putAllRecipes(recipes: List<Recipe>) {
+        recipes.forEach { recipe ->
+            putRecipe(recipe)
+        }
     }
 
     //Delete a recipe from the dataStore
@@ -82,18 +90,20 @@ class RecipeRepository(private val dataStore: DataStore<StoredRecipe>, context: 
         dataStore.data.map { remainingRecipes }
     }
 
+    suspend fun deleteAllRecipes() {
+        dataStore.updateData { storedRecipe ->
+            storedRecipe.toBuilder()
+                .clear()
+                .build() }
+    }
 
-    private fun parseRecipeData(data: StoredRecipe) : Recipe? {
-        try {
+    fun parseRecipeData(data: StoredRecipe) : Recipe {
             return Recipe(
                 name = data.name,
                 ingredients = parseIngredientData(data),
                 portionYield = data.portionYield,
                 webURL = data.webURL,
             )
-        } catch (e: Exception) {
-            return null
-        }
     }
 
     /*

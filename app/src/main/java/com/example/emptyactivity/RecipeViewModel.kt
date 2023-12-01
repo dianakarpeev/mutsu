@@ -1,42 +1,54 @@
 package com.example.emptyactivity
 
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.emptyactivity.repositories.RecipeRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.forEach
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 //ViewModel responsible for managing Recipe data and CRUD operations.
-class RecipeViewModel : ViewModel() {
+class RecipeViewModel(datastore : DataStore<StoredRecipe>, context: Context) : ViewModel() {
     private val _recipeList = MutableStateFlow<List<Recipe>>(emptyList())
     private val recipeList: StateFlow<List<Recipe>> = _recipeList.asStateFlow()
 
+    var list = mutableListOf<Recipe>()
+    private val storedRecipes = RecipeRepository(datastore, context)
+
     //Initializes the ViewModel with sample recipe data.
     init {
-        _recipeList.value = instantiateRecipes()
+        //_recipeList.value = instantiateRecipes()
+        viewModelScope.launch {
+            storedRecipes.seedRecipes(instantiateRecipes())
+           val recipeData = storedRecipes.dataFlow
+            recipeData.collect() { storedRecipe ->
+                val recipe = storedRecipes.parseRecipeData(storedRecipe)
+                if (recipe.name != "" && list.filter { it.name == recipe.name }.isEmpty()) {
+                    list.add(recipe)
+                }
+            }
+            _recipeList.value = list
+        }
     }
 
     //Creates and returns a list of sample recipes.
     private fun instantiateRecipes(): List<Recipe> {
         val recipeSeedData = mutableListOf<Recipe>()
 
-        recipeSeedData.add(
-            Recipe(
-                "Pasta Carbonara",
-                getIngredientsForCarbonara(),
-                4,
-                "https://www.bonappetit.com/recipe/simple-carbonara"
-            )
-        )
-        recipeSeedData.add(
-            Recipe(
-                "Bread Pudding",
-                getIngredientsForBreadPudding(),
-                8,
-                "https://fantabulosity.com/last-minute-bread-pudding/"
-            )
-        )
+        recipeSeedData.add(Recipe("Pasta Carbonara", getIngredientsForCarbonara(), 4, "https://www.bonappetit.com/recipe/simple-carbonara"))
+        recipeSeedData.add(Recipe("Bread Pudding", getIngredientsForBreadPudding(), 8, "https://fantabulosity.com/last-minute-bread-pudding/"))
+        recipeSeedData.add(Recipe("Apple Pie", getIngredientsForApplePie(), 8, ""))
+        recipeSeedData.add(Recipe("Pancakes", getIngredientsForPancakes(), 4, ""))
+        recipeSeedData.add(Recipe("Hot Dogs", getIngredientsForHotDogs(), 1, ""))
 
         return recipeSeedData
     }
@@ -44,45 +56,11 @@ class RecipeViewModel : ViewModel() {
     private fun getIngredientsForCarbonara() : MutableList<TemporaryIngredient>{
         val ingredientList = mutableListOf<TemporaryIngredient>()
 
-        ingredientList.add(
-            TemporaryIngredient(
-                name = "Spaghetti",
-                measurement = Measurements.GRAM,
-                quantity = 500.0
-            )
-        )
-
-        ingredientList.add(
-            TemporaryIngredient(
-                name = "Bacon",
-                measurement = Measurements.GRAM,
-                quantity = 200.0
-            )
-        )
-
-        ingredientList.add(
-            TemporaryIngredient(
-                name = "Egg",
-                measurement = Measurements.NONE,
-                quantity = 2.0
-            )
-        )
-
-        ingredientList.add(
-            TemporaryIngredient(
-                name = "Parmesan",
-                measurement = Measurements.CUP,
-                quantity = 0.5
-            )
-        )
-
-        ingredientList.add(
-            TemporaryIngredient(
-                name = "Black pepper",
-                measurement = Measurements.TEASPOON,
-                quantity = 1.0
-            )
-        )
+        ingredientList.add(TemporaryIngredient(500.0, Measurements.GRAM, "Spaghetti"))
+        ingredientList.add(TemporaryIngredient(200.0, Measurements.GRAM, "Bacon"))
+        ingredientList.add(TemporaryIngredient(2.0, Measurements.NONE, "Egg"))
+        ingredientList.add(TemporaryIngredient(0.5, Measurements.CUP, "Parmesan"))
+        ingredientList.add(TemporaryIngredient(1.0, Measurements.TEASPOON, "Black pepper"))
 
         return ingredientList
     }
@@ -90,53 +68,47 @@ class RecipeViewModel : ViewModel() {
     private fun getIngredientsForBreadPudding() : MutableList<TemporaryIngredient>{
         val ingredientList = mutableListOf<TemporaryIngredient>()
 
-        ingredientList.add(
-            TemporaryIngredient(
-                name = "Slices of bread",
-                measurement = Measurements.NONE,
-                quantity = 6.0
-            )
-        )
+        ingredientList.add(TemporaryIngredient(6.0, Measurements.NONE, "Slices of bread"))
+        ingredientList.add(TemporaryIngredient(4.0, Measurements.NONE, "Egg"))
+        ingredientList.add(TemporaryIngredient(3.0, Measurements.TABLESPOON, "Butter"))
+        ingredientList.add(TemporaryIngredient(2.0, Measurements.CUP, "Milk"))
+        ingredientList.add(TemporaryIngredient(0.5, Measurements.TEASPOON, "Cinnamon"))
+        ingredientList.add(TemporaryIngredient(1.0, Measurements.TEASPOON, "Vanilla extract"))
 
-        ingredientList.add(
-            TemporaryIngredient(
-                name = "Egg",
-                measurement = Measurements.NONE,
-                quantity = 4.0
-            )
-        )
+        return ingredientList
+    }
 
-        ingredientList.add(
-            TemporaryIngredient(
-                name = "Butter",
-                measurement = Measurements.TABLESPOON,
-                quantity = 3.0
-            )
-        )
+    private fun getIngredientsForApplePie() : MutableList<TemporaryIngredient> {
+        val ingredientList = mutableListOf<TemporaryIngredient>()
 
-        ingredientList.add(
-            TemporaryIngredient(
-                name = "Milk",
-                measurement = Measurements.CUP,
-                quantity = 2.0
-            )
-        )
+        ingredientList.add(TemporaryIngredient(1.0, Measurements.NONE, "Pie crust"))
+        ingredientList.add(TemporaryIngredient(6.0, Measurements.NONE, "Apples"))
+        ingredientList.add(TemporaryIngredient(0.5, Measurements.CUP, "Sugar"))
+        ingredientList.add(TemporaryIngredient(0.5, Measurements.CUP, "Brown sugar"))
+        ingredientList.add(TemporaryIngredient(1.0, Measurements.TEASPOON, "Cinnamon"))
+        ingredientList.add(TemporaryIngredient(0.5, Measurements.TEASPOON, "Nutmeg"))
 
-        ingredientList.add(
-            TemporaryIngredient(
-                name = "Cinnamon",
-                measurement = Measurements.TEASPOON,
-                quantity = 0.5
-            )
-        )
+        return ingredientList
+    }
 
-        ingredientList.add(
-            TemporaryIngredient(
-                name = "Vanilla extract",
-                measurement = Measurements.TEASPOON,
-                quantity = 1.0
-            )
-        )
+    private fun getIngredientsForPancakes() : MutableList<TemporaryIngredient> {
+        val ingredientList = mutableListOf<TemporaryIngredient>()
+
+        ingredientList.add(TemporaryIngredient(1.0, Measurements.NONE, "Egg"))
+        ingredientList.add(TemporaryIngredient(1.0, Measurements.CUP, "Flour"))
+        ingredientList.add(TemporaryIngredient(1.0, Measurements.CUP, "Milk"))
+        ingredientList.add(TemporaryIngredient(1.0, Measurements.TEASPOON, "Baking powder"))
+        ingredientList.add(TemporaryIngredient(1.0, Measurements.TEASPOON, "Vanilla extract"))
+
+        return ingredientList
+    }
+
+    private fun getIngredientsForHotDogs() : MutableList<TemporaryIngredient> {
+        val ingredientList = mutableListOf<TemporaryIngredient>()
+
+        ingredientList.add(TemporaryIngredient(1.0, Measurements.NONE, "Hot dog buns"))
+        ingredientList.add(TemporaryIngredient(1.0, Measurements.NONE, "Hot dogs"))
+        ingredientList.add(TemporaryIngredient(1.0, Measurements.NONE, "Ketchup"))
 
         return ingredientList
     }

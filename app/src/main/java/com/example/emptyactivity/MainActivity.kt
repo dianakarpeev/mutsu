@@ -82,9 +82,7 @@ class MainActivity : ComponentActivity() {
 
                 val windowSizeClass = calculateWindowSizeClass(this)
 
-
-
-                val recipeViewModel : RecipeViewModel = viewModel()
+                val recipeViewModel = RecipeViewModel(recipesStore, this)
                 val ingredientsViewModel = IngredientsViewModel(ingredientsNameStore, this)
 
                 Scaffold(
@@ -140,7 +138,8 @@ class MainActivity : ComponentActivity() {
                             RecipeListScreen(
                                 goToRecipeInformation = { recipeName ->
                                     navController.navigateToRecipeInformation(recipeName)
-                                }
+                                },
+                                recipeViewModel = recipeViewModel
                             )
                         }
                         composable(route = GroceryList.route){

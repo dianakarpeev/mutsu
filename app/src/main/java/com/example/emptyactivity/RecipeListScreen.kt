@@ -1,5 +1,6 @@
 package com.example.emptyactivity
 
+import android.content.Context
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,6 +37,7 @@ import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.Scaffold
 import androidx.compose.foundation.layout.Box
+import androidx.datastore.core.DataStore
 import com.example.emptyactivity.ui.theme.EmptyActivityTheme
 
 /**
@@ -50,8 +52,7 @@ import com.example.emptyactivity.ui.theme.EmptyActivityTheme
  * recipe to be shown) as a navigation argument
  */
 @Composable
-fun RecipeListScreen(goToRecipeInformation: (String) -> Unit){
-    val recipeViewModel = RecipeViewModel()
+fun RecipeListScreen(goToRecipeInformation: (String) -> Unit, recipeViewModel: RecipeViewModel) {
 
     Column(
         modifier = Modifier

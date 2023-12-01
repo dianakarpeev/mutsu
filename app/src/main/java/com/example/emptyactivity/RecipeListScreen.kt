@@ -1,6 +1,7 @@
 package com.example.emptyactivity
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,6 +31,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.Box
+import com.example.emptyactivity.ui.theme.EmptyActivityTheme
+
+data class Recipeee(val name: String)
+
 
 /**
  * Screen that displays a list of the user's existing recipes. Users can create recipes by entering

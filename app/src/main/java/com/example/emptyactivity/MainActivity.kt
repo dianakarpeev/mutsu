@@ -1,5 +1,6 @@
 package com.example.emptyactivity
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,9 +19,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.ui.Modifier
+import com.example.emptyactivity.ui.theme.EmptyActivityTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
+import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -30,16 +35,27 @@ import androidx.navigation.compose.rememberNavController
 import com.example.emptyactivity.navigation.AboutUs
 import com.example.emptyactivity.navigation.GroceryList
 import com.example.emptyactivity.navigation.Home
-import com.example.emptyactivity.navigation.LoginRegister
 import com.example.emptyactivity.navigation.MealPlan
 import com.example.emptyactivity.navigation.RecipeInformation
 import com.example.emptyactivity.navigation.Recipes
-import com.example.emptyactivity.ui.theme.EmptyActivityTheme
+import com.example.emptyactivity.navigation.LoginRegister
+import com.example.emptyactivity.repositories.IngredientsNameRepository
+import com.example.emptyactivity.serializers.IngredientsNameSerializer
+
+private const val INGREDIENTS_NAME_FILE = "ingredients_name"
+
 
 class MainActivity : ComponentActivity() {
+
+     val Context.ingredientsNameStore : DataStore<IngredientsName> by dataStore(
+        fileName = INGREDIENTS_NAME_FILE,
+        serializer = IngredientsNameSerializer()
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+
             MutsuApp()
         }
     }
@@ -58,8 +74,12 @@ class MainActivity : ComponentActivity() {
                 val currentBackStack by navController.currentBackStackEntryAsState()
                 val currentDestination = currentBackStack?.destination
 
-                val ingredientsViewModel : IngredientsViewModel = viewModel()
+                val windowSizeClass = calculateWindowSizeClass(this)
+
+
+
                 val recipeViewModel : RecipeViewModel = viewModel()
+                val ingredientsViewModel = IngredientsViewModel(ingredientsNameStore, this)
 
                 Scaffold(
                     topBar = { TopAppBar(title = { Text("MyApp")})},

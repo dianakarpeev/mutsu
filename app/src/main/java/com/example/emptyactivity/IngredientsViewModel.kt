@@ -1,21 +1,41 @@
 package com.example.emptyactivity
 
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.emptyactivity.repositories.IngredientsNameRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class IngredientsViewModel : ViewModel(){
+class IngredientsViewModel(dataStore : DataStore<IngredientsName>, context : Context) : ViewModel(){
+    private val ingredientsName = IngredientsNameRepository(dataStore, context)
+
     private val _ingredients = MutableStateFlow<List<FoodItem>>(emptyList())
-    private val _editableList = instantiateIngredients()
 
     val ingredients: StateFlow<List<FoodItem>> = _ingredients.asStateFlow()
+    var _editableList : List<FoodItem> = emptyList()
 
     init {
-        _ingredients.value = instantiateIngredients()
+        viewModelScope.launch {
+
+            var mapOf : Map<String, String> = ingredientsName.ingredientsNameFlow.first()
+
+            if (mapOf.isEmpty()){
+                ingredientsName.seedMap(mapOf)
+                mapOf = ingredientsName.ingredientsNameFlow.first()
+            }
+
+            initializeIngredients(mapOf)
+        }
+
     }
 
     private fun instantiateIngredients() : List<FoodItem>{
@@ -33,6 +53,18 @@ class IngredientsViewModel : ViewModel(){
         list.add(FoodItem("Salt", 0))
 
         return list
+    }
+
+     fun initializeIngredients(map : Map<String, String>) : Unit {
+        var foodList = mutableListOf<FoodItem>()
+        viewModelScope.launch {
+            for (i in map){
+                foodList.add(FoodItem(i.value, 0))
+            }
+
+            _editableList = foodList
+            _ingredients.update { ings -> copyList() }
+        }
     }
 
     fun increaseQuantity(index: Int){

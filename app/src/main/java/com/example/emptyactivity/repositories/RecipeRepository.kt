@@ -8,71 +8,72 @@ import com.example.emptyactivity.RecipeIngredient
 import com.example.emptyactivity.StoredRecipe
 import com.example.emptyactivity.TemporaryIngredient
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 
-class RecipeRepository(private val dataStore: DataStore<StoredRecipe>, context: Context) {
+class RecipeRepository(val dataStore: DataStore<StoredRecipe>, context: Context) {
 
     val dataFlow = dataStore.data
 
+    suspend fun doesRecipeExist(name: String) : Boolean {
+        try {
+            val recipeData = dataFlow.filter { storedRecipe -> storedRecipe.name == name }.first()
+            return true
+        } catch (e: Exception) {
+            return false
+        }
+    }
 
-    suspend fun getRecipeByName(name : String) : Recipe? {
+    suspend fun getRecipeByName(name : String): StoredRecipe? {
         // Get data from dataStore
 
         val recipeData = dataFlow
             .filter { storedRecipe -> storedRecipe.name == name }
 
-        return recipeData.firstOrNull()?.let { storedRecipe ->
-            parseRecipeData(storedRecipe)
-        }
-    }
+        val recipe = recipeData.firstOrNull()
 
-    suspend fun seedRecipes(recipes : List<Recipe>) {
-
-        recipes.forEach { recipe ->
-            putRecipe(recipe)
-        }
+        return recipe
     }
 
     suspend fun getRecipeNames() : List<String> {
         // Get data from dataStore
-        val dataFlow = dataStore.data
 
-        val recipeNames = dataFlow
-            .map { storedRecipe -> storedRecipe.name }
-            .toList()
+        val names = mutableListOf<String>()
+
+        dataFlow.collect() { storedRecipe ->
+                names.add(storedRecipe.name)
+            }
 
         // Return Recipe
-        return recipeNames
+        return names
     }
 
-    suspend fun putRecipe(recipe: Recipe) {
-        // Get data from dataStore
+    fun createStoredIngredients(recipe: Recipe) : List<RecipeIngredient> {
+        val storedIngredients = mutableListOf<RecipeIngredient>()
+        // Convert Ingredients to StoredIngredients
+        recipe.ingredients.forEach { ingredient ->
+            val storedIng = RecipeIngredient.newBuilder()
+                .setName(ingredient.name)
+                .setMeasurement(ingredient.measurement.toString())
+                .setQuantity(ingredient.quantity)
+                .build()
+            storedIngredients.add(storedIng)
+        }
+        return storedIngredients
+    }
 
-        // Convert Recipe to StoredRecipe
+    fun createStoredRecipe(recipe: Recipe, storedIngredients: List<RecipeIngredient>) : StoredRecipe {
         val storedRecipe = StoredRecipe.newBuilder()
             .setName(recipe.name)
             .setPortionYield(recipe.portionYield)
             .setWebURL(recipe.webURL)
-            .addAllIngredients( recipe.ingredients.map { ingredient ->
-                RecipeIngredient.newBuilder()
-                    .setName(ingredient.name)
-                    .setMeasurement(ingredient.measurement.toString())
-                    .setQuantity(ingredient.quantity)
-                    .build()
-            } )
+            .addAllIngredients(storedIngredients)
             .build()
-        // Put data into dataStore
-        dataStore.updateData { storedRecipe }
-    }
-
-    suspend fun putAllRecipes(recipes: List<Recipe>) {
-        recipes.forEach { recipe ->
-            putRecipe(recipe)
-        }
+        return storedRecipe
     }
 
     //Delete a recipe from the dataStore
@@ -86,10 +87,9 @@ class RecipeRepository(private val dataStore: DataStore<StoredRecipe>, context: 
     }
 
     suspend fun deleteAllRecipes() {
-        dataStore.updateData { storedRecipe ->
-            storedRecipe.toBuilder()
-                .clear()
-                .build() }
+        dataStore.updateData {
+            it.toBuilder().clear().build()
+        }
     }
 
     fun parseRecipeData(data: StoredRecipe) : Recipe {

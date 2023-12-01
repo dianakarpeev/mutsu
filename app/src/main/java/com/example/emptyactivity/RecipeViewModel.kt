@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.flow.map
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 //ViewModel responsible for managing Recipe data and CRUD operations.
 class RecipeViewModel(datastore : DataStore<StoredRecipe>, context: Context) : ViewModel() {
     private val storedRecipes = RecipeRepository(datastore, context)
+    private val recipesFlow = storedRecipes.dataFlow
     private val _recipeList = MutableStateFlow<List<Recipe>>(emptyList())
     val recipeList: StateFlow<List<Recipe>> = _recipeList.asStateFlow()
 
@@ -30,18 +32,20 @@ class RecipeViewModel(datastore : DataStore<StoredRecipe>, context: Context) : V
     init {
             //_recipeList.value = instantiateRecipes()
             viewModelScope.launch {
-                
 
+                val hardlist = instantiateRecipes()
 
-                val recipeData = storedRecipes.dataFlow
-                    .map { storedRecipe -> storedRecipes.parseRecipeData(storedRecipe) }
+                storedRecipes.deleteAllRecipes()
+                seedRecipes(hardlist)
 
-                recipeData.collect() { recipe ->
-                    if (!recipe.ingredients.isEmpty() && recipe !in editableList) {
+                recipesFlow.collect() { storedRecipe ->
+                    val recipe = storedRecipes.parseRecipeData(storedRecipe)
+                    if (recipe.ingredients.isNotEmpty()) {
+                        //editableList.add(recipe)
                         addRecipe(recipe)
-                        editableList.add(recipe)
                     }
                 }
+
             }
     }
 
@@ -60,15 +64,33 @@ class RecipeViewModel(datastore : DataStore<StoredRecipe>, context: Context) : V
 
     private fun seedRecipes(recipes : List<Recipe>) {
         viewModelScope.launch {
-            storedRecipes.deleteAllRecipes()
             recipes.forEach { recipe ->
-                if (storedRecipes.getRecipeByName(recipe.name) == null) {
-                    storedRecipes.putRecipe(recipe)
+                if(!isRecipeInStorage(recipe.name)) {
+                    val ings = storedRecipes.createStoredIngredients(recipe)
+                    val storedRecipe = storedRecipes.createStoredRecipe(recipe, ings)
+                    storedRecipes.dataStore.updateData { storedRecipe }
                 }
             }
         }
     }
 
+    fun isRecipeInStorage(name: String) : Boolean {
+        var exists = false
+        viewModelScope.launch {
+            try {
+                val recipeData = recipesFlow.filter { storedRecipe -> storedRecipe.name == name }
+                val recipe = recipeData.first()
+                if (recipe.name == name) {
+                    exists = true
+                }
+            } catch (e: Exception) {
+                exists = false
+            }
+        }
+        return exists
+    }
+
+    //region Recipe Data
     private fun getIngredientsForCarbonara() : MutableList<TemporaryIngredient>{
         val ingredientList = mutableListOf<TemporaryIngredient>()
 
@@ -128,6 +150,7 @@ class RecipeViewModel(datastore : DataStore<StoredRecipe>, context: Context) : V
 
         return ingredientList
     }
+    //endregion
 
     /**
      * Adds a new recipe to the recipe list.

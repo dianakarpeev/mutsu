@@ -29,7 +29,8 @@ class IngredientsViewModel(dataStore : DataStore<IngredientsName>, context : Con
             var mapOf : Map<String, String> = ingredientsName.ingredientsNameFlow.first()
 
             if (mapOf.isEmpty()){
-                _ingredients.value = instantiateIngredients()
+                ingredientsName.seedMap(mapOf)
+                mapOf = ingredientsName.ingredientsNameFlow.first()
             }
 
             initializeIngredients(mapOf)

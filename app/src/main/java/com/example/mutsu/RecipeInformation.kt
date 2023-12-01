@@ -29,16 +29,19 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -48,10 +51,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -115,7 +117,7 @@ fun RecipeInformationScreen(
     //TODO: Replace temporary hardcoded values with responsive behavior
     //Temporary hardcoded values - to be modified when implementing responsive behavior
     val columnWidth = 350.dp
-    val spaceBetweenElements = 2.dp
+    val spaceBetweenElements = 10.dp
 
     Box (
         modifier = Modifier.fillMaxSize(),
@@ -128,6 +130,7 @@ fun RecipeInformationScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(spaceBetweenElements)
         ) {
+            Spacer(Modifier.height(10.dp))
             //Save and delete buttons
             ButtonRow(
                 recipeViewModel = recipeViewModel,
@@ -305,6 +308,7 @@ private fun isValidPositiveInteger(string: String): Boolean {
  * @param keyboardOptions Keyboard options for specific cases. For example, when you want the user to
  * only be able to input numbers.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserFieldInput(
     label: String,
@@ -314,19 +318,32 @@ fun UserFieldInput(
     isInvalid: Boolean = false,
     errorMessage: String = "Invalid input",
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions : KeyboardActions = KeyboardActions()
+    keyboardActions : KeyboardActions = KeyboardActions(),
+    containerColor : Color = MaterialTheme.colorScheme.surface
 ) {
     //Temporary hardcoded values - to be modified when implementing responsive behavior
-    val rightPadding = 100.dp
+    val rightPadding = 150.dp
 
-    OutlinedTextField(
+    TextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(text = label) },
+        shape = RoundedCornerShape(15.dp),
+        label = { Text(text = label, fontWeight = FontWeight.Medium) },
         modifier = modifier,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
-        maxLines = 1
+        maxLines = 1,
+        colors = TextFieldDefaults.colors(
+            focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+            unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
+            focusedContainerColor = containerColor,
+            unfocusedContainerColor = containerColor,
+            disabledContainerColor = MaterialTheme.colorScheme.surface,
+            focusedLabelColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedLabelColor = MaterialTheme.colorScheme.onSurface,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        )
     )
 
     if (isInvalid) {
@@ -373,7 +390,11 @@ fun ButtonRow(
         verticalAlignment = Alignment.CenterVertically
     ){
         IconButton(
-            onClick = { showSaveDialog = true }
+            onClick = { showSaveDialog = true },
+            colors = IconButtonDefaults.iconButtonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.background
+            )
         ) {
             Icon(
                 imageVector = Icons.Default.Done,
@@ -384,7 +405,11 @@ fun ButtonRow(
         Spacer(modifier = Modifier.width(spaceBetweenButtons))
 
         IconButton(
-            onClick = { showDeleteDialog = true }
+            onClick = { showDeleteDialog = true },
+            colors = IconButtonDefaults.iconButtonColors(
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.background
+            )
         ) {
             Icon(
                 imageVector = Icons.Default.Delete,
@@ -443,50 +468,55 @@ fun IngredientDisplay(
     displayInputRow: Boolean
 ) {
     //Temporary hardcoded values - to be modified when implementing responsive behavior
-    val veryLightGray = Color(244, 244, 244)
-    val roundedCornerRadius = 12.dp
+    val roundedCornerRadius = 20.dp
     val minColumnHeight = 150.dp
     val maxColumnHeight = 350.dp
-    val columnPadding = 25.dp
+    val columnPadding = 20.dp
     val spacerHeight = 20.dp
 
     // State to hold the list of ingredients
     var ingredients by remember { mutableStateOf(recipe.ingredients.toMutableList()) }
 
-    Column(
+    Box(
         modifier = Modifier
-            .background(veryLightGray)
-            .defaultMinSize(minColumnHeight)
-            .clip(shape = RoundedCornerShape(roundedCornerRadius))
-            .heightIn(minColumnHeight, maxColumnHeight)
-            .padding(columnPadding)
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(roundedCornerRadius)
+            )
     ) {
-        LazyColumn {
-            items(
-                items = ingredients,
-                key = { ingredient -> ingredient.name }
-            ) { ingredient ->
-                key(ingredient.name) {
-                    IngredientDisplayRow(ingredient = ingredient)
+        Column(
+            modifier = Modifier
+                .defaultMinSize(minColumnHeight)
+                .heightIn(minColumnHeight, maxColumnHeight)
+                .padding(columnPadding)
+        ) {
+            LazyColumn {
+                items(
+                    items = ingredients,
+                    key = { ingredient -> ingredient.name }
+                ) { ingredient ->
+                    key(ingredient.name) {
+                        IngredientDisplayRow(ingredient = ingredient)
+                    }
                 }
             }
-        }
 
-        Spacer(Modifier.height(spacerHeight))
+            Spacer(Modifier.height(spacerHeight))
 
-        // AddIngredientButton or IngredientInputRow
-        if (displayInputRow) {
-            IngredientInputRow(
-                onIngredientAdded = { newIngredient ->
-                    ingredients = ingredients.toMutableList().apply {
-                        add(newIngredient)
+            // AddIngredientButton or IngredientInputRow
+            if (displayInputRow) {
+                IngredientInputRow(
+                    onIngredientAdded = { newIngredient ->
+                        ingredients = ingredients.toMutableList().apply {
+                            add(newIngredient)
+                        }
+                        toggleDisplayInputRow()
+                        recipe.ingredients.add(newIngredient)
                     }
-                    toggleDisplayInputRow()
-                    recipe.ingredients.add(newIngredient)
-                }
-            )
-        } else {
-            AddIngredientButton(onClick = toggleDisplayInputRow)
+                )
+            } else {
+                AddIngredientButton(onClick = toggleDisplayInputRow)
+            }
         }
     }
 }
@@ -497,9 +527,17 @@ fun AddIngredientButton(onClick: () -> Unit) {
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = onClick,
-            shape = RectangleShape
+            shape = RoundedCornerShape(10.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.background
+            )
         ) {
-            Text("Add Ingredient")
+            Text(
+                "Add Ingredient",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
@@ -519,13 +557,31 @@ fun IngredientDisplayRow(
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(ingredient.quantity.toString(), modifier = Modifier.weight(0.5f))
-        Text(ingredient.measurement.abbreviation, modifier = Modifier.weight(1f))
+        Text(
+            ingredient.quantity.toString(),
+            modifier = Modifier.weight(0.7f),
+            color = MaterialTheme.colorScheme.onPrimary
+        )
+
+        Spacer(modifier = Modifier.weight(0.3f))
+
+        Text(
+            ingredient.measurement.abbreviation,
+            modifier = Modifier.weight(1f),
+            color = MaterialTheme.colorScheme.onPrimary
+        )
+
         Spacer(modifier = Modifier
             .weight(0.5f)
             .width(spacerWidth)
         )
-        Text(ingredient.name, modifier = Modifier.weight(3f))
+
+        Text(
+            ingredient.name,
+            modifier = Modifier.weight(3f),
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
 
@@ -544,7 +600,7 @@ fun IngredientInputRow(
     val quantityFieldWidth = 75.dp
     val nameFieldWidth = 150.dp
     val spaceInBetween = 13.dp
-    val dropdownMenuOffset = 7.dp
+    val dropdownMenuOffset = 0.dp
 
     Row(
         modifier = Modifier
@@ -562,8 +618,8 @@ fun IngredientInputRow(
                 .fillMaxHeight()
                 .weight(1f)
                 .width(quantityFieldWidth),
-            keyboardOptions = KeyboardOptions.Default.copy(
-            )
+            keyboardOptions = KeyboardOptions.Default.copy(),
+            containerColor = MaterialTheme.colorScheme.background
         )
         //Measurement
         DropdownMeasurement(
@@ -599,7 +655,8 @@ fun IngredientInputRow(
                     ingredientQuantity = ""
                     ingredientName = ""
                 }
-            )
+            ),
+            containerColor = MaterialTheme.colorScheme.background
         )
     }
 }

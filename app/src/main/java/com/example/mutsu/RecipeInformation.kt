@@ -1,4 +1,4 @@
-package com.example.emptyactivity
+package com.example.mutsu
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

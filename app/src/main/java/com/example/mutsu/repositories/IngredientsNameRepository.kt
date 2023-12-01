@@ -1,13 +1,10 @@
-package com.example.emptyactivity.repositories
+package com.example.mutsu.repositories
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import com.example.emptyactivity.Ingredient
-import com.example.emptyactivity.IngredientName
-import com.example.emptyactivity.IngredientsName
+import com.example.mutsu.IngredientsName
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import java.io.IOException

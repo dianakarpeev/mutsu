@@ -1,8 +1,8 @@
-package com.example.emptyactivity.serializers
+package com.example.mutsu.serializers
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
-import com.example.emptyactivity.IngredientsName
+import com.example.mutsu.IngredientsName
 import com.google.protobuf.InvalidProtocolBufferException
 import java.io.InputStream
 import java.io.OutputStream

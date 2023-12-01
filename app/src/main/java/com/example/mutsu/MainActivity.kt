@@ -1,4 +1,4 @@
-package com.example.emptyactivity
+package com.example.mutsu
 
 import android.content.Context
 import android.os.Bundle
@@ -39,15 +39,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.emptyactivity.navigation.AboutUs
-import com.example.emptyactivity.navigation.GroceryList
-import com.example.emptyactivity.navigation.Home
-import com.example.emptyactivity.navigation.LoginRegister
-import com.example.emptyactivity.navigation.MealPlan
-import com.example.emptyactivity.navigation.RecipeInformation
-import com.example.emptyactivity.navigation.Recipes
-import com.example.emptyactivity.serializers.IngredientsNameSerializer
-import com.example.emptyactivity.ui.theme.EmptyActivityTheme
+import com.example.mutsu.navigation.AboutUs
+import com.example.mutsu.navigation.GroceryList
+import com.example.mutsu.navigation.Home
+import com.example.mutsu.navigation.LoginRegister
+import com.example.mutsu.navigation.MealPlan
+import com.example.mutsu.navigation.RecipeInformation
+import com.example.mutsu.navigation.Recipes
+import com.example.mutsu.serializers.IngredientsNameSerializer
+import com.example.mutsu.ui.theme.MutsuTheme
 
 private const val INGREDIENTS_NAME_FILE = "ingredients_name"
 
@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
         ExperimentalMaterial3Api::class)
     @Composable
     fun MutsuApp(){
-        EmptyActivityTheme {
+        MutsuTheme {
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background

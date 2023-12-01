@@ -21,13 +21,13 @@ class RecipeRepository(private val dataStore: DataStore<StoredRecipe>, context: 
 
     suspend fun getRecipeByName(name : String) : Recipe? {
         // Get data from dataStore
-        val dataFlow = dataStore.data
 
         val recipeData = dataFlow
             .filter { storedRecipe -> storedRecipe.name == name }
 
-        val recipe = recipeData.firstOrNull() ?: return null
-        return parseRecipeData(recipe)
+        return recipeData.firstOrNull()?.let { storedRecipe ->
+            parseRecipeData(storedRecipe)
+        }
     }
 
     suspend fun seedRecipes(recipes : List<Recipe>) {
@@ -51,11 +51,6 @@ class RecipeRepository(private val dataStore: DataStore<StoredRecipe>, context: 
 
     suspend fun putRecipe(recipe: Recipe) {
         // Get data from dataStore
-        val dataFlow = dataStore.data
-
-        if (dataFlow.filter { storedRecipe -> storedRecipe.name == recipe.name }.firstOrNull() != null) {
-            return
-        }
 
         // Convert Recipe to StoredRecipe
         val storedRecipe = StoredRecipe.newBuilder()

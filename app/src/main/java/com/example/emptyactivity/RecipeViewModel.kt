@@ -12,31 +12,31 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.forEach
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 //ViewModel responsible for managing Recipe data and CRUD operations.
 class RecipeViewModel(datastore : DataStore<StoredRecipe>, context: Context) : ViewModel() {
+    private val storedRecipes = RecipeRepository(datastore, context)
     private val _recipeList = MutableStateFlow<List<Recipe>>(emptyList())
     private val recipeList: StateFlow<List<Recipe>> = _recipeList.asStateFlow()
 
     var list = mutableListOf<Recipe>()
-    private val storedRecipes = RecipeRepository(datastore, context)
+
 
     //Initializes the ViewModel with sample recipe data.
     init {
+        var hardList = instantiateRecipes()
         //_recipeList.value = instantiateRecipes()
         viewModelScope.launch {
-            storedRecipes.seedRecipes(instantiateRecipes())
            val recipeData = storedRecipes.dataFlow
-            recipeData.collect() { storedRecipe ->
-                val recipe = storedRecipes.parseRecipeData(storedRecipe)
-                if (recipe.name != "" && list.filter { it.name == recipe.name }.isEmpty()) {
-                    list.add(recipe)
-                }
-            }
-            _recipeList.value = list
+               .map { storedRecipe -> storedRecipes.parseRecipeData(storedRecipe) }
+               .toList().forEach() { recipe ->
+                   list.add(recipe)
+                   addRecipe(recipe)
+               }
         }
     }
 
@@ -50,7 +50,19 @@ class RecipeViewModel(datastore : DataStore<StoredRecipe>, context: Context) : V
         recipeSeedData.add(Recipe("Pancakes", getIngredientsForPancakes(), 4, ""))
         recipeSeedData.add(Recipe("Hot Dogs", getIngredientsForHotDogs(), 1, ""))
 
+        seedRecipes(recipeSeedData)
         return recipeSeedData
+    }
+
+    private fun seedRecipes(recipes : List<Recipe>) {
+        viewModelScope.launch {
+            recipes.forEach { recipe ->
+                if (storedRecipes.getRecipeByName(recipe.name) == null) {
+                    storedRecipes.putRecipe(recipe)
+                    addRecipe(recipe)
+                }
+            }
+        }
     }
 
     private fun getIngredientsForCarbonara() : MutableList<TemporaryIngredient>{

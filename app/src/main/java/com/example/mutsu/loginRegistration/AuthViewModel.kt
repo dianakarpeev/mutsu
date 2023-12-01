@@ -2,6 +2,7 @@ package com.example.mutsu.loginRegistration
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
@@ -17,13 +18,13 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
     }
 
     fun signUp(email: String, password: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             authRepository.signUp(email, password)
         }
     }
 
     fun signIn(email: String, password: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             authRepository.signIn(email, password)
         }
     }
@@ -33,7 +34,7 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
     }
 
     fun delete() {
-        viewModelScope.launch{
+        viewModelScope.launch(Dispatchers.IO) {
             authRepository.delete()
         }
     }

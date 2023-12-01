@@ -9,6 +9,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -16,11 +17,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 data class User (var username : String, var password : String, var name : String )
 
 @Composable
-fun LoginRegisterScreen(modifier: Modifier = Modifier){
+fun LoginRegisterScreen(
+        authViewModel: AuthViewModel = viewModel(factory= AuthViewModelFactory()),
+        modifier: Modifier = Modifier)
+{
+    /*
     var tempUserData = mutableListOf<User> ()
     tempUserData.add(User("hellokitty", "kitty1234", "katrina"))
     tempUserData.add(User("dance4life", "hip82hop", "devin"))
@@ -28,38 +34,94 @@ fun LoginRegisterScreen(modifier: Modifier = Modifier){
     tempUserData.add(User("__ice__tea__", "nine8seven", "trin"))
     tempUserData.add(User("em.meme.em", "3l3vator", "E M E L I O"))
 
+
+*/
     var optionShown by rememberSaveable { mutableStateOf("") }
+    var currentUser = authViewModel.currentUser().collectAsState()
 
-    Column(Modifier.padding(15.dp), horizontalAlignment = Alignment.CenterHorizontally){
-        Text("Welcome. Click log in to access the entire app. If you don't already have an account, you can create one by clicking register.")
-        Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround){
-            Button(onClick = {
-                if (optionShown != "Login") {
-                    optionShown = "Login"
+    if (currentUser.value == null){
+        Column(Modifier.padding(15.dp), horizontalAlignment = Alignment.CenterHorizontally){
+            Text("Welcome. Click log in to access the entire app. If you don't already have an account, you can create one by clicking register.")
+
+            Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround){
+                Button(onClick = {
+                    if (optionShown != "Login") {
+                        optionShown = "Login"
+                    }
+                    else {
+                        optionShown = ""
+                    }
+                }) {
+                    Text("Log in")
                 }
-                else {
-                    optionShown = ""
+
+                Button(onClick = {
+                    if (optionShown != "Register") {
+                        optionShown = "Register"
+                    }
+                    else {
+                        optionShown = ""
+                    }
+                }) {
+                    Text("Register")
                 }
-            }) {
-                Text("Log in")
             }
+            if (optionShown == "Login"){
+                var email by rememberSaveable { mutableStateOf("") }
+                var password by rememberSaveable { mutableStateOf("") }
 
-            Button(onClick = {
-                if (optionShown != "Register") {
-                    optionShown = "Register"
+                Column(modifier.padding(15.dp)){
+                    TextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text("Enter your email: ")}
+                    )
+                    TextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Enter your password: ")}
+                    )
+                    Button(onClick = {
+                        authViewModel.signIn(email, password)
+                    }){
+                        Text("Login here")
+                    }
                 }
-                else {
-                    optionShown = ""
+
+                //Login(tempUserData, modifier.padding(15.dp))
+            }
+            else if (optionShown == "Register"){
+                var email by rememberSaveable { mutableStateOf("") }
+                var password by rememberSaveable { mutableStateOf("") }
+
+                Column(modifier.padding(15.dp)){
+                    TextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text("Enter your email: ")}
+                    )
+                    TextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Enter your password: ")}
+                    )
+                    Button(onClick = {
+                        authViewModel.signUp(email, password)
+                    }){
+                        Text("Register here")
+                    }
                 }
-            }) {
-                Text("Register")
+
+                //Register(tempUserData, modifier.padding(15.dp))
             }
         }
-        if (optionShown == "Login"){
-            Login(tempUserData, modifier.padding(15.dp))
-        }
-        else if (optionShown == "Register"){
-            Register(tempUserData, modifier.padding(15.dp))
+    }
+    else {
+        Column(Modifier.padding(15.dp)){
+            Text("Congrats! You are signed in!")
+            Button(onClick = { authViewModel.signOut() }){
+                Text("Sign out")
+            }
         }
     }
 }

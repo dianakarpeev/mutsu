@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,157 +27,110 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.flow.StateFlow
 import java.util.regex.Pattern
 
 data class User (var username : String, var password : String, var name : String )
 
 @Composable
 fun LoginRegisterScreen(
-        authViewModel: AuthViewModel = viewModel(factory= AuthViewModelFactory()),
-        modifier: Modifier = Modifier)
-{
+    authViewModel: AuthViewModel = viewModel(factory= AuthViewModelFactory())
+) {
     var optionShown by rememberSaveable { mutableStateOf("") }
     var currentUser = authViewModel.currentUser().collectAsState()
 
-    //i got the regex from gskinner from the following website:
-    //https://regexr.com/3e48o
-    var goodEmailRegex = Pattern.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\$")
-
     if (currentUser.value == null){
         Column(Modifier.padding(15.dp), horizontalAlignment = Alignment.CenterHorizontally){
-            Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround){
-                Button(onClick = {
-                    if (optionShown != "Login") {
-                        optionShown = "Login"
-                    }
-                    else {
-                        optionShown = ""
-                    }
-                }) {
-                    Text(
-                        text ="Log in",
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-
-                Button(onClick = {
-                    if (optionShown != "Register") {
-                        optionShown = "Register"
-                    }
-                    else {
-                        optionShown = ""
-                    }
-                }) {
-                    Text(
-                        text = "Register",
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-            }
-            if (optionShown == "Login"){
-                var email by rememberSaveable { mutableStateOf("") }
-                var password by rememberSaveable { mutableStateOf("") }
-                var message by rememberSaveable { mutableStateOf("")}
-
-                Column(modifier.padding(15.dp)){
-                    TextField(
-                        value = email,
-                        onValueChange = { email = it },
-                        label = { Text("Enter your email: ")}
-                    )
-                    TextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        label = { Text("Enter your password: ")}
-                    )
-
-                    Text("$message")
-
-                    Button(onClick = {
-                        var emailMatches = goodEmailRegex.matcher(email)
-
-                        if(email == null || password == null || email == "" || password == "" || email == " " || password == " "){
-                            message = "Both the email and password fields have to be filled out to register."
-                        }
-                        else if (!emailMatches.matches()) {
-                            message = "That is not a valid email address. Please try another."
-                        }
-                        else {
-                            authViewModel.signIn(email, password)
-
-                            if (currentUser.value == null){
-                                message = "The credentials you entered do not match any in our system. Please try again."
-                            }
-                        }
-                    }){
-                        Text("Login here")
-                    }
-                }
-            }
-            else if (optionShown == "Register"){
-                var email by rememberSaveable { mutableStateOf("") }
-                var password by rememberSaveable { mutableStateOf("") }
-                var message by rememberSaveable { mutableStateOf("")}
-
-                Column(modifier.padding(15.dp)){
-                    TextField(
-                        value = email,
-                        onValueChange = { email = it },
-                        label = { Text("Enter your email: ")}
-                    )
-                    TextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        label = { Text("Enter your password: ")}
-                    )
-
-                    Text("$message")
-
-                    Button(onClick = {
-                        var emailMatches = goodEmailRegex.matcher(email)
-
-                        if(email == null || password == null || email == "" || password == "" || email == " " || password == " "){
-                            message = "Both the email and password fields have to be filled out to register."
-                        }
-                        else if (!emailMatches.matches()) {
-                            message = "That is not a valid email address. Please try another."
-                        }
-                        else if (password.length < 8) {
-                            message = "The password can't be less than 8 characters."
-                        }
-                        else{
-                            authViewModel.signUp(email, password)
-
-                            if (currentUser.value == null){
-                                message = "Sorry, we couldn't create an account with the credentials you entered. Please try again."
-                            }
-                        }
-                    }){
-                        Text("Register here")
-                    }
-                }
-            }
+            AuthenticationForm(
+                authViewModel = authViewModel,
+                currentUser = currentUser,
+                formType = optionShown
+            )
         }
     }
     else {
-        var showPopUp by rememberSaveable { mutableStateOf(false) }
+        SignedInScreen(modifier = Modifier)
+    }
+}
 
-        Column(Modifier.padding(15.dp)){
-            Text("Congrats! You are signed in!")
-            Row {
-                Button(onClick = { authViewModel.signOut() }){
-                    Text("Sign out")
-                }
+fun isNullOrEmpty(input: String?): Boolean {
+    return input == null || input.isEmpty()
+}
 
-                Button(onClick = { showPopUp = true }){
-                    Text("Delete account")
-                }
+@Composable
+fun AuthenticationForm(
+    authViewModel: AuthViewModel,
+    currentUser: State<Users?>,
+    formType: String,
+    modifier: Modifier = Modifier
+) {
+    val goodEmailRegex = Pattern.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\$")
+    var email by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var message by rememberSaveable { mutableStateOf("") }
 
-                if (showPopUp){
-                    ConfirmDeleteAccount(confirm = authViewModel::delete, dismiss = {showPopUp = false})
+    Column(modifier.padding(15.dp)) {
+        TextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Enter your email: ") }
+        )
+        TextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Enter your password: ") }
+        )
+
+        Text("$message")
+
+        Button(onClick = {
+            val emailMatches = goodEmailRegex.matcher(email)
+
+            if (isNullOrEmpty(email) || isNullOrEmpty(password))
+                message = "Both the email and password fields have to be filled out."
+            else if (!emailMatches.matches())
+                message = "That is not a valid email address. Please try again."
+            else {
+                when (formType) {
+                    "Login" -> {
+                        authViewModel.signIn(email, password)
+                        if (currentUser.value == null)
+                            message = "The credentials you entered do not match any in our system. Please try again."
+                    }
+                    "Register" -> {
+                        if (password.length < 8)
+                            message = "The password can't be less than 8 characters."
+                        else {
+                            authViewModel.signUp(email, password)
+                            if (currentUser.value == null)
+                                message = "Sorry, we couldn't create an account with the credentials you entered. Please try again."
+                        }
+                    }
                 }
+            }
+        }) {
+            Text(if (formType == "Login") "Login here" else "Register here")
+        }
+    }
+}
+
+@Composable
+fun SignedInScreen(modifier: Modifier){
+    var showPopUp by rememberSaveable { mutableStateOf(false) }
+
+    Column(Modifier.padding(15.dp)){
+        Text("Congrats! You are signed in!")
+        Row {
+            Button(onClick = { authViewModel.signOut() }){
+                Text("Sign out")
+            }
+
+            Button(onClick = { showPopUp = true }){
+                Text("Delete account")
+            }
+
+            if (showPopUp){
+                ConfirmDeleteAccount(confirm = authViewModel::delete, dismiss = {showPopUp = false})
             }
         }
     }

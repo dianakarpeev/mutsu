@@ -40,6 +40,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.mutsu.R
 import com.example.mutsu.loginRegistration.AuthViewModel
 import com.example.mutsu.loginRegistration.AuthViewModelFactory
 import com.example.mutsu.loginRegistration.LoginRegisterScreen
@@ -51,7 +52,7 @@ import com.example.mutsu.navigation.MealPlan
 import com.example.mutsu.navigation.RecipeInformation
 import com.example.mutsu.navigation.Recipes
 import com.example.mutsu.serializers.IngredientsNameSerializer
-import com.example.mutsu.seralizers.StoredRecipesSerializer
+import com.example.mutsu.serializers.StoredRecipesSerializer
 import com.example.mutsu.ui.theme.MutsuTheme
 
 private const val INGREDIENTS_NAME_FILE = "ingredients_name"

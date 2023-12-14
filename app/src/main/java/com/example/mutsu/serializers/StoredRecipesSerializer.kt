@@ -1,7 +1,7 @@
-package com.example.emptyactivity.serializers
+package com.example.mutsu.serializers
 
 import androidx.datastore.core.Serializer
-import com.example.emptyactivity.StoredRecipes
+import com.example.mutsu.StoredRecipes
 import java.io.InputStream
 import java.io.OutputStream
 

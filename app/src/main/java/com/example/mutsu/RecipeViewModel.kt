@@ -31,6 +31,8 @@ class RecipeViewModel(datastore: DataStore<StoredRecipes>, context: Context) : V
     init {
         if (_recipeList.value.isEmpty()) {
             viewModelScope.launch {
+                val recipes = instantiateRecipes()
+                //seedRecipes(recipes)
                 getRecipesFromStorage()
             }
         }

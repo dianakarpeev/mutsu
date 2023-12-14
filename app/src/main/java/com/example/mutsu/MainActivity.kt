@@ -33,6 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.Serializer
 import androidx.datastore.dataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -57,22 +58,23 @@ import com.example.mutsu.ui.theme.MutsuTheme
 
 private const val INGREDIENTS_NAME_FILE = "ingredients_name"
 private const val RECIPES_FILE = "stored_recipes"
+private val dataStores = dataStoreSingleton()
+
 
 class MainActivity : ComponentActivity() {
 
-     val Context.ingredientsNameStore : DataStore<IngredientsName> by dataStore(
-        fileName = INGREDIENTS_NAME_FILE,
-        serializer = IngredientsNameSerializer()
-    )
-    val Context.recipesStore : DataStore<StoredRecipes> by dataStore(
-        fileName = RECIPES_FILE,
-        serializer = StoredRecipesSerializer()
-    )
+    private val ingredientsNameStore : DataStore<IngredientsName> by lazy {
+        dataStores.getIngredientsNameStore(this)
+    }
+
+    private val recipesStore : DataStore<StoredRecipes> by lazy {
+        dataStores.getRecipesStore(this)
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
             MutsuApp()
         }
     }

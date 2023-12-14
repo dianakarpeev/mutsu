@@ -6,16 +6,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -23,16 +19,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -42,10 +36,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -205,7 +196,7 @@ fun AuthenticationForm(
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.background
+                contentColor = Color.White
             ),
             onClick = {
                 when {
@@ -255,7 +246,6 @@ fun AuthenticationForm(
  * @param keyboardOptions Keyboard options for specific cases. For example, when you want the user to
  * only be able to input numbers.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserFieldInput(
     label: String,
@@ -318,7 +308,6 @@ fun SignedInScreen(
     var showPopUp by rememberSaveable { mutableStateOf(false) }
     val roundedCornerRadius = 20.dp
     val buttonCornerRadius = 10.dp
-    val spacedBy = 10.dp
     val spacerHeight = 15.dp
     val padding = 20.dp
     val imagePadding = 35.dp
@@ -435,18 +424,6 @@ fun ConfirmDeleteAccount(
     dismiss: () -> Unit = {}
 ){
     AlertDialog(
-        icon = {
-            Icon(Icons.Filled.Delete, contentDescription = null)
-        },
-        title = {
-            Text("Delete account")
-        },
-        text = {
-            Text("Are you sure you want to delete your account? You won't be able to undo this action.")
-        },
-        onDismissRequest = {
-            dismiss()
-        },
         icon = { Icons.Filled.Delete },
         title = { Text("Delete account") },
         text = { Text("Are you sure you want to delete your account? You won't be able to undo this action.") },
@@ -458,7 +435,7 @@ fun ConfirmDeleteAccount(
                     confirm()
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.tertiary,
                     contentColor = MaterialTheme.colorScheme.background
                 ),
             ) {
@@ -471,7 +448,7 @@ fun ConfirmDeleteAccount(
                     dismiss()
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
                     contentColor = MaterialTheme.colorScheme.background
                 ),
             ) {

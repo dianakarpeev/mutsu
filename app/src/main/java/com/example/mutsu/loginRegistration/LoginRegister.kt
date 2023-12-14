@@ -56,6 +56,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mutsu.R
 import java.util.regex.Pattern
 
+/**
+ * Composable function that displays a login/register screen. Once logged in, users can view
+ * a "signed in" screen that allows them to delete their account or sign out.
+ *
+ * @param authViewModel The view model responsible for authentication operations.
+ */
 @Composable
 fun LoginRegisterScreen(
     authViewModel: AuthViewModel = viewModel(factory= AuthViewModelFactory())
@@ -86,6 +92,14 @@ fun LoginRegisterScreen(
     }
 }
 
+/**
+ * Composable function that renders an authentication form for user login or registration.
+ *
+ * @param authViewModel The view model handling authentication processes.
+ * @param currentUser State holding information about the current user.
+ * @param initialFormType The initial type of form to display ('Login' or 'Register').
+ * @param modifier Optional modifier for configuring the layout.
+ */
 @Composable
 fun AuthenticationForm(
     authViewModel: AuthViewModel,
@@ -112,6 +126,7 @@ fun AuthenticationForm(
         val introduction = if (formType == "Login") "Enter your credentials to log in."
                            else "Create an account to get started"
 
+        //Headers
         Text(
             text = welcome,
             modifier = Modifier.fillMaxWidth(),
@@ -130,6 +145,7 @@ fun AuthenticationForm(
             fontSize = 20.sp
         )
 
+        //Form field inputs (email and password)
         UserFieldInput(
             label = "Enter your email",
             value = email,
@@ -150,6 +166,7 @@ fun AuthenticationForm(
             modifier = Modifier.fillMaxWidth()
         )
 
+        //Clickable text that allows the user to switch between log in and register forms
         val toggleText = if (formType == "Login") "Don't have an account? Create one"
                          else "Already have an account? Log in"
 
@@ -169,6 +186,7 @@ fun AuthenticationForm(
             fontSize = 14.sp
         )
 
+        //Error message after users click on the submission button (i.e. incorrect credentials)
         if (message.isNotBlank()){
             Text(
                 text = message,
@@ -180,6 +198,7 @@ fun AuthenticationForm(
             )
         }
 
+        //Submission button
         Button(
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(
@@ -191,16 +210,23 @@ fun AuthenticationForm(
                     email.isEmpty() || password.isEmpty() ->
                         message = "Both the email and password fields have to be filled out."
 
-                    formType == "Login" && currentUser.value == null -> {
-                        authViewModel.signIn(email, password)
-                        message =
-                            "The credentials you entered do not match any in our system. Please try again."
+                    //Figured out with the help of ChatGPT (checking for success before displaying an error message)
+                    formType == "Login" -> {
+                        authViewModel.signIn(email, password) { success ->
+                            if (!success) {
+                                message =
+                                    "The credentials you entered do not match any in our system. Please try again."
+                            }
+                        }
                     }
 
-                    formType == "Register" && currentUser.value == null -> {
-                        authViewModel.signUp(email, password)
-                        message =
-                            "Sorry, we couldn't create an account with the credentials you entered. Please try again."
+                    formType == "Register" -> {
+                        authViewModel.signUp(email, password) { success ->
+                            if (!success) {
+                                message =
+                                    "Sorry, we couldn't create an account with the credentials you entered. Please try again."
+                            }
+                        }
                     }
                 }
             }
@@ -276,7 +302,12 @@ fun UserFieldInput(
     }
 }
 
-
+/**
+ * Composable function displaying the screen for a signed-in user with options for sign-out and account deletion.
+ *
+ * @param authViewModel The view model managing authentication operations.
+ * @param currentUser State holding information about the currently signed-in user.
+ */
 @Composable
 fun SignedInScreen(
     authViewModel: AuthViewModel,
@@ -296,6 +327,7 @@ fun SignedInScreen(
             .padding(15.dp)
             .fillMaxWidth() // Updated to fill max width
     ) {
+        //Headings
         Text(
             text = "Great to see you!",
             modifier = Modifier.fillMaxWidth(),
@@ -315,6 +347,7 @@ fun SignedInScreen(
 
         Spacer(Modifier.height(spacerHeight))
 
+        //Button column
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -330,6 +363,7 @@ fun SignedInScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
+                //Sign out button
                 Button(
                     shape = RoundedCornerShape(buttonCornerRadius),
                     onClick = { authViewModel.signOut() },
@@ -346,6 +380,7 @@ fun SignedInScreen(
                     )
                 }
 
+                //Delete account button
                 Button(
                     shape = RoundedCornerShape(buttonCornerRadius),
                     onClick = { showPopUp = true },
@@ -366,6 +401,7 @@ fun SignedInScreen(
 
         Spacer(Modifier.height(spacerHeight))
 
+        //Cute little radish image!
         Image(
             painter = painterResource(id = R.drawable.radish),
             contentDescription = null,
@@ -376,6 +412,7 @@ fun SignedInScreen(
         )
     }
 
+    //Confirm deletion before actually deleting the account
     if (showPopUp){
         ConfirmDeleteAccount(
             confirm = authViewModel::delete,

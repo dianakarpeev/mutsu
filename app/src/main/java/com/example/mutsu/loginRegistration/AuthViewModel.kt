@@ -17,15 +17,19 @@ class AuthViewModel(private val authRepository: AuthRepository) : ViewModel() {
         return authRepository.currentUser()
     }
 
-    fun signUp(email: String, password: String) {
+    //Refactored using ChatGPT to return a success boolean
+    fun signIn(email: String, password: String, callback: (Boolean) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            authRepository.signUp(email, password)
+            val signInSuccess = authRepository.signIn(email, password)
+            callback(signInSuccess)
         }
     }
 
-    fun signIn(email: String, password: String) {
+    //Refactored using ChatGPT to return a success boolean
+    fun signUp(email: String, password: String, callback: (Boolean) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            authRepository.signIn(email, password)
+            val signUpSuccess = authRepository.signUp(email, password)
+            callback(signUpSuccess)
         }
     }
 

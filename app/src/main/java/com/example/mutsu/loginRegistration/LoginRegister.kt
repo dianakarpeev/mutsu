@@ -1,13 +1,19 @@
 package com.example.mutsu.loginRegistration
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -18,6 +24,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -33,13 +40,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
+import com.example.mutsu.R
 import java.util.regex.Pattern
 
 data class User (var username : String, var password : String, var name : String )
@@ -51,21 +62,21 @@ fun LoginRegisterScreen(
     val defaultOption = "Register"
     val currentUser = authViewModel.currentUser().collectAsState()
 
-    if (currentUser.value == null){
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ){
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        if (currentUser.value == null){
             AuthenticationForm(
                 authViewModel = authViewModel,
                 currentUser = currentUser,
                 initialFormType = defaultOption
             )
         }
-    }
-    else {
-        SignedInScreen(authViewModel)
+        else {
+            SignedInScreen(authViewModel, currentUser)
+        }
     }
 }
 
@@ -93,8 +104,6 @@ fun AuthenticationForm(
         val welcome = if (formType == "Login") "Welcome back!" else "Welcome!"
         val introduction = if (formType == "Login") "Enter your credentials to log in."
                            else "Create an account to get started"
-
-        Spacer(Modifier.height(35.dp))
 
         Text(
             text = welcome,
@@ -128,7 +137,8 @@ fun AuthenticationForm(
             onValueChange = { password = it },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             isInvalid = password.isNotEmpty() && password.length < 8,
-            errorMessage = "The password can't be less than 8 characters."
+            errorMessage = "The password can't be less than 8 characters.",
+            isPassword = true
         )
 
         val toggleText = if (formType == "Login") "Don't have an account? Create one"
@@ -137,13 +147,13 @@ fun AuthenticationForm(
         Text(
             text = toggleText,
             modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        formType = if (formType == "Login") "Register" else "Login"
-                        email = ""
-                        password = ""
-                        message = ""
-                    },
+                .fillMaxWidth()
+                .clickable {
+                    formType = if (formType == "Login") "Register" else "Login"
+                    email = ""
+                    password = ""
+                    message = ""
+                },
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Left,
@@ -219,7 +229,8 @@ fun UserFieldInput(
     errorMessage: String = "Invalid input",
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions : KeyboardActions = KeyboardActions(),
-    containerColor : Color = MaterialTheme.colorScheme.surface
+    containerColor : Color = MaterialTheme.colorScheme.surface,
+    isPassword: Boolean = false
 ) {
     TextField(
         value = value,
@@ -230,6 +241,7 @@ fun UserFieldInput(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         maxLines = 1,
+        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
         colors = TextFieldDefaults.colors(
             focusedTextColor = MaterialTheme.colorScheme.onPrimary,
             unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
@@ -255,49 +267,127 @@ fun UserFieldInput(
     }
 }
 
+
 @Composable
 fun SignedInScreen(
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    currentUser: State<Users?>
 ){
     var showPopUp by rememberSaveable { mutableStateOf(false) }
+    val roundedCornerRadius = 20.dp
+    val buttonCornerRadius = 10.dp
+    val spacedBy = 10.dp //between all elements
+    val spacerHeight = 15.dp //between text "you are currently signed with.." and buttons
+    val padding = 20.dp //padding of column and buttons
 
-    Column(Modifier.padding(15.dp)){
-        Text("Congrats! You are signed in!")
-        Row {
-            Button(onClick = { authViewModel.signOut() }){
-                Text("Sign out")
-            }
+    Column(
+        Modifier
+            .fillMaxHeight()
+            .padding(15.dp)
+            .width(300.dp),
+        verticalArrangement = Arrangement.spacedBy(spacedBy),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(spacerHeight))
 
-            Button(onClick = { showPopUp = true }){
-                Text("Delete account")
-            }
+        Text(
+            text = "Great to see you!",
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            fontSize = 30.sp
+        )
 
-            if (showPopUp){
-                ConfirmDeleteAccount(confirm = authViewModel::delete, dismiss = {showPopUp = false})
+        Text(
+            text = "You are currently signed with " + currentUser.value!!.email,
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center,
+            fontSize = 17.sp
+        )
+
+        Spacer(Modifier.height(spacerHeight))
+
+        Box(
+            modifier = Modifier
+                .background(
+                    color = MaterialTheme.colorScheme.surface,
+                    shape = RoundedCornerShape(roundedCornerRadius)
+                )
+        ) {
+            Column(
+                modifier = Modifier.padding(padding),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                Button(
+                    shape = RoundedCornerShape(buttonCornerRadius),
+                    onClick = { authViewModel.signOut() },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.background
+                    )
+                ) {
+                    Text(
+                        "Sign Out",
+                        Modifier.padding(padding, 0.dp),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Button(
+                    shape = RoundedCornerShape(buttonCornerRadius),
+                    onClick = { showPopUp = true },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.background
+                    )
+                ) {
+                    Text(
+                        "Delete Account",
+                        Modifier.padding(padding, 0.dp),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
+
+        Spacer(Modifier.height(spacerHeight))
+
+        Image(
+            painter = painterResource(id = R.drawable.radish),
+            contentDescription = null,
+            Modifier.size(size = 230.dp)
+        )
+    }
+
+    if (showPopUp){
+        ConfirmDeleteAccount(
+            confirm = authViewModel::delete,
+            dismiss = { showPopUp = false }
+        )
     }
 }
 
-/*
- * got this code and modified it a bit from here:
- * https://developer.android.com/jetpack/compose/components/dialog#alert
+/**
+ * Displays a pop up message where users can either confirm or dismiss the deletion of their account.
+ *
+ * @param confirm Actions to take when the user clicks outside of the popup or the dismiss button
+ * @param dismiss Actions to take when the users click on the confirm button
  */
 @Composable
-fun ConfirmDeleteAccount(confirm: () -> Unit, dismiss: () -> Unit = {}){
+fun ConfirmDeleteAccount(
+    confirm: () -> Unit,
+    dismiss: () -> Unit = {}
+){
     AlertDialog(
-        icon = {
-            Icons.Filled.Delete
-        },
-        title = {
-            Text("Delete account")
-        },
-        text = {
-            Text("Are you sure you want to delete your account? You won't be able to undo this action.")
-        },
-        onDismissRequest = {
-            dismiss()
-        },
+        icon = { Icons.Filled.Delete },
+        title = { Text("Delete account") },
+        text = { Text("Are you sure you want to delete your account? You won't be able to undo this action.") },
+        onDismissRequest = { dismiss() },
         confirmButton = {
             TextButton(
                 onClick = {
@@ -309,11 +399,7 @@ fun ConfirmDeleteAccount(confirm: () -> Unit, dismiss: () -> Unit = {}){
             }
         },
         dismissButton = {
-            TextButton(
-                onClick = {
-                    dismiss()
-                }
-            ) {
+            TextButton(onClick = { dismiss() }) {
                 Text("Dismiss")
             }
         }

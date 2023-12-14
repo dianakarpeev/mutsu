@@ -115,20 +115,7 @@ fun ShowAllIngredients(
 
         var message by rememberSaveable { mutableStateOf<String>("")}
         Button(
-            onClick = {
-                showPopUp = true
-                /*
-                message = "Items in your grocery list:"
-
-                for(i in ingredients.indices){
-                    if (ingredients[i].quantityInCart > 0){
-                        var name = ingredients[i].name
-                        var quantity = ingredients[i].quantityInCart
-                        message += "\n  - x$quantity $name"
-                    }
-                }
-                */
-            },
+            onClick = { showPopUp = true },
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.tertiary,
                 contentColor = MaterialTheme.colorScheme.background
@@ -145,12 +132,6 @@ fun ShowAllIngredients(
         if (showPopUp){
             ListConfirmationPopUp(confirm = showGroceryList, dismiss = { showPopUp = false })
         }
-    /*
-        Text(
-            text = "$message",
-            color = MaterialTheme.colorScheme.onPrimary
-        )
-    */
     }
 }
 

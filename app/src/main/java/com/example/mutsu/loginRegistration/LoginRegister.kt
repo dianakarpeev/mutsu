@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -182,7 +184,7 @@ fun LoginRegisterScreen(
 fun ConfirmDeleteAccount(confirm: () -> Unit, dismiss: () -> Unit = {}){
     AlertDialog(
         icon = {
-            Icons.Filled.Delete
+            Icon(Icons.Filled.Delete, contentDescription = null)
         },
         title = {
             Text("Delete account")

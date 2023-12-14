@@ -251,7 +251,7 @@ fun ListConfirmationPopUp(
     */
     AlertDialog(
         icon = {
-            Icons.Filled.List
+            Icon(Icons.Filled.List, contentDescription = null)
         },
         title = {
             Text("Generate Grocery List")

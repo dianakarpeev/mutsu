@@ -1,8 +1,6 @@
 package com.example.emptyactivity
 
-import android.content.Context
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,14 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.Scaffold
-import androidx.compose.foundation.layout.Box
-import androidx.datastore.core.DataStore
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.emptyactivity.ui.theme.EmptyActivityTheme
 
 /**
  * Screen that displays a list of the user's existing recipes. Users can create recipes by entering
@@ -69,7 +60,8 @@ fun RecipeListScreen(goToRecipeInformation: (String) -> Unit, recipeViewModel: R
         ){
             RecipeList(
                 recipes,
-                goToRecipeInformation
+                goToRecipeInformation,
+                recipeViewModel
             )
         }
     }
@@ -155,7 +147,11 @@ fun Section(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipeList(recipeList: List<Recipe>, goToRecipeInformation: (String) -> Unit) {
+fun RecipeList(
+    recipeList: List<Recipe>,
+    goToRecipeInformation: (String) -> Unit,
+    recipeViewModel: RecipeViewModel
+) {
     if (recipeList.isNotEmpty()){
         Box (
             modifier = Modifier//.verticalScroll(rememberScrollState())
@@ -175,7 +171,9 @@ fun RecipeList(recipeList: List<Recipe>, goToRecipeInformation: (String) -> Unit
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant
                         ),
-                        onClick = { goToRecipeInformation(recipe.name) }
+                        onClick = {
+                            recipeViewModel.selectRecipe(recipe.name)
+                            goToRecipeInformation(recipe.name) }
                     ) {
                         Text(
                             text = recipe.name,

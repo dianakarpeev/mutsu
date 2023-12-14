@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -39,12 +38,11 @@ import com.example.emptyactivity.navigation.MealPlan
 import com.example.emptyactivity.navigation.RecipeInformation
 import com.example.emptyactivity.navigation.Recipes
 import com.example.emptyactivity.navigation.LoginRegister
-import com.example.emptyactivity.repositories.IngredientsNameRepository
 import com.example.emptyactivity.serializers.IngredientsNameSerializer
-import com.example.emptyactivity.serializers.RecipeSerializer
+import com.example.emptyactivity.serializers.StoredRecipesSerializer
 
 private const val INGREDIENTS_NAME_FILE = "ingredients_name"
-private const val RECIPES_FILE = "recipes"
+private const val RECIPES_FILE = "stored_recipes"
 
 
 class MainActivity : ComponentActivity() {
@@ -53,9 +51,9 @@ class MainActivity : ComponentActivity() {
         fileName = INGREDIENTS_NAME_FILE,
         serializer = IngredientsNameSerializer()
     )
-    val Context.recipesStore : DataStore<StoredRecipe> by dataStore(
+    val Context.recipesStore : DataStore<StoredRecipes> by dataStore(
         fileName = RECIPES_FILE,
-        serializer = RecipeSerializer()
+        serializer = StoredRecipesSerializer()
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {

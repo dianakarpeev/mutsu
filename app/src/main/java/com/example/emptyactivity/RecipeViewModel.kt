@@ -2,51 +2,64 @@ package com.example.emptyactivity
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.dataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.emptyactivity.repositories.RecipeRepository
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.forEach
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+
 //ViewModel responsible for managing Recipe data and CRUD operations.
-class RecipeViewModel(datastore : DataStore<StoredRecipe>, context: Context) : ViewModel() {
+class RecipeViewModel(datastore: DataStore<StoredRecipes>, context: Context) : ViewModel() {
     private val storedRecipes = RecipeRepository(datastore, context)
     private val recipesFlow = storedRecipes.dataFlow
+
     private val _recipeList = MutableStateFlow<List<Recipe>>(emptyList())
     val recipeList: StateFlow<List<Recipe>> = _recipeList.asStateFlow()
 
     private var editableList = mutableListOf<Recipe>()
+    var selectedRecipe : Recipe? = null
 
 
     //Initializes the ViewModel with sample recipe data.
     init {
-            //_recipeList.value = instantiateRecipes()
+        if (_recipeList.value.isEmpty()) {
             viewModelScope.launch {
+                getRecipesFromStorage()
+            }
+        }
+    }
 
-                val hardlist = instantiateRecipes()
-
-                storedRecipes.deleteAllRecipes()
-                seedRecipes(hardlist)
-
-                recipesFlow.collect() { storedRecipe ->
+     fun getRecipesFromStorage() {
+        viewModelScope.launch {
+            recipesFlow.collect() {storedList ->
+                storedList.recipesList.forEach { storedRecipe ->
                     val recipe = storedRecipes.parseRecipeData(storedRecipe)
                     if (recipe.ingredients.isNotEmpty()) {
-                        //editableList.add(recipe)
-                        addRecipe(recipe)
+                        editableList.add(recipe)
+                        _recipeList.update { recipes -> copyList() }
                     }
                 }
-
             }
+        }
+    }
+
+
+    fun selectRecipe(recipeName: String) {
+        viewModelScope.launch {
+            recipeList.collect { recipes ->
+                val recipe = recipes.firstOrNull { it.name == recipeName }
+                if (recipe != null) {
+                    selectedRecipe = recipe
+                }
+            }
+        }
     }
 
     //Creates and returns a list of sample recipes.
@@ -62,32 +75,20 @@ class RecipeViewModel(datastore : DataStore<StoredRecipe>, context: Context) : V
         return recipeSeedData
     }
 
-    private fun seedRecipes(recipes : List<Recipe>) {
-        viewModelScope.launch {
+    private suspend fun seedRecipes(recipes : List<Recipe>) {
             recipes.forEach { recipe ->
-                if(!isRecipeInStorage(recipe.name)) {
-                    val ings = storedRecipes.createStoredIngredients(recipe)
-                    val storedRecipe = storedRecipes.createStoredRecipe(recipe, ings)
-                    storedRecipes.dataStore.updateData { storedRecipe }
+                viewModelScope.launch {
+                    if (!isRecipeInStorage(recipe.name)) {
+                        val storedIngredients = storedRecipes.createStoredIngredients(recipe)
+                        val storedRecipe = storedRecipes.createStoredRecipe(recipe, storedIngredients)
+                        storedRecipes.addRecipe(storedRecipe)
+                    }
                 }
             }
-        }
     }
 
-    fun isRecipeInStorage(name: String) : Boolean {
-        var exists = false
-        viewModelScope.launch {
-            try {
-                val recipeData = recipesFlow.filter { storedRecipe -> storedRecipe.name == name }
-                val recipe = recipeData.first()
-                if (recipe.name == name) {
-                    exists = true
-                }
-            } catch (e: Exception) {
-                exists = false
-            }
-        }
-        return exists
+    suspend fun isRecipeInStorage(name: String) : Boolean {
+        return storedRecipes.doesRecipeExist(name)
     }
 
     //region Recipe Data
@@ -182,7 +183,12 @@ class RecipeViewModel(datastore : DataStore<StoredRecipe>, context: Context) : V
      */
     fun removeRecipe(recipe: Recipe) {
         viewModelScope.launch {
-            _recipeList.value = _recipeList.value - recipe
+            storedRecipes.deleteRecipe(recipe.name)
+            val index = editableList.indexOfFirst { it.name == recipe.name }
+            if (index != -1) {
+                editableList.removeAt(index)
+                _recipeList.update { recipes -> copyList() }
+            }
         }
     }
 
@@ -192,7 +198,7 @@ class RecipeViewModel(datastore : DataStore<StoredRecipe>, context: Context) : V
      * @return A list of all recipes.
      */
     fun getAllRecipes(): List<Recipe>{
-        return recipeList.value
+        return _recipeList.value
     }
 
     /**
@@ -200,10 +206,20 @@ class RecipeViewModel(datastore : DataStore<StoredRecipe>, context: Context) : V
      *
      * @param name The name of the recipe to retrieve.
      * @return The recipe with the specified name, or null if not found.
-     */
+
     fun getRecipeByName(name: String): Recipe? {
-        return _recipeList.value.find { it.name == name }
+        var recipe : Recipe? = null;
+
+        viewModelScope.launch {
+            val recipeData = recipesFlow.filter { storedRecipe -> storedRecipe.name == name }
+            val storedRecipe = recipeData.firstOrNull()
+            if (storedRecipe != null) {
+                recipe = storedRecipes.parseRecipeData(storedRecipe)
+            }
+        }
+        return recipe
     }
+     */
 
     /**
      * Updates an existing recipe in the recipe list.
@@ -213,11 +229,19 @@ class RecipeViewModel(datastore : DataStore<StoredRecipe>, context: Context) : V
      */
     fun editRecipe(recipeName: String, updatedRecipe: Recipe) {
         viewModelScope.launch {
-            val newList = _recipeList.value.toMutableList()
-            val index = newList.indexOfFirst { it.name == recipeName }
+
+            val index = editableList.indexOfFirst { it.name == recipeName }
             if (index != -1) {
-                newList[index] = updatedRecipe
-                _recipeList.value = newList
+                editableList[index] = updatedRecipe
+
+                //Deleting the old recipe in the case of a name change
+                storedRecipes.deleteRecipe(recipeName)
+
+                val storedIngredients = storedRecipes.createStoredIngredients(updatedRecipe)
+                val storedRecipe = storedRecipes.createStoredRecipe(updatedRecipe, storedIngredients)
+                storedRecipes.addRecipe(storedRecipe)
+
+                copyList()
             }
         }
     }

@@ -26,6 +26,9 @@ message StoredRecipe {
   repeated RecipeIngredient ingredients = 4;
 }
 
+message StoredRecipes {
+  repeated StoredRecipe recipes = 1;
+}
 
 /*
 message Username {

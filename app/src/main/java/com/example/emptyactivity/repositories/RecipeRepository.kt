@@ -6,50 +6,38 @@ import com.example.emptyactivity.Measurements
 import com.example.emptyactivity.Recipe
 import com.example.emptyactivity.RecipeIngredient
 import com.example.emptyactivity.StoredRecipe
+import com.example.emptyactivity.StoredRecipes
 import com.example.emptyactivity.TemporaryIngredient
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
 
-class RecipeRepository(val dataStore: DataStore<StoredRecipe>, context: Context) {
+class RecipeRepository(val dataStore: DataStore<StoredRecipes>, context: Context) {
 
     val dataFlow = dataStore.data
 
     suspend fun doesRecipeExist(name: String) : Boolean {
-        try {
-            val recipeData = dataFlow.filter { storedRecipe -> storedRecipe.name == name }.first()
-            return true
-        } catch (e: Exception) {
-            return false
-        }
+        val recipe = getRecipeByName(name)
+        return recipe != null
     }
 
     suspend fun getRecipeByName(name : String): StoredRecipe? {
-        // Get data from dataStore
-
-        val recipeData = dataFlow
-            .filter { storedRecipe -> storedRecipe.name == name }
-
-        val recipe = recipeData.firstOrNull()
-
-        return recipe
+        return dataFlow.firstOrNull()?.recipesList?.firstOrNull {recipe ->
+            recipe.name == name
+        }
     }
 
-    suspend fun getRecipeNames() : List<String> {
-        // Get data from dataStore
-
-        val names = mutableListOf<String>()
-
-        dataFlow.collect() { storedRecipe ->
-                names.add(storedRecipe.name)
+    suspend fun addRecipe(recipe: StoredRecipe) {
+        dataStore.updateData { currentData ->
+            val mutableList = currentData.recipesList.toMutableList()
+            val index = mutableList.indexOfFirst { it.name == recipe.name }
+            if (index != -1) {
+                mutableList[index] = recipe
+            } else {
+                mutableList.add(recipe)
             }
-
-        // Return Recipe
-        return names
+            currentData.toBuilder().clearRecipes().addAllRecipes(mutableList).build()
+        }
     }
 
     fun createStoredIngredients(recipe: Recipe) : List<RecipeIngredient> {
@@ -76,19 +64,20 @@ class RecipeRepository(val dataStore: DataStore<StoredRecipe>, context: Context)
         return storedRecipe
     }
 
-    //Delete a recipe from the dataStore
-    //Not sure if this works tbh -M
-    suspend fun deleteRecipe(recipe: Recipe) {
-        val dataFlow = dataStore.data.toList()
-
-        val remainingRecipes = dataFlow.filter { storedRecipe -> storedRecipe.name != recipe.name }
-
-        dataStore.data.map { remainingRecipes }
-    }
-
     suspend fun deleteAllRecipes() {
         dataStore.updateData {
             it.toBuilder().clear().build()
+        }
+    }
+
+    suspend fun deleteRecipe(recipeName : String) {
+        dataStore.updateData { currentData ->
+            val mutableList = currentData.recipesList.toMutableList()
+            val index = mutableList.indexOfFirst { it.name == recipeName }
+            if (index != -1) {
+                mutableList.removeAt(index)
+            }
+            currentData.toBuilder().clearRecipes().addAllRecipes(mutableList).build()
         }
     }
 
@@ -122,4 +111,6 @@ class RecipeRepository(val dataStore: DataStore<StoredRecipe>, context: Context)
 
         return tempIngredients
     }
+
+
 }

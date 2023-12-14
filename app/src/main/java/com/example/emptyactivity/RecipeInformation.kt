@@ -1,5 +1,6 @@
 package com.example.emptyactivity
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -57,6 +58,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 data class Recipe(
     var name: String,
@@ -96,6 +101,7 @@ data class TemporaryIngredient(
  * @param goToRecipeList Navigation to the Recipe List screen. Used when the changes to the recipe
  * are saved or when the recipe is deleted.
  */
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun RecipeInformationScreen(
     recipeViewModel: RecipeViewModel,
@@ -105,12 +111,8 @@ fun RecipeInformationScreen(
     //The recipe name is passed through navigation arguments and may be null
     if (recipeName == null) throw IllegalStateException("Recipe name is missing.")
 
-    /**
-     * Obtain the recipe's information - if it doesn't exist in the ViewModel, create a new empty
-     * recipe. Temporary fix until the datastore is implemented in this screen.
-     */
-    val recipe = recipeViewModel.getRecipeByName(recipeName)
-        ?: createEmptyRecipe(recipeName)
+
+    val recipe = findRecipe(recipeName, recipeViewModel)
 
     //TODO: Replace temporary hardcoded values with responsive behavior
     //Temporary hardcoded values - to be modified when implementing responsive behavior
@@ -140,6 +142,12 @@ fun RecipeInformationScreen(
             RecipeForm(recipe = recipe)
         }
     }
+}
+
+private fun findRecipe(recipeName: String, recipeView : RecipeViewModel): Recipe {
+    val firstRecipes = recipeView.getAllRecipes()
+    val secondRecipes = recipeView.recipeList.value
+    return firstRecipes.find { it.name == recipeName } ?: createEmptyRecipe(recipeName)
 }
 
 private fun createEmptyRecipe(recipeName: String): Recipe{

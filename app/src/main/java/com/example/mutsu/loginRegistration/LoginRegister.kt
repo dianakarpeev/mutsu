@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,9 +16,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
@@ -53,17 +56,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mutsu.R
 import java.util.regex.Pattern
 
-data class User (var username : String, var password : String, var name : String )
-
 @Composable
 fun LoginRegisterScreen(
     authViewModel: AuthViewModel = viewModel(factory= AuthViewModelFactory())
 ) {
     val defaultOption = "Register"
     val currentUser = authViewModel.currentUser().collectAsState()
+    val verticalPadding = 10.dp
+    val horizontalPadding = 30.dp
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontalPadding, verticalPadding),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
@@ -71,7 +76,8 @@ fun LoginRegisterScreen(
             AuthenticationForm(
                 authViewModel = authViewModel,
                 currentUser = currentUser,
-                initialFormType = defaultOption
+                initialFormType = defaultOption,
+                modifier = Modifier.fillMaxWidth()
             )
         }
         else {
@@ -88,6 +94,7 @@ fun AuthenticationForm(
     modifier: Modifier = Modifier
 ) {
     val goodEmailRegex = Pattern.compile("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\$")
+
     var formType by rememberSaveable { mutableStateOf(initialFormType) }
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -95,8 +102,8 @@ fun AuthenticationForm(
 
     Column(
         modifier
-            .padding(15.dp)
-            .width(325.dp),
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(15.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -128,7 +135,8 @@ fun AuthenticationForm(
             value = email,
             onValueChange = { email = it },
             isInvalid = email.isNotEmpty() && !goodEmailRegex.matcher(email).matches(),
-            errorMessage = "That is not a valid email address. Please try again."
+            errorMessage = "That is not a valid email address. Please try again.",
+            modifier = Modifier.fillMaxWidth()
         )
 
         UserFieldInput(
@@ -138,7 +146,8 @@ fun AuthenticationForm(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             isInvalid = password.isNotEmpty() && password.length < 8,
             errorMessage = "The password can't be less than 8 characters.",
-            isPassword = true
+            isPassword = true,
+            modifier = Modifier.fillMaxWidth()
         )
 
         val toggleText = if (formType == "Login") "Don't have an account? Create one"
@@ -237,7 +246,7 @@ fun UserFieldInput(
         onValueChange = onValueChange,
         shape = RoundedCornerShape(15.dp),
         label = { Text(text = label, fontWeight = FontWeight.Medium) },
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(), // Updated to fill max width
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         maxLines = 1,
@@ -276,20 +285,17 @@ fun SignedInScreen(
     var showPopUp by rememberSaveable { mutableStateOf(false) }
     val roundedCornerRadius = 20.dp
     val buttonCornerRadius = 10.dp
-    val spacedBy = 10.dp //between all elements
-    val spacerHeight = 15.dp //between text "you are currently signed with.." and buttons
-    val padding = 20.dp //padding of column and buttons
+    val spacedBy = 10.dp
+    val spacerHeight = 15.dp
+    val padding = 20.dp
+    val imagePadding = 35.dp
 
     Column(
         Modifier
-            .fillMaxHeight()
+            .fillMaxSize()
             .padding(15.dp)
-            .width(300.dp),
-        verticalArrangement = Arrangement.spacedBy(spacedBy),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxWidth() // Updated to fill max width
     ) {
-        Spacer(modifier = Modifier.height(spacerHeight))
-
         Text(
             text = "Great to see you!",
             modifier = Modifier.fillMaxWidth(),
@@ -311,13 +317,16 @@ fun SignedInScreen(
 
         Box(
             modifier = Modifier
+                .fillMaxWidth()
                 .background(
                     color = MaterialTheme.colorScheme.surface,
                     shape = RoundedCornerShape(roundedCornerRadius)
                 )
         ) {
             Column(
-                modifier = Modifier.padding(padding),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(padding),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
@@ -360,7 +369,10 @@ fun SignedInScreen(
         Image(
             painter = painterResource(id = R.drawable.radish),
             contentDescription = null,
-            Modifier.size(size = 230.dp)
+            Modifier
+                .padding(imagePadding)
+                .fillMaxWidth()
+                .aspectRatio(1f)
         )
     }
 

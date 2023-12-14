@@ -15,6 +15,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -22,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +42,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun IngredientsScreen(viewModel: IngredientsViewModel = viewModel(), modifier: Modifier = Modifier){
     val ingredients by viewModel.ingredients.collectAsStateWithLifecycle()
+    var showGroceryList by rememberSaveable { mutableStateOf(false) }
 
     val increase: (Int) -> Unit = {
         viewModel.increaseQuantity(it)
@@ -53,7 +58,7 @@ fun IngredientsScreen(viewModel: IngredientsViewModel = viewModel(), modifier: M
     ){
         Instructions(modifier)
         Spacer(modifier.height(10.dp))
-        ShowAllIngredients(ingredients, increase, decrease, modifier)
+        ShowAllIngredients(ingredients, increase, decrease, { showGroceryList = true }, modifier)
     }
 }
 
@@ -84,7 +89,15 @@ fun Instructions(modifier: Modifier = Modifier){
 *  for each.
 */
 @Composable
-fun ShowAllIngredients(ingredients: List<FoodItem>, increaseQuantity: (Int) -> Unit, decreaseQuantity: (Int) -> Unit, modifier: Modifier = Modifier){
+fun ShowAllIngredients(
+    ingredients: List<FoodItem>,
+    increaseQuantity: (Int) -> Unit,
+    decreaseQuantity: (Int) -> Unit,
+    showGroceryList: () -> Unit,
+    modifier: Modifier = Modifier
+){
+    var showPopUp by rememberSaveable { mutableStateOf(false) }
+
     Column(modifier = modifier.fillMaxWidth(),){
         ingredients.forEachIndexed{ index, it ->
             IngredientButtonBox(
@@ -98,6 +111,8 @@ fun ShowAllIngredients(ingredients: List<FoodItem>, increaseQuantity: (Int) -> U
         var message by rememberSaveable { mutableStateOf<String>("")}
         Button(
             onClick = {
+                showPopUp = true
+                /*
                 message = "Items in your grocery list:"
 
                 for(i in ingredients.indices){
@@ -107,6 +122,7 @@ fun ShowAllIngredients(ingredients: List<FoodItem>, increaseQuantity: (Int) -> U
                         message += "\n  - x$quantity $name"
                     }
                 }
+                */
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.tertiary,
@@ -120,10 +136,16 @@ fun ShowAllIngredients(ingredients: List<FoodItem>, increaseQuantity: (Int) -> U
                 fontWeight = FontWeight.Medium
             )
         }
+
+        if (showPopUp){
+            ListConfirmationPopUp(confirm = showGroceryList, dismiss = { showPopUp = false })
+        }
+    /*
         Text(
             text = "$message",
             color = MaterialTheme.colorScheme.onPrimary
         )
+    */
     }
 }
 
@@ -197,4 +219,45 @@ fun IngredientButtonBox(
             }
         }
     }
+}
+
+@Composable
+fun ListConfirmationPopUp(
+    confirm : () -> Unit,
+    dismiss : () -> Unit,
+    modifier : Modifier = Modifier
+){
+    AlertDialog(
+        icon = {
+            Icons.Filled.List
+        },
+        title = {
+            Text("Generate Grocery List")
+        },
+        text = {
+            Text("Are you sure you want to generate your grocery list? You won't be able to make any edits to the list once you confirm this action.")
+        },
+        onDismissRequest = {
+            dismiss()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    dismiss()
+                    confirm()
+                }
+            ) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    dismiss()
+                }
+            ) {
+                Text("Dismiss")
+            }
+        }
+    )
 }

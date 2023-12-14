@@ -58,7 +58,12 @@ fun IngredientsScreen(viewModel: IngredientsViewModel = viewModel(), modifier: M
     ){
         Instructions(modifier)
         Spacer(modifier.height(10.dp))
-        ShowAllIngredients(ingredients, increase, decrease, { showGroceryList = true }, modifier)
+        if (!showGroceryList){
+            ShowAllIngredients(ingredients, increase, decrease, { showGroceryList = true }, modifier)
+        }
+        else {
+            ShowGroceryList(ingredients, modifier)
+        }
     }
 }
 
@@ -216,6 +221,21 @@ fun IngredientButtonBox(
                         contentDescription = "Remove one $ingredientName"
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun ShowGroceryList(ingredients: List<FoodItem>, modifier: Modifier = Modifier){
+    Column(modifier = modifier.fillMaxWidth(),){
+        ingredients.forEach{
+            if (it.quantityInCart > 0){
+                Text(
+                    text = " - ${it.quantityInCart} ${it.name}",
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Medium
+                )
             }
         }
     }

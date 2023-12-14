@@ -1,7 +1,9 @@
 package com.example.mutsu
 
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +17,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -22,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +35,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -38,6 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun IngredientsScreen(viewModel: IngredientsViewModel = viewModel(), modifier: Modifier = Modifier){
     val ingredients by viewModel.ingredients.collectAsStateWithLifecycle()
+    var showGroceryList by rememberSaveable { mutableStateOf(false) }
 
     val increase: (Int) -> Unit = {
         viewModel.increaseQuantity(it)
@@ -51,9 +59,16 @@ fun IngredientsScreen(viewModel: IngredientsViewModel = viewModel(), modifier: M
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ){
-        Instructions(modifier)
-        Spacer(modifier.height(10.dp))
-        ShowAllIngredients(ingredients, increase, decrease, modifier)
+        if (!showGroceryList){
+            Instructions("Feel free to add or remove any ingredients found below.", modifier)
+            Spacer(modifier.height(10.dp))
+            ShowAllIngredients(ingredients, increase, decrease, { showGroceryList = true }, modifier)
+        }
+        else {
+            Instructions("Be careful! Once you leave this screen, the current grocery list will be lost.", modifier)
+            Spacer(modifier.height(10.dp))
+            ShowGroceryList(ingredients, modifier)
+        }
     }
 }
 
@@ -62,7 +77,7 @@ data class FoodItem (val name: String, var quantityInCart: Int)
 
 /* Prints the instructions for the page at the top of the screen. */
 @Composable
-fun Instructions(modifier: Modifier = Modifier){
+fun Instructions(message: String, modifier: Modifier = Modifier){
     Column(){
         Text(
             text = "Grocery List",
@@ -72,7 +87,7 @@ fun Instructions(modifier: Modifier = Modifier){
             modifier = modifier.padding(6.dp)
         )
         Text(
-            text = "Here is your grocery list. Feel free to add or remove any ingredients found below.",
+            text = "Here is your grocery list. $message",
             color = MaterialTheme.colorScheme.onSurface,
             modifier = modifier.padding(6.dp)
         )
@@ -84,7 +99,15 @@ fun Instructions(modifier: Modifier = Modifier){
 *  for each.
 */
 @Composable
-fun ShowAllIngredients(ingredients: List<FoodItem>, increaseQuantity: (Int) -> Unit, decreaseQuantity: (Int) -> Unit, modifier: Modifier = Modifier){
+fun ShowAllIngredients(
+    ingredients: List<FoodItem>,
+    increaseQuantity: (Int) -> Unit,
+    decreaseQuantity: (Int) -> Unit,
+    showGroceryList: () -> Unit,
+    modifier: Modifier = Modifier
+){
+    var showPopUp by rememberSaveable { mutableStateOf(false) }
+
     Column(modifier = modifier.fillMaxWidth(),){
         ingredients.forEachIndexed{ index, it ->
             IngredientButtonBox(
@@ -97,17 +120,7 @@ fun ShowAllIngredients(ingredients: List<FoodItem>, increaseQuantity: (Int) -> U
 
         var message by rememberSaveable { mutableStateOf<String>("")}
         Button(
-            onClick = {
-                message = "Items in your grocery list:"
-
-                for(i in ingredients.indices){
-                    if (ingredients[i].quantityInCart > 0){
-                        var name = ingredients[i].name
-                        var quantity = ingredients[i].quantityInCart
-                        message += "\n  - x$quantity $name"
-                    }
-                }
-            },
+            onClick = { showPopUp = true },
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.tertiary,
                 contentColor = MaterialTheme.colorScheme.background
@@ -120,10 +133,10 @@ fun ShowAllIngredients(ingredients: List<FoodItem>, increaseQuantity: (Int) -> U
                 fontWeight = FontWeight.Medium
             )
         }
-        Text(
-            text = "$message",
-            color = MaterialTheme.colorScheme.onPrimary
-        )
+
+        if (showPopUp){
+            ListConfirmationPopUp(confirm = showGroceryList, dismiss = { showPopUp = false })
+        }
     }
 }
 
@@ -197,4 +210,85 @@ fun IngredientButtonBox(
             }
         }
     }
+}
+
+@Composable
+fun ShowGroceryList(ingredients: List<FoodItem>, modifier: Modifier = Modifier){
+    Box(modifier = modifier
+        .padding(6.dp)
+        .background(
+            color = MaterialTheme.colorScheme.surface,
+            shape = RoundedCornerShape(10.dp)
+        )
+    ){
+        Column(
+            modifier = modifier.fillMaxWidth()
+                .padding(6.dp),
+            ){
+            ingredients.forEach{
+                if (it.quantityInCart > 0){
+                    Text(
+                        text = " - ${it.quantityInCart} ${it.name}",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
+    }
+
+}
+
+@Composable
+fun ListConfirmationPopUp(
+    confirm : () -> Unit,
+    dismiss : () -> Unit,
+    modifier : Modifier = Modifier
+){
+    /*
+    * got this code and modified it a bit from here:
+    * https://developer.android.com/jetpack/compose/components/dialog#alert
+    */
+    AlertDialog(
+        icon = {
+            Icon(Icons.Filled.List, contentDescription = null)
+        },
+        title = {
+            Text("Generate Grocery List")
+        },
+        text = {
+            Text("Are you sure you want to generate your grocery list? You won't be able to make any edits to the list once you confirm this action.")
+        },
+        onDismissRequest = {
+            dismiss()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    dismiss()
+                    confirm()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.background
+                ),
+           ) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    dismiss()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.background
+                ),
+            ) {
+                Text("Dismiss")
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.background,
+    )
 }

@@ -285,7 +285,7 @@ fun ListConfirmationPopUp(
                 Text("Dismiss")
             }
         },
+        containerColor = MaterialTheme.colorScheme.background,
         modifier = modifier
-            .border(BorderStroke(2.dp, MaterialTheme.colorScheme.onPrimary), MaterialTheme.shapes.extraLarge)
     )
 }

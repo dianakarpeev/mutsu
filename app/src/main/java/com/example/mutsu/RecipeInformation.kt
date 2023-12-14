@@ -254,6 +254,10 @@ fun ConfirmPopup(
     dialogText: String,
     icon: ImageVector,
 ) {
+    /*
+    * got this code and modified it a bit from here:
+    * https://developer.android.com/jetpack/compose/components/dialog#alert
+    */
     AlertDialog(
         icon = { Icon(icon, contentDescription = null) },
         title = { Text(text = dialogTitle) },
@@ -263,7 +267,11 @@ fun ConfirmPopup(
             TextButton(
                 onClick = {
                     onConfirmation()
-                }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.background
+                ),
             ) {
                 Text(confirmText)
             }
@@ -272,11 +280,16 @@ fun ConfirmPopup(
             TextButton(
                 onClick = {
                     onDismissRequest()
-                }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.background
+                ),
             ) {
                 Text("Cancel")
             }
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background,
     )
 }
 

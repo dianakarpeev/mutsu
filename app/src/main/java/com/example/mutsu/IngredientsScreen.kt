@@ -245,6 +245,10 @@ fun ListConfirmationPopUp(
     dismiss : () -> Unit,
     modifier : Modifier = Modifier
 ){
+    /*
+    * got this code and modified it a bit from here:
+    * https://developer.android.com/jetpack/compose/components/dialog#alert
+    */
     AlertDialog(
         icon = {
             Icons.Filled.List
@@ -286,6 +290,5 @@ fun ListConfirmationPopUp(
             }
         },
         containerColor = MaterialTheme.colorScheme.background,
-        modifier = modifier
     )
 }

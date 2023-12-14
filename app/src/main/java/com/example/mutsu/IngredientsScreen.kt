@@ -214,17 +214,29 @@ fun IngredientButtonBox(
 
 @Composable
 fun ShowGroceryList(ingredients: List<FoodItem>, modifier: Modifier = Modifier){
-    Column(modifier = modifier.fillMaxWidth(),){
-        ingredients.forEach{
-            if (it.quantityInCart > 0){
-                Text(
-                    text = " - ${it.quantityInCart} ${it.name}",
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Medium
-                )
+    Box(modifier = modifier
+        .padding(6.dp)
+        .background(
+            color = MaterialTheme.colorScheme.surface,
+            shape = RoundedCornerShape(10.dp)
+        )
+    ){
+        Column(
+            modifier = modifier.fillMaxWidth()
+                .padding(6.dp),
+            ){
+            ingredients.forEach{
+                if (it.quantityInCart > 0){
+                    Text(
+                        text = " - ${it.quantityInCart} ${it.name}",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
         }
     }
+
 }
 
 @Composable

@@ -11,8 +11,10 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -200,7 +202,11 @@ fun ConfirmDeleteAccount(confirm: () -> Unit, dismiss: () -> Unit = {}){
                 onClick = {
                     dismiss()
                     confirm()
-                }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.background
+                ),
             ) {
                 Text("Confirm")
             }
@@ -209,10 +215,15 @@ fun ConfirmDeleteAccount(confirm: () -> Unit, dismiss: () -> Unit = {}){
             TextButton(
                 onClick = {
                     dismiss()
-                }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.background
+                ),
             ) {
                 Text("Dismiss")
             }
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background,
     )
 }

@@ -56,12 +56,14 @@ fun IngredientsScreen(viewModel: IngredientsViewModel = viewModel(), modifier: M
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ){
-        Instructions(modifier)
-        Spacer(modifier.height(10.dp))
         if (!showGroceryList){
+            Instructions("Feel free to add or remove any ingredients found below.", modifier)
+            Spacer(modifier.height(10.dp))
             ShowAllIngredients(ingredients, increase, decrease, { showGroceryList = true }, modifier)
         }
         else {
+            Instructions("Be careful! Once you leave this screen, the current grocery list will be lost.", modifier)
+            Spacer(modifier.height(10.dp))
             ShowGroceryList(ingredients, modifier)
         }
     }
@@ -72,7 +74,7 @@ data class FoodItem (val name: String, var quantityInCart: Int)
 
 /* Prints the instructions for the page at the top of the screen. */
 @Composable
-fun Instructions(modifier: Modifier = Modifier){
+fun Instructions(message: String, modifier: Modifier = Modifier){
     Column(){
         Text(
             text = "Grocery List",
@@ -82,7 +84,7 @@ fun Instructions(modifier: Modifier = Modifier){
             modifier = modifier.padding(6.dp)
         )
         Text(
-            text = "Here is your grocery list. Feel free to add or remove any ingredients found below.",
+            text = "Here is your grocery list. $message",
             color = MaterialTheme.colorScheme.onSurface,
             modifier = modifier.padding(6.dp)
         )

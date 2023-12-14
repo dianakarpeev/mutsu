@@ -29,12 +29,8 @@ class RecipeViewModel(datastore: DataStore<StoredRecipes>, context: Context) : V
 
     //Initializes the ViewModel with sample recipe data.
     init {
-        if (_recipeList.value.isEmpty()) {
-            viewModelScope.launch {
-                val recipes = instantiateRecipes()
-                //seedRecipes(recipes)
-                getRecipesFromStorage()
-            }
+        viewModelScope.launch {
+            getRecipesFromStorage()
         }
     }
 
@@ -47,6 +43,12 @@ class RecipeViewModel(datastore: DataStore<StoredRecipes>, context: Context) : V
                         editableList.add(recipe)
                         _recipeList.update { recipes -> copyList() }
                     }
+                }
+            }
+            if( recipeList.value.isEmpty() || _recipeList.value.isEmpty()) {
+                val recipes = instantiateRecipes()
+                viewModelScope.launch {
+                    seedRecipes(recipes)
                 }
             }
         }

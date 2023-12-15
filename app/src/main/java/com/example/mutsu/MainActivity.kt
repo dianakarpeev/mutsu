@@ -33,6 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.Serializer
 import androidx.datastore.dataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -40,6 +41,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.mutsu.R
 import com.example.mutsu.loginRegistration.AuthViewModel
 import com.example.mutsu.loginRegistration.AuthViewModelFactory
 import com.example.mutsu.loginRegistration.LoginRegisterScreen
@@ -51,21 +53,28 @@ import com.example.mutsu.navigation.MealPlan
 import com.example.mutsu.navigation.RecipeInformation
 import com.example.mutsu.navigation.Recipes
 import com.example.mutsu.serializers.IngredientsNameSerializer
+import com.example.mutsu.serializers.StoredRecipesSerializer
 import com.example.mutsu.ui.theme.MutsuTheme
 
 private const val INGREDIENTS_NAME_FILE = "ingredients_name"
+private const val RECIPES_FILE = "stored_recipes"
+private val dataStores = dataStoreSingleton()
+
 
 class MainActivity : ComponentActivity() {
 
-     val Context.ingredientsNameStore : DataStore<IngredientsName> by dataStore(
-        fileName = INGREDIENTS_NAME_FILE,
-        serializer = IngredientsNameSerializer()
-    )
+    private val ingredientsNameStore : DataStore<IngredientsName> by lazy {
+        dataStores.getIngredientsNameStore(this)
+    }
+
+    private val recipesStore : DataStore<StoredRecipes> by lazy {
+        dataStores.getRecipesStore(this)
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
             MutsuApp()
         }
     }
@@ -86,7 +95,7 @@ class MainActivity : ComponentActivity() {
 
                 val windowSizeClass = calculateWindowSizeClass(this)
 
-                val recipeViewModel : RecipeViewModel = viewModel()
+                val recipeViewModel = RecipeViewModel(recipesStore, this)
                 val ingredientsViewModel = IngredientsViewModel(ingredientsNameStore, this)
 
                 val authViewModel : AuthViewModel = viewModel(factory= AuthViewModelFactory())
@@ -168,10 +177,12 @@ class MainActivity : ComponentActivity() {
                             foodCounter()
                         }
                         composable(route = Recipes.route){
+                            val newRecipeModel = RecipeViewModel(recipesStore, this@MainActivity)
                             RecipeListScreen(
                                 goToRecipeInformation = { recipeName ->
                                     navController.navigateToRecipeInformation(recipeName)
-                                }
+                                },
+                                recipeViewModel = newRecipeModel
                             )
                         }
                         composable(route = GroceryList.route){

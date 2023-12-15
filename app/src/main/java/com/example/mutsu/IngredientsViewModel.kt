@@ -20,6 +20,7 @@ class IngredientsViewModel(dataStore : DataStore<IngredientsName>, context : Con
     val ingredients: StateFlow<List<FoodItem>> = _ingredients.asStateFlow()
     var _editableList : List<FoodItem> = emptyList()
 
+
     init {
         viewModelScope.launch {
 

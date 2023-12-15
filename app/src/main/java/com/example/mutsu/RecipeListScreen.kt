@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -59,8 +60,8 @@ import com.example.mutsu.ui.theme.MutsuTheme
  * recipe to be shown) as a navigation argument
  */
 @Composable
-fun RecipeListScreen(goToRecipeInformation: (String) -> Unit){
-    val recipeViewModel = RecipeViewModel()
+fun RecipeListScreen(goToRecipeInformation: (String) -> Unit, recipeViewModel: RecipeViewModel) {
+    val recipes by recipeViewModel.recipeList.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier.padding(20.dp)
@@ -85,22 +86,16 @@ fun RecipeListScreen(goToRecipeInformation: (String) -> Unit){
                 .weight(3f)
         ){
             RecipeList(
-                recipeViewModel.getAllRecipes(),
-                goToRecipeInformation
+                recipes,
+                goToRecipeInformation,
+                recipeViewModel
             )
         }
     }
 }
 
 private fun addNewEmptyRecipe(recipeViewModel: RecipeViewModel, recipeName: String) {
-    recipeViewModel.addRecipe(
-        Recipe(
-        name = recipeName,
-        ingredients = mutableListOf(),
-        portionYield = 0,
-        webURL = null
-    )
-    )
+    recipeViewModel.createNewRecipe(recipeName)
 }
 
 /**
@@ -139,7 +134,7 @@ fun RecipeInput(
                 } },
             modifier = Modifier
                 .align(Alignment.CenterVertically),
-            enabled = false,
+            enabled = true,
             colors = IconButtonDefaults.iconButtonColors(
                 containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = MaterialTheme.colorScheme.background,
@@ -181,7 +176,11 @@ fun Section(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipeList(recipeList: List<Recipe>, goToRecipeInformation: (String) -> Unit) {
+fun RecipeList(
+    recipeList: List<Recipe>,
+    goToRecipeInformation: (String) -> Unit,
+    recipeViewModel: RecipeViewModel
+) {
     if (recipeList.isNotEmpty()){
         Box (
             modifier = Modifier//.verticalScroll(rememberScrollState())
@@ -198,7 +197,9 @@ fun RecipeList(recipeList: List<Recipe>, goToRecipeInformation: (String) -> Unit
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surface
                         ),
-                        onClick = { goToRecipeInformation(recipe.name) }
+                        onClick = {
+                            recipeViewModel.selectRecipe(recipe.name)
+                            goToRecipeInformation(recipe.name) }
                     ) {
                         Box(
                             modifier = Modifier

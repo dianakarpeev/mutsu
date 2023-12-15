@@ -4,27 +4,33 @@ option java_package = "com.example.mutsu";
 option java_multiple_files = true;
 
 
+//IngredientsName is used for storing Ingredients for the Grocery List.
 message IngredientsName {
   map<string, string> names = 1;
 }
 
+//RecipeIngredient translates to RecipeInformation::TemporaryIngredient
+message RecipeIngredient {
+  string name = 1;
+  double quantity = 2;
+  string measurement = 3;
+
+
+}
+
+//Translates to RecipeInformation::Recipe
+message StoredRecipe {
+  string name = 1;
+  string webURL = 2;
+  int32 portion_yield = 3;
+  repeated RecipeIngredient ingredients = 4;
+}
+
+message StoredRecipes {
+  repeated StoredRecipe recipes = 1;
+}
+
 /*
-message Ingredient {
-  string name = 1;
-  int32 portions = 2;
-}
-
-message Recipe {
-  string name = 1;
-  string referenceURL = 2;
-  //Some information for an image
-  //Some way of storing User
-  repeated Ingredient ingredients = 5;
-}
-
-
-  Commenting out for now so Android Studio stops throwing a fit
-
 message Username {
   string username = 1;
   //I somehow think that storing the password's a bad idea, but like. it might work???
@@ -38,5 +44,4 @@ message GroceryList {
 
   repeated Ingredient ingredients = 3;
 }
-
 */

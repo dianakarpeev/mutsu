@@ -107,11 +107,13 @@ fun AuthenticationForm(
     var password by rememberSaveable { mutableStateOf("") }
     var message by rememberSaveable { mutableStateOf("") }
 
+    val spacedBy = 15.dp
+
     Column(
         modifier
             .fillMaxWidth()
             .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(15.dp),
+        verticalArrangement = Arrangement.spacedBy(spacedBy),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 

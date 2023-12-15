@@ -30,10 +30,29 @@ class RecipeViewModel(datastore: DataStore<StoredRecipes>, context: Context) : V
     //Initializes the ViewModel with sample recipe data.
     init {
         viewModelScope.launch {
+            val seeds = instantiateRecipes()
+            seedRecipes(seeds)
             getRecipesFromStorage()
 
         }
+
+        removeDuplicates()
         _recipeList.update { recipes -> copyList() }
+
+
+    }
+
+    //removes any duplicate recipes that found their way into the list
+    private fun removeDuplicates(){
+        var list = mutableListOf<Recipe>()
+
+        for (recipe in editableList) {
+            if(!list.contains(recipe)){
+                list.add(recipe)
+            }
+        }
+
+        editableList = list
     }
 
      fun getRecipesFromStorage() {

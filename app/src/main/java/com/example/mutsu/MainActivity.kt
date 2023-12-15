@@ -91,6 +91,7 @@ class MainActivity : ComponentActivity() {
 
                 val recipeViewModel = RecipeViewModel(recipesStore, this)
                 val ingredientsViewModel = IngredientsViewModel(ingredientsNameStore, this)
+                val mealsViewModel = MealsViewModel(recipesStore, this)
 
                 val authViewModel : AuthViewModel = viewModel(factory= AuthViewModelFactory())
                 var currentUser = authViewModel.currentUser().collectAsState()
@@ -168,7 +169,9 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(route = MealPlan.route){
-                            MealPlanScreen()
+                            MealPlanScreen(
+                                mealsViewModel = mealsViewModel
+                            )
                         }
                         composable(route = Recipes.route){
                             val newRecipeModel = RecipeViewModel(recipesStore, this@MainActivity)

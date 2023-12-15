@@ -37,6 +37,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 /*
 @Composable
@@ -220,9 +222,9 @@ fun BaconAndEggs(count: Int, increase: () -> Unit, decrease: () -> Unit) {
 
 
 
-
+//
 @Composable
-fun MealPlanScreen(modifier: Modifier = Modifier) {
+fun MealPlanScreen(mealsViewModel: MealsViewModel,modifier: Modifier = Modifier) {
     /*
     var hamburgerCount by rememberSaveable {mutableStateOf(0)}
     var beefStewCount by rememberSaveable {mutableStateOf(0)}
@@ -248,9 +250,11 @@ fun MealPlanScreen(modifier: Modifier = Modifier) {
     }
      */
 
+    val meals by mealsViewModel.meals.collectAsStateWithLifecycle()
+
     Column(){
-        ShowAllMeals(modifier)
-        ShowAllMeals(modifier)
+        //ShowAllMeals(modifier)
+        ShowAllMeals(meals, modifier)
     }
 
 
@@ -258,81 +262,99 @@ fun MealPlanScreen(modifier: Modifier = Modifier) {
 
 data class Meals(val recipe: Recipe, val quantity: Int)
 
+//
 @Composable
-fun ShowAllMeals(modifier: Modifier = Modifier){
+fun ShowAllMeals(meals: List<Meals>,modifier: Modifier = Modifier){
     Column(modifier = modifier,){
-        //foreach item in list {}
-        Box(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(start = 10.dp, top = 13.dp, end = 10.dp, bottom = 0.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.surface,
-                    shape = RoundedCornerShape(10.dp)
-                ),
-            contentAlignment = Alignment.Center
-        ){
-            Column(horizontalAlignment = Alignment.CenterHorizontally){
-                Row(
-                    modifier = modifier.padding(start = 8.dp, top = 10.dp, end = 8.dp, bottom = 4.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    Text(
-                        text = "MMMMMeal name here",
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Medium
-                        )
+        meals.forEachIndexed { index, it ->
+            //Text(text = "${meals.size}")
+
+            MealBox(
+                mealName = it.recipe.name,
+                mealQuantity = it.quantity,
+                modifier = modifier
+            )
+
+        }
+        //Text("please?")
+    }
+}
+
+@Composable
+fun MealBox(
+    mealName : String,
+    mealQuantity : Int,
+    modifier : Modifier = Modifier){
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 10.dp, top = 13.dp, end = 10.dp, bottom = 0.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(10.dp)
+            ),
+        contentAlignment = Alignment.Center
+    ){
+        Column(horizontalAlignment = Alignment.CenterHorizontally){
+            Row(
+                modifier = modifier.padding(start = 8.dp, top = 10.dp, end = 8.dp, bottom = 4.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text(
+                    text = mealName,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            Row(
+                modifier = modifier.padding(start = 8.dp, top = 4.dp, end = 8.dp, bottom = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                IconButton(
+                    onClick = {}, //add
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.background
+                    ),
+                    modifier = Modifier.padding(
+                        start = 0.dp,
+                        top = 0.dp,
+                        end = 15.dp,
+                        bottom = 0.dp
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add one meal name"
+                    )
                 }
 
-                Row(
-                    modifier = modifier.padding(start = 8.dp, top = 4.dp, end = 8.dp, bottom = 10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    IconButton(
-                        onClick = {}, //add
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.background
-                        ),
-                        modifier = Modifier.padding(
-                            start = 0.dp,
-                            top = 0.dp,
-                            end = 15.dp,
-                            bottom = 0.dp
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add one meal name"
-                        )
-                    }
+                Text(
+                    text = "$mealQuantity",
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Medium
+                )
 
-                    Text(
-                        text = "quantity",
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Medium
+                IconButton(
+                    onClick = {}, //remove
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.background
+                    ),
+                    modifier = Modifier.padding(
+                        start = 15.dp,
+                        top = 0.dp,
+                        end = 0.dp,
+                        bottom = 0.dp
                     )
-
-                    IconButton(
-                        onClick = {}, //remove
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                            contentColor = MaterialTheme.colorScheme.background
-                        ),
-                        modifier = Modifier.padding(
-                            start = 15.dp,
-                            top = 0.dp,
-                            end = 0.dp,
-                            bottom = 0.dp
-                        )
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.remove_icon),
-                            contentDescription = "remove one meal name"
-                        )
-                    }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.remove_icon),
+                        contentDescription = "remove one meal name"
+                    )
                 }
             }
         }

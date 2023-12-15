@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
@@ -252,19 +254,29 @@ fun MealPlanScreen(mealsViewModel: MealsViewModel,modifier: Modifier = Modifier)
 
     val meals by mealsViewModel.meals.collectAsStateWithLifecycle()
 
-    Column(){
+    val increase: (Int) -> Unit = {
+        mealsViewModel.increaseQuantity(it)
+    }
+
+    Column(modifier = modifier
+        .verticalScroll(rememberScrollState())
+        .padding(16.dp)
+    ){
         //ShowAllMeals(modifier)
-        ShowAllMeals(meals, modifier)
+        ShowAllMeals(meals, increase, modifier)
     }
 
 
 }
 
-data class Meals(val recipe: Recipe, val quantity: Int)
+data class Meals(var recipe: Recipe, var quantity: Int)
 
 //
 @Composable
-fun ShowAllMeals(meals: List<Meals>,modifier: Modifier = Modifier){
+fun ShowAllMeals(
+    meals: List<Meals>,
+    increaseQuantity: (Int) -> Unit,
+    modifier: Modifier = Modifier){
     Column(modifier = modifier,){
         meals.forEachIndexed { index, it ->
             //Text(text = "${meals.size}")
@@ -272,6 +284,7 @@ fun ShowAllMeals(meals: List<Meals>,modifier: Modifier = Modifier){
             MealBox(
                 mealName = it.recipe.name,
                 mealQuantity = it.quantity,
+                isAdded = { increaseQuantity(index) },
                 modifier = modifier
             )
 
@@ -284,6 +297,7 @@ fun ShowAllMeals(meals: List<Meals>,modifier: Modifier = Modifier){
 fun MealBox(
     mealName : String,
     mealQuantity : Int,
+    isAdded : () -> Unit,
     modifier : Modifier = Modifier){
     Box(
         modifier = modifier
@@ -314,7 +328,7 @@ fun MealBox(
                 verticalAlignment = Alignment.CenterVertically
             ){
                 IconButton(
-                    onClick = {}, //add
+                    onClick = isAdded,
                     colors = IconButtonDefaults.iconButtonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.background

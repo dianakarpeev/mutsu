@@ -7,7 +7,7 @@ import com.example.mutsu.serializers.IngredientsNameSerializer
 import com.example.mutsu.serializers.StoredRecipesSerializer
 import java.io.File
 
-class dataStoreSingleton() {
+class DataStoreSingleton() {
     private var ingredientsNameStore: DataStore<IngredientsName>? = null
     private var recipesStore: DataStore<StoredRecipes>? = null
 

@@ -137,7 +137,7 @@ fun RecipeInformationScreen(
             ButtonRow(
                 recipeViewModel = recipeViewModel,
                 recipe = recipe,
-                originalRecipe = recipe,
+                originalRecipe = copyRecipe(recipe),
                 goToRecipeList = goToRecipeList
             )
 
@@ -145,6 +145,15 @@ fun RecipeInformationScreen(
             RecipeForm(recipe = recipe)
         }
     }
+}
+
+fun copyRecipe(recipe: Recipe): Recipe {
+    return Recipe(
+        name = recipe.name,
+        ingredients = recipe.ingredients.toMutableList(),
+        portionYield = recipe.portionYield,
+        webURL = recipe.webURL
+    )
 }
 
 private fun findRecipe(recipeName: String, recipeView : RecipeViewModel): Recipe {
@@ -233,7 +242,7 @@ fun RecipeForm(
         //Web URL
         UserFieldInput(
             label = "Web URL",
-            value = urlState,
+            value = urlState ?: "",
             onValueChange = {
                 urlState = it
                 recipe.webURL = urlState

@@ -95,14 +95,7 @@ fun RecipeListScreen(goToRecipeInformation: (String) -> Unit, recipeViewModel: R
 }
 
 private fun addNewEmptyRecipe(recipeViewModel: RecipeViewModel, recipeName: String) {
-    recipeViewModel.addRecipe(
-        Recipe(
-        name = recipeName,
-        ingredients = mutableListOf(),
-        portionYield = 0,
-        webURL = null
-    )
-    )
+    recipeViewModel.createNewRecipe(recipeName)
 }
 
 /**
@@ -141,7 +134,7 @@ fun RecipeInput(
                 } },
             modifier = Modifier
                 .align(Alignment.CenterVertically),
-            enabled = false,
+            enabled = true,
             colors = IconButtonDefaults.iconButtonColors(
                 containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = MaterialTheme.colorScheme.background,

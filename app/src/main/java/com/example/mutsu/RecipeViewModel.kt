@@ -31,7 +31,9 @@ class RecipeViewModel(datastore: DataStore<StoredRecipes>, context: Context) : V
     init {
         viewModelScope.launch {
             getRecipesFromStorage()
+
         }
+        _recipeList.update { recipes -> copyList() }
     }
 
      fun getRecipesFromStorage() {
@@ -41,14 +43,7 @@ class RecipeViewModel(datastore: DataStore<StoredRecipes>, context: Context) : V
                     val recipe = storedRecipes.parseRecipeData(storedRecipe)
                     if (recipe.ingredients.isNotEmpty()) {
                         editableList.add(recipe)
-                        _recipeList.update { recipes -> copyList() }
                     }
-                }
-            }
-            if( recipeList.value.isEmpty() || _recipeList.value.isEmpty()) {
-                val recipes = instantiateRecipes()
-                viewModelScope.launch {
-                    seedRecipes(recipes)
                 }
             }
         }
@@ -172,11 +167,20 @@ class RecipeViewModel(datastore: DataStore<StoredRecipes>, context: Context) : V
     fun addRecipe(recipe: Recipe) {
         viewModelScope.launch {
 
-            val newList = _recipeList.value.toMutableList()
-            newList.add(recipe)
+        }
+    }
 
-            _recipeList.update { recipes -> emptyList() }
-            _recipeList.update { recipes -> newList }
+    fun createNewRecipe(recipeName: String) {
+        viewModelScope.launch {
+            if (!isRecipeInStorage(recipeName)) {
+                val recipe = Recipe(
+                    name = recipeName,
+                    ingredients = mutableListOf(),
+                    portionYield = 0,
+                    webURL = ""
+                )
+                editableList.add(recipe)
+            }
         }
     }
 
@@ -233,19 +237,24 @@ class RecipeViewModel(datastore: DataStore<StoredRecipes>, context: Context) : V
      */
     fun editRecipe(recipeName: String, updatedRecipe: Recipe) {
         viewModelScope.launch {
-
             val index = editableList.indexOfFirst { it.name == recipeName }
             if (index != -1) {
-                editableList[index] = updatedRecipe
-
-                //Deleting the old recipe in the case of a name change
-                storedRecipes.deleteRecipe(recipeName)
 
                 val storedIngredients = storedRecipes.createStoredIngredients(updatedRecipe)
                 val storedRecipe = storedRecipes.createStoredRecipe(updatedRecipe, storedIngredients)
-                storedRecipes.addRecipe(storedRecipe)
+                storedRecipes.addRecipe(storedRecipe, recipeName)
 
-                copyList()
+                _recipeList.update { recipes -> copyList() }
+
+            } else {
+                //Recipe was added, but not saved to storage yet
+                editableList.add(updatedRecipe)
+                val storedIngredients = storedRecipes.createStoredIngredients(updatedRecipe)
+                val storedRecipe = storedRecipes.createStoredRecipe(updatedRecipe, storedIngredients)
+                storedRecipes.addRecipe(storedRecipe, recipeName)
+                _recipeList.update { recipes -> emptyList() }
+                _recipeList.update { recipes -> copyList() }
+
             }
         }
     }

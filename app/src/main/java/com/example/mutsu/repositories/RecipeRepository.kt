@@ -27,15 +27,21 @@ class RecipeRepository(val dataStore: DataStore<StoredRecipes>, context: Context
         }
     }
 
-    suspend fun addRecipe(recipe: StoredRecipe) {
+    suspend fun addRecipe(recipe: StoredRecipe, originalName: String = "") {
         dataStore.updateData { currentData ->
             val mutableList = currentData.recipesList.toMutableList()
-            val index = mutableList.indexOfFirst { it.name == recipe.name }
+            var index = -1;
+
+            if (originalName != "") {
+                index = mutableList.indexOfFirst { it.name == originalName }
+            }
+
             if (index != -1) {
                 mutableList[index] = recipe
             } else {
                 mutableList.add(recipe)
             }
+
             currentData.toBuilder().clearRecipes().addAllRecipes(mutableList).build()
         }
     }
@@ -58,7 +64,7 @@ class RecipeRepository(val dataStore: DataStore<StoredRecipes>, context: Context
         val storedRecipe = StoredRecipe.newBuilder()
             .setName(recipe.name)
             .setPortionYield(recipe.portionYield)
-            .setWebURL(recipe.webURL)
+            .setWebURL(recipe.webURL ?: "")
             .addAllIngredients(storedIngredients)
             .build()
         return storedRecipe

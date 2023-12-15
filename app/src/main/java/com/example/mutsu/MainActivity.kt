@@ -177,11 +177,12 @@ class MainActivity : ComponentActivity() {
                             foodCounter()
                         }
                         composable(route = Recipes.route){
+                            val newRecipeModel = RecipeViewModel(recipesStore, this@MainActivity)
                             RecipeListScreen(
                                 goToRecipeInformation = { recipeName ->
                                     navController.navigateToRecipeInformation(recipeName)
                                 },
-                                recipeViewModel = recipeViewModel
+                                recipeViewModel = newRecipeModel
                             )
                         }
                         composable(route = GroceryList.route){

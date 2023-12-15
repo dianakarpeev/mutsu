@@ -58,15 +58,23 @@ class MealsViewModel(datastore: DataStore<StoredRecipes>, context : Context) : V
 
     fun increaseQuantity(index: Int){
         viewModelScope.launch {
-            _meals.update { ings -> emptyList() }
+            _meals.update { _ -> emptyList() }
 
             editableList[index].quantity++
 
-            _meals.update { ings -> copyList() }
+            _meals.update { _ -> copyList() }
         }
     }
 
+    fun decreaseQuantity(index: Int){
+        viewModelScope.launch {
+            _meals.update { _ -> emptyList() }
 
+            editableList[index].quantity--
+
+            _meals.update { _ -> copyList() }
+        }
+    }
 
     private fun copyList() : List<Meals> {
         var list = mutableListOf<Meals>()

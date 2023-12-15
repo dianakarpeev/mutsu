@@ -257,13 +257,16 @@ fun MealPlanScreen(mealsViewModel: MealsViewModel,modifier: Modifier = Modifier)
     val increase: (Int) -> Unit = {
         mealsViewModel.increaseQuantity(it)
     }
+    val decrease: (Int) -> Unit = {
+        mealsViewModel.decreaseQuantity(it)
+    }
 
     Column(modifier = modifier
         .verticalScroll(rememberScrollState())
         .padding(16.dp)
     ){
         //ShowAllMeals(modifier)
-        ShowAllMeals(meals, increase, modifier)
+        ShowAllMeals(meals, increase, decrease, modifier)
     }
 
 
@@ -276,6 +279,7 @@ data class Meals(var recipe: Recipe, var quantity: Int)
 fun ShowAllMeals(
     meals: List<Meals>,
     increaseQuantity: (Int) -> Unit,
+    decreaseQuantity: (Int) -> Unit,
     modifier: Modifier = Modifier){
     Column(modifier = modifier,){
         meals.forEachIndexed { index, it ->
@@ -285,6 +289,7 @@ fun ShowAllMeals(
                 mealName = it.recipe.name,
                 mealQuantity = it.quantity,
                 isAdded = { increaseQuantity(index) },
+                isRemoved = { if (it.quantity > 0) decreaseQuantity(index) },
                 modifier = modifier
             )
 
@@ -298,6 +303,7 @@ fun MealBox(
     mealName : String,
     mealQuantity : Int,
     isAdded : () -> Unit,
+    isRemoved: () -> Unit,
     modifier : Modifier = Modifier){
     Box(
         modifier = modifier
@@ -353,7 +359,7 @@ fun MealBox(
                 )
 
                 IconButton(
-                    onClick = {}, //remove
+                    onClick = isRemoved,
                     colors = IconButtonDefaults.iconButtonColors(
                         containerColor = MaterialTheme.colorScheme.secondary,
                         contentColor = MaterialTheme.colorScheme.background

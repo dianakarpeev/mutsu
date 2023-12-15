@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -69,15 +70,16 @@ fun MutsuHomeScreen(
                 contentColor = MaterialTheme.colorScheme.onSurface
             ),
             modifier = Modifier
-                .padding(15.dp)
+                .padding(17.dp)
                 .fillMaxWidth()
         ) {
             Text(
                 text = "Figuring out what to eat and what ingredients you need can be challenging. " +
                         "We're here to change that!",
                 style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Justify,
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(20.dp)
             )
         }
 

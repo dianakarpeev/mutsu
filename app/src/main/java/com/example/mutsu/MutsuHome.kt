@@ -98,23 +98,6 @@ fun MutsuHomeScreen(
                     style = MaterialTheme.typography.titleMedium
                 )
             }
-
-            Button(
-                onClick = { },
-                modifier = modifier
-                    .fillMaxHeight()
-                    .padding(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.background
-                )
-            ) {
-                Text(
-                    text = "Get Started!",
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
         }
     }
 }

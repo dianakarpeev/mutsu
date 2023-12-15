@@ -49,7 +49,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mutsu.navigation.MealPlan
 
 @Composable
-fun MealPlanScreen(mealsViewModel: MealsViewModel,modifier: Modifier = Modifier) {
+fun MealPlanScreen(goToGroceryListScreen : () -> Unit, mealsViewModel: MealsViewModel,modifier: Modifier = Modifier) {
     val meals by mealsViewModel.meals.collectAsStateWithLifecycle()
 
     val increase: (Int) -> Unit = {
@@ -65,6 +65,7 @@ fun MealPlanScreen(mealsViewModel: MealsViewModel,modifier: Modifier = Modifier)
     ){
         Instructions(modifier)
         ShowAllMeals(meals, increase, decrease, modifier)
+        GroceryListButton(goToGroceryListScreen, modifier)
     }
 }
 
@@ -95,8 +96,6 @@ fun ShowAllMeals(
     decreaseQuantity: (Int) -> Unit,
     modifier: Modifier = Modifier
 ){
-    var showPopUp by rememberSaveable { mutableStateOf(false) }
-
     Column(modifier = modifier,){
         meals.forEachIndexed { index, it ->
             MealBox(
@@ -108,6 +107,13 @@ fun ShowAllMeals(
             )
         }
     }
+
+
+}
+
+@Composable
+fun GroceryListButton(goToGroceryListScreen: () -> Unit, modifier: Modifier = Modifier){
+    var showPopUp by rememberSaveable { mutableStateOf(false) }
 
     Button(
         onClick = { showPopUp = true },
@@ -125,7 +131,13 @@ fun ShowAllMeals(
     }
 
     if (showPopUp){
-        MealPlanConfirmationPopUp(confirm = { showPopUp = false }, dismiss = { showPopUp = false })
+        MealPlanConfirmationPopUp(
+            confirm = {
+                showPopUp = false
+                goToGroceryListScreen()
+                      },
+            dismiss = { showPopUp = false }
+        )
     }
 }
 

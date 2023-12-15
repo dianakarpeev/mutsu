@@ -170,6 +170,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(route = MealPlan.route){
                             MealPlanScreen(
+                                goToGroceryListScreen = {
+                                    navController.navigateSingleTopTo(GroceryList.route)
+                                },
                                 mealsViewModel = mealsViewModel
                             )
                         }

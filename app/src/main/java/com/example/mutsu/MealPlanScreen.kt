@@ -57,11 +57,30 @@ fun MealPlanScreen(mealsViewModel: MealsViewModel,modifier: Modifier = Modifier)
         .verticalScroll(rememberScrollState())
         .padding(16.dp)
     ){
+        Instructions(modifier)
         ShowAllMeals(meals, increase, decrease, modifier)
     }
 }
 
 data class Meals(var recipe: Recipe, var quantity: Int)
+
+@Composable
+fun Instructions(modifier: Modifier = Modifier){
+    Column(){
+        Text(
+            text = "Meal Plan",
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.titleLarge,
+            modifier = modifier.padding(6.dp)
+        )
+        Text(
+            text = "Plan for the upcoming week! \nSelect the meals you'd like to prepare and Mutsu will generate a grocery list for you. Beware! Leaving this screen will make you lose your changes.",
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = modifier.padding(6.dp)
+        )
+    }
+}
 
 @Composable
 fun ShowAllMeals(

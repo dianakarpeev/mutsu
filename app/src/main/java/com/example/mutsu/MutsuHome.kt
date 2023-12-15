@@ -73,8 +73,8 @@ fun MutsuHomeScreen(
                 .fillMaxWidth()
         ) {
             Text(
-                text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod " +
-                        "tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
+                text = "Figuring out what to eat and what ingredients you need can be challenging. " +
+                        "We're here to change that!",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
                     .padding(16.dp)

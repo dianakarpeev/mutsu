@@ -139,12 +139,6 @@ class MainActivity : ComponentActivity() {
                                     ){
                                         Icon(MealPlan.icon, contentDescription = "Meal Plan")
                                     }
-
-                                    IconButton(
-                                        onClick = { navController.navigateSingleTopTo(GroceryList.route) }
-                                    ){
-                                        Icon(GroceryList.icon, contentDescription = "Grocery List")
-                                    }
                                 }
 
                                 IconButton(

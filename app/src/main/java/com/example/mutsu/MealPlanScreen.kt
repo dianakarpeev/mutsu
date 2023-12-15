@@ -211,7 +211,7 @@ fun BaconAndEggs(count: Int, increase: () -> Unit, decrease: () -> Unit) {
 }
 
 @Composable
-fun foodCounter () {
+fun MealPlanScreen () {
     var hamburgerCount by rememberSaveable {mutableStateOf(0)}
     var beefStewCount by rememberSaveable {mutableStateOf(0)}
     var baconAndEggsCount by rememberSaveable {mutableStateOf(0)}

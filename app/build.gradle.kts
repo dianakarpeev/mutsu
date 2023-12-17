@@ -1,10 +1,11 @@
-import com.google.protobuf.gradle.*
+import com.google.protobuf.gradle.id
 
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.protobuf") version "0.9.4"
     id("com.google.gms.google-services")
+    id("com.diffplug.spotless") version "6.23.3"
 }
 
 android {
@@ -27,11 +28,15 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
+        }
+        debug {
+            isDebuggable = true
         }
     }
     compileOptions {
@@ -52,7 +57,18 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-
+    spotless {
+        kotlin {
+            ktfmt()
+            ktlint()
+            diktat()
+            prettier()
+        }
+        kotlinGradle {
+            ktlint()
+            diktat()
+        }
+    }
 }
 
 dependencies {
@@ -68,7 +84,7 @@ dependencies {
     implementation("androidx.benchmark:benchmark-macro:1.2.1")
     implementation("androidx.compose.ui:ui-text-android:1.5.4")
     testImplementation("junit:junit:4.13.2")
-    implementation ("androidx.compose.material3:material3-window-size-class:1.1.2")
+    implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
@@ -77,28 +93,30 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1")
 
-    //stateflow
+    // stateflow
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+
 
     //navigation
     implementation("androidx.navigation:navigation-compose:2.7.0-beta02")
 
-    //firebase
+
+    // firebase
     implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
-    //implementation("com.firebaseui:firebase-ui-auth:7.2.0")
+    // implementation("com.firebaseui:firebase-ui-auth:7.2.0")
     implementation("com.google.firebase:firebase-auth-ktx")
 
     // Preferences DataStore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    //Coroutines
+    // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     // Proto DataStore
     implementation("androidx.datastore:datastore-core:1.0.0")
     implementation("androidx.datastore:datastore:1.0.0")
-    implementation ("com.google.protobuf:protobuf-lite:3.0.1")
-    compileOnly ("javax.annotation:javax.annotation-api:1.2")
+    implementation("com.google.protobuf:protobuf-lite:3.0.1")
+    compileOnly("javax.annotation:javax.annotation-api:1.2")
 }
 protobuf {
     protoc {

@@ -23,6 +23,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemColors
+import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -57,6 +59,7 @@ import com.example.mutsu.navigation.MealPlan
 import com.example.mutsu.navigation.RecipeInformation
 import com.example.mutsu.navigation.Recipes
 import com.example.mutsu.ui.theme.MutsuTheme
+import androidx.compose.ui.graphics.Color
 
 private const val INGREDIENTS_NAME_FILE = "ingredients_name"
 private const val RECIPES_FILE = "stored_recipes"
@@ -97,14 +100,16 @@ class MainActivity : ComponentActivity() {
                         MutsuAppPortrait(
                             navController,
                             currentUser,
-                            authViewModel
+                            authViewModel,
+                            windowSize
                         )
                     }
                     else -> {
                         MutsuAppLandscape(
                             navController,
                             currentUser,
-                            authViewModel
+                            authViewModel,
+                            windowSize
                         )
                     }
                 }
@@ -116,7 +121,8 @@ class MainActivity : ComponentActivity() {
     fun MutsuAppLandscape(
         navController: NavHostController,
         currentUser: State<Users?>,
-        authViewModel: AuthViewModel
+        authViewModel: AuthViewModel,
+        windowSize: WindowSizeClass
     ) {
         Row {
             MutsuNavigationRail(
@@ -127,7 +133,8 @@ class MainActivity : ComponentActivity() {
             HomeScreen(
                 modifier = Modifier,
                 navController = navController,
-                authViewModel = authViewModel
+                authViewModel = authViewModel,
+                windowSize = windowSize
             )
         }
     }
@@ -136,7 +143,8 @@ class MainActivity : ComponentActivity() {
     fun MutsuAppPortrait(
         navController: NavHostController,
         currentUser: State<Users?>,
-        authViewModel: AuthViewModel
+        authViewModel: AuthViewModel,
+        windowSize: WindowSizeClass
     ) {
         Scaffold(
             topBar = { MutsuTopAppBar() },
@@ -150,7 +158,8 @@ class MainActivity : ComponentActivity() {
             HomeScreen(
                 navController,
                 authViewModel,
-                Modifier.padding(innerPadding)
+                Modifier.padding(innerPadding),
+                windowSize
             )
         }
     }
@@ -159,7 +168,8 @@ class MainActivity : ComponentActivity() {
     fun HomeScreen(
         navController : NavHostController,
         authViewModel : AuthViewModel,
-        modifier: Modifier = Modifier
+        modifier: Modifier = Modifier,
+        windowSize: WindowSizeClass
     ) {
         val recipeViewModel = RecipeViewModel(recipesStore, this)
         val ingredientsViewModel = IngredientsViewModel(ingredientsNameStore, this)
@@ -173,7 +183,8 @@ class MainActivity : ComponentActivity() {
                 MutsuHomeScreen(
                     goToAboutUs = {
                         navController.navigateSingleTopTo(AboutUs.route)
-                    }
+                    },
+                    windowSize = windowSize
                 )
             }
             composable(route = MealPlan.route) {
@@ -302,6 +313,15 @@ fun MutsuNavigationRail(
                         contentDescription = "Home"
                     )
                 },
+                colors = NavigationRailItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                    selectedTextColor = Color.Transparent,
+                    indicatorColor = Color.Transparent,
+                    unselectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                    unselectedTextColor = Color.Transparent,
+                    disabledIconColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledTextColor = Color.Transparent
+                ),
                 selected = false,
                 onClick = { navController.navigateSingleTopTo(Home.route) }
             )
@@ -316,6 +336,15 @@ fun MutsuNavigationRail(
                             contentDescription = "Recipe Collection"
                         )
                     },
+                    colors = NavigationRailItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                        selectedTextColor = Color.Transparent,
+                        indicatorColor = Color.Transparent,
+                        unselectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                        unselectedTextColor = Color.Transparent,
+                        disabledIconColor = MaterialTheme.colorScheme.onPrimary,
+                        disabledTextColor = Color.Transparent
+                    ),
                     selected = false,
                     onClick = { navController.navigateSingleTopTo(Recipes.route) }
                 )
@@ -329,6 +358,15 @@ fun MutsuNavigationRail(
                             contentDescription = "Meal Plan"
                         )
                     },
+                    colors = NavigationRailItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                        selectedTextColor = Color.Transparent,
+                        indicatorColor = Color.Transparent,
+                        unselectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                        unselectedTextColor = Color.Transparent,
+                        disabledIconColor = MaterialTheme.colorScheme.onPrimary,
+                        disabledTextColor = Color.Transparent
+                    ),
                     selected = false,
                     onClick = { navController.navigateSingleTopTo(MealPlan.route) }
                 )
@@ -342,6 +380,15 @@ fun MutsuNavigationRail(
                             contentDescription = "Grocery List"
                         )
                     },
+                    colors = NavigationRailItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                        selectedTextColor = Color.Transparent,
+                        indicatorColor = Color.Transparent,
+                        unselectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                        unselectedTextColor = Color.Transparent,
+                        disabledIconColor = MaterialTheme.colorScheme.onPrimary,
+                        disabledTextColor = Color.Transparent
+                    ),
                     selected = false,
                     onClick = { navController.navigateSingleTopTo(GroceryList.route) }
                 )
@@ -357,6 +404,15 @@ fun MutsuNavigationRail(
                     )
                 },
                 selected = false,
+                colors = NavigationRailItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                    selectedTextColor = Color.Transparent,
+                    indicatorColor = Color.Transparent,
+                    unselectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                    unselectedTextColor = Color.Transparent,
+                    disabledIconColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledTextColor = Color.Transparent
+                ),
                 onClick = { navController.navigateSingleTopTo(LoginRegister.route) }
             )
         }

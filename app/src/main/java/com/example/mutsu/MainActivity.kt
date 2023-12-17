@@ -160,6 +160,22 @@ class MainActivity : ComponentActivity() {
                         startDestination = Home.route,
                         modifier = Modifier.padding(innerPadding)
                     ){
+
+                        /*
+                         *  In each of these composables, they have four extra arguments:
+                         *      enterTransition
+                         *      exitTransition
+                         *      popEnterTransition
+                         *      popExitTransition
+                         *  These are used when transitioning between screens. Each of them have a
+                         *  direction for the screen to move in and a tween for how long it should
+                         *  be moving. This allows for a smooth animation while transitioning from
+                         *  screen to screen.
+                         *
+                         *  This part of the code comes from the tutorial linked here:
+                         *  https://proandroiddev.com/screen-transition-animations-with-jetpack-navigation-17afdc714d0e
+                         */
+
                         composable(
                             route = Home.route,
                             enterTransition = {

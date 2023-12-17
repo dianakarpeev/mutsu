@@ -52,6 +52,10 @@ import com.example.mutsu.navigation.MealPlan
 fun MealPlanScreen(goToGroceryListScreen : () -> Unit, mealsViewModel: MealsViewModel,modifier: Modifier = Modifier) {
     val meals by mealsViewModel.meals.collectAsStateWithLifecycle()
 
+    val createMealPlan: () -> Unit = {
+        mealsViewModel.addMealPlan()
+    }
+
     val increase: (Int) -> Unit = {
         mealsViewModel.increaseQuantity(it)
     }
@@ -65,7 +69,7 @@ fun MealPlanScreen(goToGroceryListScreen : () -> Unit, mealsViewModel: MealsView
     ){
         Instructions(modifier)
         ShowAllMeals(meals, increase, decrease, modifier)
-        GroceryListButton(goToGroceryListScreen, modifier)
+        GroceryListButton(goToGroceryListScreen, modifier, createMealPlan)
     }
 }
 
@@ -112,7 +116,7 @@ fun ShowAllMeals(
 }
 
 @Composable
-fun GroceryListButton(goToGroceryListScreen: () -> Unit, modifier: Modifier = Modifier){
+fun GroceryListButton(goToGroceryListScreen: () -> Unit, modifier: Modifier = Modifier, createMealPlan : () -> Unit){
     var showPopUp by rememberSaveable { mutableStateOf(false) }
 
     Button(
@@ -134,6 +138,7 @@ fun GroceryListButton(goToGroceryListScreen: () -> Unit, modifier: Modifier = Mo
         MealPlanConfirmationPopUp(
             confirm = {
                 showPopUp = false
+                createMealPlan()
                 goToGroceryListScreen()
                       },
             dismiss = { showPopUp = false }

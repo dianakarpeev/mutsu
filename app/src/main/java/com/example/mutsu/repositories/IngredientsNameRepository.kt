@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import com.example.mutsu.IngredientsName
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import java.io.IOException
@@ -24,17 +25,21 @@ class IngredientsNameRepository(private val dataStore: DataStore<IngredientsName
         }
 
 
+    suspend fun parseIngredients(ingredients : List<String>) {
+        val map = dataStore.data.firstOrNull()?.namesMap ?: emptyMap()
+        val newMap = mutableMapOf<String, String>()
 
-    suspend fun getAllIngredientValues() : List<String> {
-        val list = mutableListOf<String>()
-        for (i in ingredientsNameFlow.toList()[0]){
-            list.add(i.value)
+        ingredients.forEach { ingredient ->
+            if (!map.containsKey(ingredient)){
+                //Replace spaces with underscores and make all letters uppercase
+                val key = ingredient.replace(" ", "_").uppercase()
+                newMap[key] = ingredient
+            }
         }
-        return list
+        putIngredientMap(newMap)
     }
 
     suspend fun seedMap(ingredients : Map<String, String>) {
-
 
         if (ingredients.isEmpty()) {
             val seedsMap = mutableMapOf<String, String>()

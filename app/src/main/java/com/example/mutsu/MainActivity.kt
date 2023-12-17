@@ -93,8 +93,8 @@ class MainActivity : ComponentActivity() {
                 val windowSizeClass = calculateWindowSizeClass(this)
 
                 val recipeViewModel = RecipeViewModel(recipesStore, this)
-                val ingredientsViewModel = IngredientsViewModel(ingredientsNameStore, this)
-                val mealsViewModel = MealsViewModel(recipesStore, this)
+                val ingredientsViewModel = IngredientsViewModel(ingredientsNameStore, mealPlanStore, recipesStore,this)
+                val mealsViewModel = MealsViewModel(recipesStore, mealPlanStore, this)
 
                 val authViewModel : AuthViewModel = viewModel(factory= AuthViewModelFactory())
                 var currentUser = authViewModel.currentUser().collectAsState()

@@ -1,8 +1,10 @@
-name: Release Workflow
+name: Build Workflow
 
 
 on:
   push:
+    branches:
+      -main
   pull_request:
     branches:
       -main

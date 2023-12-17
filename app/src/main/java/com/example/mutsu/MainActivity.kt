@@ -65,6 +65,9 @@ class MainActivity : ComponentActivity() {
         dataStores.getRecipesStore(this)
     }
 
+    private val mealPlanStore : DataStore<StoredMealPlan> by lazy {
+        dataStores.getMealPlanStore(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

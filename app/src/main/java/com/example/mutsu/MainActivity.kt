@@ -65,6 +65,9 @@ class MainActivity : ComponentActivity() {
         dataStores.getRecipesStore(this)
     }
 
+    private val mealPlanStore : DataStore<StoredMealPlan> by lazy {
+        dataStores.getMealPlanStore(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,8 +93,8 @@ class MainActivity : ComponentActivity() {
                 val windowSizeClass = calculateWindowSizeClass(this)
 
                 val recipeViewModel = RecipeViewModel(recipesStore, this)
-                val ingredientsViewModel = IngredientsViewModel(ingredientsNameStore, this)
-                val mealsViewModel = MealsViewModel(recipesStore, this)
+                val ingredientsViewModel = IngredientsViewModel(ingredientsNameStore, mealPlanStore, recipesStore,this)
+                val mealsViewModel = MealsViewModel(recipesStore, mealPlanStore, this)
 
                 val authViewModel : AuthViewModel = viewModel(factory= AuthViewModelFactory())
                 var currentUser = authViewModel.currentUser().collectAsState()
@@ -139,12 +142,6 @@ class MainActivity : ComponentActivity() {
                                     ){
                                         Icon(MealPlan.icon, contentDescription = "Meal Plan")
                                     }
-
-                                    IconButton(
-                                        onClick = { navController.navigateSingleTopTo(GroceryList.route) }
-                                    ){
-                                        Icon(GroceryList.icon, contentDescription = "Grocery List")
-                                    }
                                 }
 
                                 IconButton(
@@ -170,6 +167,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(route = MealPlan.route){
                             MealPlanScreen(
+                                goToGroceryListScreen = {
+                                    navController.navigateSingleTopTo(GroceryList.route)
+                                },
                                 mealsViewModel = mealsViewModel
                             )
                         }

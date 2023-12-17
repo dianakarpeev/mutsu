@@ -20,6 +20,9 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -28,6 +31,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,10 +46,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mutsu.navigation.MealPlan
 
 @Composable
-fun MealPlanScreen(mealsViewModel: MealsViewModel,modifier: Modifier = Modifier) {
+fun MealPlanScreen(goToGroceryListScreen : () -> Unit, mealsViewModel: MealsViewModel,modifier: Modifier = Modifier) {
     val meals by mealsViewModel.meals.collectAsStateWithLifecycle()
+
+    val createMealPlan: () -> Unit = {
+        mealsViewModel.addMealPlan()
+    }
 
     val increase: (Int) -> Unit = {
         mealsViewModel.increaseQuantity(it)
@@ -60,6 +69,7 @@ fun MealPlanScreen(mealsViewModel: MealsViewModel,modifier: Modifier = Modifier)
     ){
         Instructions(modifier)
         ShowAllMeals(meals, increase, decrease, modifier)
+        GroceryListButton(goToGroceryListScreen, modifier, createMealPlan)
     }
 }
 
@@ -88,7 +98,8 @@ fun ShowAllMeals(
     meals: List<Meals>,
     increaseQuantity: (Int) -> Unit,
     decreaseQuantity: (Int) -> Unit,
-    modifier: Modifier = Modifier){
+    modifier: Modifier = Modifier
+){
     Column(modifier = modifier,){
         meals.forEachIndexed { index, it ->
             MealBox(
@@ -101,8 +112,15 @@ fun ShowAllMeals(
         }
     }
 
+
+}
+
+@Composable
+fun GroceryListButton(goToGroceryListScreen: () -> Unit, modifier: Modifier = Modifier, createMealPlan : () -> Unit){
+    var showPopUp by rememberSaveable { mutableStateOf(false) }
+
     Button(
-        onClick = { },
+        onClick = { showPopUp = true },
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.tertiary,
             contentColor = MaterialTheme.colorScheme.background
@@ -113,6 +131,17 @@ fun ShowAllMeals(
             text = "Go to the Grocery List!",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium
+        )
+    }
+
+    if (showPopUp){
+        MealPlanConfirmationPopUp(
+            confirm = {
+                showPopUp = false
+                createMealPlan()
+                goToGroceryListScreen()
+                      },
+            dismiss = { showPopUp = false }
         )
     }
 }
@@ -198,4 +227,57 @@ fun MealBox(
             }
         }
     }
+}
+
+@Composable
+fun MealPlanConfirmationPopUp(
+    confirm : () -> Unit,
+    dismiss : () -> Unit,
+    modifier : Modifier = Modifier
+){
+    /*
+    * got this code and modified it a bit from here:
+    * https://developer.android.com/jetpack/compose/components/dialog#alert
+    */
+    AlertDialog(
+        icon = {
+            Icon(Icons.Filled.ShoppingCart, contentDescription = null)
+        },
+        title = {
+            Text("Go to the Grocery List")
+        },
+        text = {
+            Text("Are you sure you want to go to the grocery list screen? You won't be able to make any changes to your meal plan once you proceed.")
+        },
+        onDismissRequest = {
+            dismiss()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    confirm()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.background
+                ),
+            ) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    dismiss()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.background
+                ),
+            ) {
+                Text("Dismiss")
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.background,
+    )
 }

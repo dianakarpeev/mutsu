@@ -5,14 +5,17 @@ import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mutsu.repositories.RecipeRepository
+import com.example.mutsu.repositories.StoredMealPlanRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
-class MealsViewModel(datastore: DataStore<StoredRecipes>, context : Context) : ViewModel() {
+class MealsViewModel(datastore: DataStore<StoredRecipes>, mealPlanStore: DataStore<StoredMealPlan>, context : Context) : ViewModel() {
     private val storedRecipes = RecipeRepository(datastore, context)
+    private val storedMealPlan = StoredMealPlanRepository(mealPlanStore)
     private val recipesFlow = storedRecipes.dataFlow
 
     private val _meals = MutableStateFlow<List<Meals>>(emptyList())
@@ -53,6 +56,19 @@ class MealsViewModel(datastore: DataStore<StoredRecipes>, context : Context) : V
                     }
                 }
             }
+        }
+    }
+
+    fun addMealPlan(){
+        val mealPlan = mutableMapOf<String, Int>()
+
+        for (meal in editableList){
+            mealPlan[meal.recipe.name] = meal.quantity
+        }
+
+        //TODO: Find a better feeling approach. This *works* but it's dangerous
+        runBlocking {
+            storedMealPlan.addMealPlan(mealPlan)
         }
     }
 

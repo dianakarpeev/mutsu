@@ -10,7 +10,7 @@ import com.example.mutsu.StoredRecipes
 import com.example.mutsu.TemporaryIngredient
 import kotlinx.coroutines.flow.firstOrNull
 
-class RecipeRepository(val dataStore: DataStore<StoredRecipes>, context: Context) {
+class RecipeRepository(private val dataStore: DataStore<StoredRecipes>, context: Context) {
 
     val dataFlow = dataStore.data
 
@@ -58,14 +58,16 @@ class RecipeRepository(val dataStore: DataStore<StoredRecipes>, context: Context
         return storedIngredients
     }
 
-    fun createStoredRecipe(recipe: Recipe, storedIngredients: List<RecipeIngredient>) : StoredRecipe {
-        val storedRecipe = StoredRecipe.newBuilder()
+    fun createStoredRecipe(
+        recipe: Recipe,
+        storedIngredients: List<RecipeIngredient>
+    ): StoredRecipe {
+        return StoredRecipe.newBuilder()
             .setName(recipe.name)
             .setPortionYield(recipe.portionYield)
             .setWebURL(recipe.webURL ?: "")
             .addAllIngredients(storedIngredients)
             .build()
-        return storedRecipe
     }
 
     suspend fun deleteAllRecipes() {

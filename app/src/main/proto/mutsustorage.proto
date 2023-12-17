@@ -30,6 +30,10 @@ message StoredRecipes {
   repeated StoredRecipe recipes = 1;
 }
 
+message StoredMealPlan {
+  map <string, int32> recipeNamesAndCount = 1;
+}
+
 /*
 message Username {
   string username = 1;

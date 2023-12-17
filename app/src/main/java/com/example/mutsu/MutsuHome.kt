@@ -30,7 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun MutsuHomeScreen(
     goToAboutUs: () -> Unit,
@@ -105,40 +104,21 @@ fun HomePortrait(
         )
     }
 
-    Row(modifier = Modifier){
-        Button(
-            onClick = goToAboutUs,
-            modifier = modifier
-                .fillMaxHeight()
-                .padding(16.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.background
-            )
-        ) {
-            Text(
-                text = "About Us",
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
-
-        Button(
-            onClick = { },
-            modifier = modifier
-                .fillMaxHeight()
-                .padding(16.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.background
-            )
-        ) {
-            Text(
-                text = "Get Started!",
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
+    Button(
+        onClick = goToAboutUs,
+        modifier = modifier
+            .fillMaxHeight()
+            .padding(16.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.secondary,
+            contentColor = MaterialTheme.colorScheme.background
+        )
+    ) {
+        Text(
+            text = "About Us",
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.titleMedium
+        )
     }
 }
 
@@ -197,40 +177,21 @@ fun HomeLandscape(
                 )
             }
 
-            Row(modifier = Modifier){
-                Button(
-                    onClick = goToAboutUs,
-                    modifier = modifier
-                        .fillMaxHeight()
-                        .padding(20.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.background
-                    )
-                ) {
-                    Text(
-                        text = "About Us",
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-
-                Button(
-                    onClick = { },
-                    modifier = modifier
-                        .fillMaxHeight()
-                        .padding(20.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.background
-                    )
-                ) {
-                    Text(
-                        text = "Get Started!",
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
+            Button(
+                onClick = goToAboutUs,
+                modifier = modifier
+                    .fillMaxHeight()
+                    .padding(20.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.background
+                )
+            ) {
+                Text(
+                    text = "About Us",
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
         }
     }

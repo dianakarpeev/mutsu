@@ -4,12 +4,14 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import com.example.mutsu.serializers.IngredientsNameSerializer
+import com.example.mutsu.serializers.StoredMealPlanSerializer
 import com.example.mutsu.serializers.StoredRecipesSerializer
 import java.io.File
 
 class DataStoreSingleton() {
     private var ingredientsNameStore: DataStore<IngredientsName>? = null
     private var recipesStore: DataStore<StoredRecipes>? = null
+    private var mealPlanStore : DataStore<StoredMealPlan>? = null
 
 
 
@@ -31,6 +33,16 @@ class DataStoreSingleton() {
             )
         }
         return recipesStore!!
+    }
+
+    fun getMealPlanStore(context: Context): DataStore<StoredMealPlan> {
+        if (mealPlanStore == null) {
+            mealPlanStore = DataStoreFactory.create(
+                serializer = StoredMealPlanSerializer(),
+                produceFile = { File(context.filesDir, "meal_plan") }
+            )
+        }
+        return mealPlanStore!!
     }
 
 }

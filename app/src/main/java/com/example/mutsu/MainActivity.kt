@@ -36,6 +36,7 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -60,6 +61,7 @@ import com.example.mutsu.navigation.RecipeInformation
 import com.example.mutsu.navigation.Recipes
 import com.example.mutsu.ui.theme.MutsuTheme
 import androidx.compose.ui.graphics.Color
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 private const val INGREDIENTS_NAME_FILE = "ingredients_name"
 private const val RECIPES_FILE = "stored_recipes"
@@ -74,6 +76,10 @@ class MainActivity : ComponentActivity() {
         dataStores.getRecipesStore(this)
     }
 
+    private val mealPlanStore : DataStore<StoredMealPlan> by lazy {
+        dataStores.getMealPlanStore(this)
+    }
+
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,6 +92,9 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun MutsuApp(windowSize: WindowSizeClass){
         val navController = rememberNavController()
+
+        val currentBackStack by navController.currentBackStackEntryAsState()
+        val currentDestination = currentBackStack?.destination
 
         val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory())
         val currentUser = authViewModel.currentUser().collectAsState()
@@ -172,7 +181,13 @@ class MainActivity : ComponentActivity() {
         windowSize: WindowSizeClass
     ) {
         val recipeViewModel = RecipeViewModel(recipesStore, this)
-        val ingredientsViewModel = IngredientsViewModel(ingredientsNameStore, this)
+        val ingredientsViewModel = IngredientsViewModel(
+            dataStore = ingredientsNameStore,
+            mealPlanStore = mealPlanStore,
+            recipeStore = recipesStore,
+            context = this
+        )
+        val mealsViewModel = MealsViewModel(recipesStore, mealPlanStore, this)
 
         NavHost(
             navController = navController,
@@ -187,8 +202,13 @@ class MainActivity : ComponentActivity() {
                     windowSize = windowSize
                 )
             }
-            composable(route = MealPlan.route) {
-                foodCounter()
+            composable(route = MealPlan.route){
+                MealPlanScreen(
+                    goToGroceryListScreen = {
+                        navController.navigateSingleTopTo(GroceryList.route)
+                    },
+                    mealsViewModel = mealsViewModel
+                )
             }
             composable(route = Recipes.route) {
                 val newRecipeModel = RecipeViewModel(recipesStore, this@MainActivity)
@@ -253,12 +273,6 @@ class MainActivity : ComponentActivity() {
                         onClick = { navController.navigateSingleTopTo(MealPlan.route) }
                     ) {
                         Icon(MealPlan.icon, contentDescription = "Meal Plan")
-                    }
-
-                    IconButton(
-                        onClick = { navController.navigateSingleTopTo(GroceryList.route) }
-                    ) {
-                        Icon(GroceryList.icon, contentDescription = "Grocery List")
                     }
                 }
 
@@ -369,28 +383,6 @@ fun MutsuNavigationRail(
                     ),
                     selected = false,
                     onClick = { navController.navigateSingleTopTo(MealPlan.route) }
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                NavigationRailItem(
-                    icon = {
-                        Icon(
-                            imageVector = GroceryList.icon,
-                            contentDescription = "Grocery List"
-                        )
-                    },
-                    colors = NavigationRailItemDefaults.colors(
-                        selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                        selectedTextColor = Color.Transparent,
-                        indicatorColor = Color.Transparent,
-                        unselectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                        unselectedTextColor = Color.Transparent,
-                        disabledIconColor = MaterialTheme.colorScheme.onPrimary,
-                        disabledTextColor = Color.Transparent
-                    ),
-                    selected = false,
-                    onClick = { navController.navigateSingleTopTo(GroceryList.route) }
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))

@@ -3,8 +3,6 @@ package com.example.mutsu.repositories
 import androidx.datastore.core.DataStore
 import com.example.mutsu.StoredMealPlan
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.lastOrNull
 
 class StoredMealPlanRepository(val dataStore: DataStore<StoredMealPlan>) {
         val dataFlow = dataStore.data

@@ -4,12 +4,13 @@ import androidx.datastore.core.DataStore
 import com.example.mutsu.StoredMealPlan
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.lastOrNull
 
 class StoredMealPlanRepository(val dataStore: DataStore<StoredMealPlan>) {
         val dataFlow = dataStore.data
 
-        suspend fun addMealPlan(mealPlan: Map<String, Int>) {
-            val currentMap = getMealPlanAsMap().toMutableMap()
+         suspend fun addMealPlan(mealPlan: Map<String, Int>) {
+            val currentMap = mutableMapOf<String, Int>()
 
             mealPlan.forEach { (recipeName, count) ->
                 currentMap[recipeName] = count
@@ -18,17 +19,12 @@ class StoredMealPlanRepository(val dataStore: DataStore<StoredMealPlan>) {
             dataStore.updateData { currentData ->
                 currentData.toBuilder().putAllRecipeNamesAndCount(currentMap).build()
             }
-
-            val test = dataFlow.firstOrNull()?.recipeNamesAndCountMap ?: emptyMap()
-            if (test.isNotEmpty()) {
-                println(test)
-                println("test")
-            } else {
-                println("test2")
-            }
         }
 
         suspend fun getMealPlanAsMap() : Map<String, Int> {
+
+            val firstMap = dataFlow.firstOrNull()?.recipeNamesAndCountMap ?: emptyMap()
+
             return dataFlow.firstOrNull()?.recipeNamesAndCountMap ?: emptyMap()
         }
 

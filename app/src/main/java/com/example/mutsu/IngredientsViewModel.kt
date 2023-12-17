@@ -91,7 +91,7 @@ class IngredientsViewModel(dataStore : DataStore<IngredientsName>, mealPlanStore
 
     suspend fun addMealPlan(list : List<FoodItem>) {
         viewModelScope.launch {
-            val mealPlan = storedMealPlan.getMealPlanAsMap().toMutableMap()
+            val mealPlan = storedMealPlan.getMealPlanAsMap()
             //For each recipe in the list, create a map of ingredients and their quantities
             for (meal in mealPlan) {
                 val recipeName = meal.key

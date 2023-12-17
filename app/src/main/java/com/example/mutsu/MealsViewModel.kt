@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class MealsViewModel(datastore: DataStore<StoredRecipes>, mealPlanStore: DataStore<StoredMealPlan>, context : Context) : ViewModel() {
     private val storedRecipes = RecipeRepository(datastore, context)
@@ -59,13 +60,14 @@ class MealsViewModel(datastore: DataStore<StoredRecipes>, mealPlanStore: DataSto
     }
 
     fun addMealPlan(){
-        viewModelScope.launch {
-            val mealPlan = mutableMapOf<String, Int>()
+        val mealPlan = mutableMapOf<String, Int>()
 
-            for (meal in editableList){
-                mealPlan[meal.recipe.name] = meal.quantity
-            }
+        for (meal in editableList){
+            mealPlan[meal.recipe.name] = meal.quantity
+        }
 
+        //TODO: Find a better feeling approach. This *works* but it's dangerous
+        runBlocking {
             storedMealPlan.addMealPlan(mealPlan)
         }
     }

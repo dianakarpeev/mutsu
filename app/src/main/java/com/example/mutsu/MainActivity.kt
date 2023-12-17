@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -194,15 +196,83 @@ class MainActivity : ComponentActivity() {
             startDestination = Home.route,
             modifier = modifier
         ) {
-            composable(route = Home.route) {
+
+            /*
+             *  In each of these composables, they have four extra arguments:
+             *      enterTransition
+             *      exitTransition
+             *      popEnterTransition
+             *      popExitTransition
+             *  These are used when transitioning between screens. Each of them have a
+             *  direction for the screen to move in and a tween for how long it should
+             *  be moving. This allows for a smooth animation while transitioning from
+             *  screen to screen.
+             *
+             *  This part of the code comes from the tutorial linked here:
+             *  https://proandroiddev.com/screen-transition-animations-with-jetpack-navigation-17afdc714d0e
+             */
+
+            composable(
+                route = Home.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+            ){
                 MutsuHomeScreen(
                     goToAboutUs = {
                         navController.navigateSingleTopTo(AboutUs.route)
                     },
-                    windowSize = windowSize
+                    windowSize
                 )
             }
-            composable(route = MealPlan.route){
+            composable(
+                route = MealPlan.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+            ){
                 MealPlanScreen(
                     goToGroceryListScreen = {
                         navController.navigateSingleTopTo(GroceryList.route)
@@ -210,7 +280,33 @@ class MainActivity : ComponentActivity() {
                     mealsViewModel = mealsViewModel
                 )
             }
-            composable(route = Recipes.route) {
+            composable(
+                route = Recipes.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+            ){
                 val newRecipeModel = RecipeViewModel(recipesStore, this@MainActivity)
                 RecipeListScreen(
                     goToRecipeInformation = { recipeName ->
@@ -219,14 +315,90 @@ class MainActivity : ComponentActivity() {
                     recipeViewModel = newRecipeModel
                 )
             }
-            composable(route = GroceryList.route) {
+            composable(
+                route = GroceryList.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+            ){
                 IngredientsScreen(ingredientsViewModel)
             }
-            composable(route = AboutUs.route) {
+            composable(
+                route = AboutUs.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+            ){
                 AboutUsScreen()
             }
             composable(
                 route = RecipeInformation.routeWithArgs,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
                 arguments = RecipeInformation.arguments
             ) { navBackStackEntry ->
                 val recipeName =
@@ -238,7 +410,33 @@ class MainActivity : ComponentActivity() {
                     goToRecipeList = { navController.navigateSingleTopTo(Recipes.route) }
                 )
             }
-            composable(route = LoginRegister.route) {
+            composable(
+                route = LoginRegister.route,
+                enterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                        animationSpec = tween(1000)
+                    )
+                },
+            ){
                 LoginRegisterScreen(authViewModel)
             }
         }

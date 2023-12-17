@@ -38,14 +38,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.Scaffold
-import androidx.compose.foundation.layout.Box
-import com.example.mutsu.Recipe
-import com.example.mutsu.RecipeViewModel
-import com.example.mutsu.ui.theme.MutsuTheme
 
 
 /**

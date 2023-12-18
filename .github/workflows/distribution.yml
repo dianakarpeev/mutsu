@@ -3,10 +3,12 @@
 
 # A lot was also adapted from teacher's github workflow.
 # link: https://github.com/michaelhaaf/KotlinWithCompose/blob/main/.github/workflows/distribute.yml
-
 name: Distribute Firebase
 
-on: [push]
+on: 
+  push:
+    branches:
+      - 'firebase-workflow-try-two'
   workflow_dispatch:
     inputs:
       release_notes:

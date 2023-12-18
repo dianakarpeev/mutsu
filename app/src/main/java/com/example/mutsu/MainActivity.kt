@@ -437,7 +437,7 @@ class MainActivity : ComponentActivity() {
                     )
                 },
             ){
-                LoginRegisterScreen(authViewModel)
+                LoginRegisterScreen(authViewModel, windowSize)
             }
         }
     }

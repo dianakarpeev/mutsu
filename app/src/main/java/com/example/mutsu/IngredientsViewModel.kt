@@ -35,7 +35,6 @@ class IngredientsViewModel(dataStore : DataStore<IngredientsName>, mealPlanStore
                 ingredientsName.seedMap(mapOf)
                 mapOf = ingredientsName.ingredientsNameFlow.first()
             }
-
             initializeIngredients(mapOf)
         }
         _ingredients.update { ings -> copyList() }
@@ -59,28 +58,11 @@ class IngredientsViewModel(dataStore : DataStore<IngredientsName>, mealPlanStore
         }
     }
 
-    private fun instantiateIngredients() : List<FoodItem>{
-        var list = mutableListOf<FoodItem>()
-        list.add(FoodItem("Flour", 0))
-        list.add(FoodItem("Rice", 0))
-        list.add(FoodItem("Ketchup Chips", 0))
-        list.add(FoodItem("White Bread", 0))
-        list.add(FoodItem("Hummus", 0))
-        list.add(FoodItem("Apple Juice", 0))
-        list.add(FoodItem("Chicken", 0))
-        list.add(FoodItem("Apples", 0))
-        list.add(FoodItem("Cucumber", 0))
-        list.add(FoodItem("Tapioca", 0))
-        list.add(FoodItem("Salt", 0))
-
-        return list
-    }
-
      fun initializeIngredients(map : Map<String, String>) : Unit {
         var foodList = mutableListOf<FoodItem>()
         viewModelScope.launch {
             for (i in map){
-                foodList.add(FoodItem(i.value, 0))
+                foodList.add(FoodItem(foodList.size + 1,  i.value, 0, " "))
             }
 
             _editableList = foodList
@@ -105,7 +87,9 @@ class IngredientsViewModel(dataStore : DataStore<IngredientsName>, mealPlanStore
                         val index = list.indexOfFirst { it.name == ingredient.name }
                         if (index != -1) {
                             var ingredientCount = meal.value * ingredient.quantity
+                            var measurement = ingredient.measurement.abbreviation
                             list[index].quantityInCart = (list[index].quantityInCart + ingredientCount).toInt()
+                            list[index].measurement = measurement
                         }
                     }
                 }
@@ -114,20 +98,22 @@ class IngredientsViewModel(dataStore : DataStore<IngredientsName>, mealPlanStore
         _ingredients.update { ings -> copyList() }
     }
 
-    fun increaseQuantity(index: Int){
+    fun increaseQuantity(id: Int){
         viewModelScope.launch {
             _ingredients.update { ings -> emptyList() }
 
+            val index = _editableList.indexOfFirst { it.id == id }
             _editableList[index].quantityInCart++
 
             _ingredients.update { ings -> copyList() }
         }
     }
 
-    fun decreaseQuantity(index: Int){
+    fun decreaseQuantity(id: Int){
         viewModelScope.launch {
             _ingredients.update { ings -> emptyList() }
 
+            val index = _editableList.indexOfFirst { it.id == id }
             _editableList[index].quantityInCart--
 
             _ingredients.update { ings -> copyList() }
@@ -138,7 +124,7 @@ class IngredientsViewModel(dataStore : DataStore<IngredientsName>, mealPlanStore
         var list = mutableListOf<FoodItem>()
 
         for (i in _editableList){
-            list.add(FoodItem(i.name, i.quantityInCart))
+            list.add(FoodItem(i.id, i.name, i.quantityInCart, i.measurement))
         }
 
         return list

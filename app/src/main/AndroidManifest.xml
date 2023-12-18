@@ -7,9 +7,9 @@
         android:name=".MyApp"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/mutsu_square"
         android:label="Mutsu"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/mutsu_square"
         android:supportsRtl="true"
         android:theme="@style/Theme.EmptyActivity"
         tools:targetApi="31">

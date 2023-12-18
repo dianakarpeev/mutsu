@@ -676,6 +676,14 @@ fun IngredientInputRow(
             keyboardActions = KeyboardActions(
                 onDone = {
                     // Recompose IngredientsDisplay to show new changes
+
+                    //Adding validation to the input fields
+                    if (ingredientQuantity.isBlank() ||
+                        ingredientQuantity <= "0" ||
+                        ingredientName.isBlank()) {
+                        return@KeyboardActions
+                    }
+
                     onIngredientAdded(TemporaryIngredient(
                         name = ingredientName,
                         quantity = ingredientQuantity.toDouble(),

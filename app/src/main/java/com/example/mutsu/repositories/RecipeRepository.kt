@@ -10,6 +10,8 @@ import com.example.mutsu.StoredRecipes
 import com.example.mutsu.TemporaryIngredient
 import kotlinx.coroutines.flow.firstOrNull
 
+
+//Idea for repositories came from: https://www.oneclickitsolution.com/blog/implementation-proto-datastore-in-android/
 class RecipeRepository(private val dataStore: DataStore<StoredRecipes>, context: Context) {
 
     val dataFlow = dataStore.data

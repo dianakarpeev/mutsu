@@ -5,6 +5,7 @@ import com.example.mutsu.StoredRecipes
 import java.io.InputStream
 import java.io.OutputStream
 
+// Proto DataStore Serializer idea came from https://developer.android.com/codelabs/android-proto-datastore#5
 class StoredRecipesSerializer : Serializer<StoredRecipes> {
     override val defaultValue: StoredRecipes = StoredRecipes.getDefaultInstance()
 

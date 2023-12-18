@@ -4,6 +4,8 @@ import androidx.datastore.core.DataStore
 import com.example.mutsu.StoredMealPlan
 import kotlinx.coroutines.flow.firstOrNull
 
+
+//Idea for repositories came from: https://www.oneclickitsolution.com/blog/implementation-proto-datastore-in-android/
 class StoredMealPlanRepository(private val dataStore: DataStore<StoredMealPlan>) {
         private val dataFlow = dataStore.data
 

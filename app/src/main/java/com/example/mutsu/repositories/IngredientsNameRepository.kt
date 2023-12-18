@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 
+//Idea for repositories came from: https://www.oneclickitsolution.com/blog/implementation-proto-datastore-in-android/
 class IngredientsNameRepository(private val dataStore: DataStore<IngredientsName>, context: Context) {
 
     val ingredientsNameFlow : Flow<MutableMap<String, String>> = dataStore.data

@@ -96,10 +96,8 @@ dependencies {
     // stateflw
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
 
-
-    //navigation
+    // navigation
     implementation("androidx.navigation:navigation-compose:2.7.0-beta02")
-
 
     // firebase
     implementation(platform("com.google.firebase:firebase-bom:32.6.0"))

@@ -6,12 +6,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -27,6 +30,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -55,35 +60,49 @@ import java.util.regex.Pattern
  *
  * @param authViewModel The view model responsible for authentication operations.
  */
+
 @Composable
 fun LoginRegisterScreen(
-    authViewModel: AuthViewModel = viewModel(factory= AuthViewModelFactory())
-) {
+    authViewModel: AuthViewModel = viewModel(factory= AuthViewModelFactory()),
+    windowSize: WindowSizeClass,
+){
     val defaultOption = "Register"
     val currentUser = authViewModel.currentUser().collectAsState()
-    val verticalPadding = 10.dp
-    val horizontalPadding = 30.dp
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontalPadding, verticalPadding),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ){
         if (currentUser.value == null){
             AuthenticationForm(
                 authViewModel = authViewModel,
-                currentUser = currentUser,
                 initialFormType = defaultOption,
                 modifier = Modifier.fillMaxWidth()
             )
         }
         else {
-            SignedInScreen(authViewModel, currentUser)
+            when (windowSize.widthSizeClass) {
+                WindowWidthSizeClass.Compact -> {
+                    SignedInScreenPortrait(
+                        authViewModel = authViewModel,
+                        currentUser = currentUser
+                    )
+                }
+                else -> {
+                    SignedInScreenLandscape(
+                        authViewModel = authViewModel,
+                        currentUser = currentUser
+                    )
+                }
+            }
         }
     }
 }
+
+
 
 /**
  * Composable function that renders an authentication form for user login or registration.
@@ -96,7 +115,6 @@ fun LoginRegisterScreen(
 @Composable
 fun AuthenticationForm(
     authViewModel: AuthViewModel,
-    currentUser: State<Users?>,
     initialFormType: String,
     modifier: Modifier = Modifier
 ) {
@@ -112,6 +130,7 @@ fun AuthenticationForm(
     Column(
         modifier
             .fillMaxWidth()
+            .padding(30.dp)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(spacedBy),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -130,6 +149,8 @@ fun AuthenticationForm(
             textAlign = TextAlign.Center,
             fontSize = 30.sp
         )
+
+        Spacer(Modifier.height(0.5.dp))
 
         Text(
             text = introduction,
@@ -303,7 +324,7 @@ fun UserFieldInput(
  * @param currentUser State holding information about the currently signed-in user.
  */
 @Composable
-fun SignedInScreen(
+fun SignedInScreenPortrait(
     authViewModel: AuthViewModel,
     currentUser: State<Users?>
 ){
@@ -312,13 +333,14 @@ fun SignedInScreen(
     val buttonCornerRadius = 10.dp
     val spacerHeight = 15.dp
     val padding = 20.dp
-    val imagePadding = 35.dp
 
     Column(
         Modifier
             .fillMaxSize()
             .padding(15.dp)
-            .fillMaxWidth() // Updated to fill max width
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         //Headings
         Text(
@@ -398,10 +420,7 @@ fun SignedInScreen(
         Image(
             painter = painterResource(id = R.drawable.radish),
             contentDescription = null,
-            Modifier
-                .padding(imagePadding)
-                .fillMaxWidth()
-                .aspectRatio(1f)
+            modifier = Modifier.size(size = 200.dp)
         )
     }
 
@@ -411,6 +430,119 @@ fun SignedInScreen(
             confirm = authViewModel::delete,
             dismiss = { showPopUp = false }
         )
+    }
+}
+
+@Composable
+fun SignedInScreenLandscape(
+    authViewModel: AuthViewModel,
+    currentUser: State<Users?>
+){
+    var showPopUp by rememberSaveable { mutableStateOf(false) }
+    val roundedCornerRadius = 20.dp
+    val buttonCornerRadius = 10.dp
+    val spacerHeight = 15.dp
+    val padding = 20.dp
+
+    Column(
+        Modifier
+            .fillMaxSize()
+            .padding(30.dp)
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row{
+            Image(
+                painter = painterResource(id = R.drawable.radish),
+                contentDescription = null,
+                modifier = Modifier.size(size = 200.dp)
+            )
+
+            Spacer(Modifier.width(30.dp))
+
+            Column {
+                //Headings
+                Text(
+                    text = "Great to see you!",
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    fontSize = 30.sp
+                )
+
+                Text(
+                    text = "You are currently signed with " + currentUser.value!!.email,
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center,
+                    fontSize = 17.sp
+                )
+
+                Spacer(Modifier.height(spacerHeight))
+
+                //Button column
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = RoundedCornerShape(roundedCornerRadius)
+                        )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(padding),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ){
+                        //Sign out button
+                        Button(
+                            shape = RoundedCornerShape(buttonCornerRadius),
+                            onClick = { authViewModel.signOut() },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                contentColor = MaterialTheme.colorScheme.background
+                            )
+                        ) {
+                            Text(
+                                "Sign Out",
+                                Modifier.padding(padding, 0.dp),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        //Delete account button
+                        Button(
+                            shape = RoundedCornerShape(buttonCornerRadius),
+                            onClick = { showPopUp = true },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                contentColor = MaterialTheme.colorScheme.background
+                            )
+                        ) {
+                            Text(
+                                "Delete Account",
+                                Modifier.padding(padding, 0.dp),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+
+
+                if (showPopUp){
+                    ConfirmDeleteAccount(
+                        confirm = authViewModel::delete,
+                        dismiss = { showPopUp = false }
+                    )
+                }
+            }
+        }
     }
 }
 

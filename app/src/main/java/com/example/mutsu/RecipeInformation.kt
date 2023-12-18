@@ -17,12 +17,15 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
@@ -43,6 +46,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -104,12 +109,12 @@ data class TemporaryIngredient(
 fun RecipeInformationScreen(
     recipeViewModel: RecipeViewModel,
     recipeName: String?,
-    goToRecipeList: () -> Unit
+    goToRecipeList: () -> Unit,
+    windowSize: WindowSizeClass
 ){
     //The recipe name is passed through navigation arguments and may be null
     if (recipeName == null) throw IllegalStateException("Recipe name is missing.")
-
-
+    
     val recipe = findRecipe(recipeName, recipeViewModel)
 
     //TODO: Replace temporary hardcoded values with responsive behavior
@@ -123,12 +128,12 @@ fun RecipeInformationScreen(
     ) {
         Column(
             modifier = Modifier
-                .width(columnWidth)
-                .fillMaxHeight(),
+                .fillMaxSize()
+                .padding(20.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(spaceBetweenElements)
         ) {
-            Spacer(Modifier.height(10.dp))
             //Save and delete buttons
             ButtonRow(
                 recipeViewModel = recipeViewModel,
@@ -137,8 +142,19 @@ fun RecipeInformationScreen(
                 goToRecipeList = goToRecipeList
             )
 
-            //Form containing all the information for users to fill/edit
-            RecipeForm(recipe = recipe)
+            when (windowSize.widthSizeClass) {
+                WindowWidthSizeClass.Compact -> {
+                    RecipeFormPortrait(
+                        recipe = recipe
+                    )
+                }
+                
+                else -> {
+                    RecipeFormLandscape(
+                        recipe = recipe
+                    )
+                }
+            }
         }
     }
 }
@@ -168,8 +184,7 @@ private fun createEmptyRecipe(recipeName: String): Recipe{
 }
 
 @Composable
-fun RecipeForm(
-    modifier: Modifier = Modifier,
+fun RecipeFormPortrait(
     recipe: Recipe
 ) {
     //Variables to toggle the new ingredient input row's visibility to users.
@@ -189,27 +204,129 @@ fun RecipeForm(
     val invalidStringErrorMessage by remember { mutableStateOf("Please enter a valid string")}
     val invalidIntegerErrorMessage by remember { mutableStateOf("Please enter a valid positive number") }
 
-    //Temporary hardcoded values - to be modified when implementing responsive behavior
-    val spaceBetweenInputFields = 20.dp
+    //Recipe Name
+    UserFieldInput(
+        label = "Name",
+        value = nameState,
+        onValueChange = {
+            nameState = it
+            isNameValid = isValidString(it)
+            if (isNameValid) { recipe.name = nameState }
+        },
+        isInvalid = !isNameValid,
+        errorMessage = invalidStringErrorMessage,
+        modifier = Modifier.fillMaxWidth()
+    )
 
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(spaceBetweenInputFields)
-    ) {
-        //Recipe Name
-        UserFieldInput(
-            label = "Name",
-            value = nameState,
-            onValueChange = {
-                nameState = it
-                isNameValid = isValidString(it)
-                if (isNameValid) { recipe.name = nameState }
-            },
-            isInvalid = !isNameValid,
-            errorMessage = invalidStringErrorMessage,
-            modifier = Modifier.fillMaxWidth()
-        )
+    //Ingredients
+    IngredientDisplay(
+        recipe = recipe,
+        toggleDisplayInputRow = toggleDisplayInputRow,
+        displayInputRow = displayInputRow
+    )
+
+    //Portion Yield
+    UserFieldInput(
+        label = "Portion yield",
+        value = portionState,
+        onValueChange = {
+            portionState = it
+            isPortionValid = isValidPositiveInteger(it)
+            if (isPortionValid) { recipe.portionYield = it.toInt() }
+        },
+        isInvalid = !isPortionValid,
+        errorMessage = invalidIntegerErrorMessage,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Number
+        ),
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    //Web URL
+    UserFieldInput(
+        label = "Web URL",
+        value = urlState,
+        onValueChange = {
+            urlState = it
+            recipe.webURL = urlState
+        },
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+@Composable
+fun RecipeFormLandscape(
+    recipe: Recipe
+) {
+    //Variables to toggle the new ingredient input row's visibility to users.
+    var displayInputRow by remember { mutableStateOf(false)}
+    val toggleDisplayInputRow: () -> Unit = { displayInputRow = !displayInputRow }
+
+    //Fields other than ingredients for users to fill out.
+    var nameState by remember { mutableStateOf(recipe.name) }
+    var portionState by remember { mutableStateOf(recipe.portionYield.toString()) }
+    var urlState by remember { mutableStateOf(recipe.webURL ?: "") }
+
+    //Displays an error message under the corresponding fields when false.
+    var isNameValid by remember { mutableStateOf(true) }
+    var isPortionValid by remember { mutableStateOf(true) }
+
+    //Error messages to display under corresponding fields when invalid.
+    val invalidStringErrorMessage by remember { mutableStateOf("Please enter a valid string")}
+    val invalidIntegerErrorMessage by remember { mutableStateOf("Please enter a valid positive number") }
+
+    Row {
+        Column(
+            Modifier
+                .widthIn(max = 300.dp)
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            //Recipe Name
+            UserFieldInput(
+                label = "Name",
+                value = nameState,
+                onValueChange = {
+                    nameState = it
+                    isNameValid = isValidString(it)
+                    if (isNameValid) { recipe.name = nameState }
+                },
+                isInvalid = !isNameValid,
+                errorMessage = invalidStringErrorMessage,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            //Portion Yield
+            UserFieldInput(
+                label = "Portion yield",
+                value = portionState,
+                onValueChange = {
+                    portionState = it
+                    isPortionValid = isValidPositiveInteger(it)
+                    if (isPortionValid) { recipe.portionYield = it.toInt() }
+                },
+                isInvalid = !isPortionValid,
+                errorMessage = invalidIntegerErrorMessage,
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            //Web URL
+            UserFieldInput(
+                label = "Web URL",
+                value = urlState,
+                onValueChange = {
+                    urlState = it
+                    recipe.webURL = urlState
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        Spacer(Modifier.width(50.dp))
 
         //Ingredients
         IngredientDisplay(
@@ -217,36 +334,9 @@ fun RecipeForm(
             toggleDisplayInputRow = toggleDisplayInputRow,
             displayInputRow = displayInputRow
         )
-
-        //Portion Yield
-        UserFieldInput(
-            label = "Portion yield",
-            value = portionState,
-            onValueChange = {
-                portionState = it
-                isPortionValid = isValidPositiveInteger(it)
-                if (isPortionValid) { recipe.portionYield = it.toInt() }
-            },
-            isInvalid = !isPortionValid,
-            errorMessage = invalidIntegerErrorMessage,
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Number
-            ),
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        //Web URL
-        UserFieldInput(
-            label = "Web URL",
-            value = urlState ?: "",
-            onValueChange = {
-                urlState = it
-                recipe.webURL = urlState
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
     }
 }
+
 
 /**
  * Displays a pop up message where users can dismiss or confirm the requested action.
@@ -334,7 +424,6 @@ private fun isValidPositiveInteger(string: String): Boolean {
  * @param keyboardOptions Keyboard options for specific cases. For example, when you want the user to
  * only be able to input numbers.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserFieldInput(
     label: String,
@@ -496,6 +585,7 @@ fun IngredientDisplay(
     //Temporary hardcoded values - to be modified when implementing responsive behavior
     val roundedCornerRadius = 20.dp
     val minColumnHeight = 150.dp
+    val minColumnWidth = 1000.dp
     val maxColumnHeight = 350.dp
     val columnPadding = 20.dp
     val spacerHeight = 20.dp
@@ -512,7 +602,7 @@ fun IngredientDisplay(
     ) {
         Column(
             modifier = Modifier
-                .defaultMinSize(minColumnHeight)
+                .defaultMinSize(minColumnWidth, minColumnHeight)
                 .heightIn(minColumnHeight, maxColumnHeight)
                 .padding(columnPadding)
         ) {

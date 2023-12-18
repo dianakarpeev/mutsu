@@ -93,7 +93,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1")
 
-    // stateflow
+    // stateflw
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
 
 

@@ -5,10 +5,7 @@
 # link: https://github.com/michaelhaaf/KotlinWithCompose/blob/main/.github/workflows/distribute.yml
 name: Distribute Firebase
 
-on: 
-  push:
-    branches:
-      - 'firebase-workflow-try-two'
+on:
   workflow_dispatch:
     inputs:
       release_notes:

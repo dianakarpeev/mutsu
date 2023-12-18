@@ -69,7 +69,7 @@ fun IngredientsScreen(viewModel: IngredientsViewModel = viewModel(), modifier: M
 }
 
 /* Data class for the ingredients. */
-data class FoodItem (val name: String, var quantityInCart: Int)
+data class FoodItem (val id:Int, val name: String, var quantityInCart: Int, var measurement: String)
 
 /* Prints the instructions for the page at the top of the screen. */
 @Composable
@@ -105,12 +105,13 @@ fun ShowAllIngredients(
     var showPopUp by rememberSaveable { mutableStateOf(false) }
 
     Column(modifier = modifier.fillMaxWidth(),){
-        ingredients.forEachIndexed{ index, it ->
+        ingredients.sortedByDescending { it.quantityInCart }.forEachIndexed{ index, it ->
             IngredientButtonBox(
                 ingredientName = it.name,
                 ingredientQuantity = it.quantityInCart,
-                isAdded = { increaseQuantity(index) },
-                isRemoved = { if (it.quantityInCart != 0) decreaseQuantity(index) },
+                ingredientMeasurement = it.measurement,
+                isAdded = { increaseQuantity(it.id) },
+                isRemoved = { if (it.quantityInCart != 0) decreaseQuantity(it.id) },
                 modifier = modifier.fillMaxWidth())
         }
 
@@ -141,6 +142,7 @@ fun ShowAllIngredients(
 fun IngredientButtonBox(
     ingredientName: String,
     ingredientQuantity: Int,
+    ingredientMeasurement: String,
     isAdded: () -> Unit,
     isRemoved: () -> Unit,
     modifier: Modifier = Modifier
@@ -160,7 +162,7 @@ fun IngredientButtonBox(
         {
             Column(){
                 Text(
-                    "$ingredientQuantity $ingredientName",
+                    "$ingredientQuantity $ingredientMeasurement $ingredientName",
                     color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Medium
                 )

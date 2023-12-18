@@ -30,11 +30,12 @@ On Android Studio (or any other IDE) open a terminal by selecting `View > Tool W
 - test the code with `./gradlew spotlessApply`
 
 ## 👀 Sneakpeek
-![Home](assets/screenshots/mutsu-home.jpg)
-![Recipe Collection](assets/screenshots/mutsu-recipe-collection.jpg)
-![Recipe Information](assets/screenshots/mutsu-recipe-information.jpg)
-![Meal Plan](assets/screenshots/mutsu-meal-plan.jpg)
-![Logged In](assets/screenshots/mutsu-logged-in.jpg)
+### Portrait
+![mutsu-home](https://github.com/dianakarpeev/mutsu/assets/78222551/7f8f1a02-d445-4ad3-b471-6ed0a50b92d4)
+![mutsu-recipe-collection](https://github.com/dianakarpeev/mutsu/assets/78222551/b667290d-7d6f-4873-8e69-8af0b4734d55)
+![mutsu-recipe-information](https://github.com/dianakarpeev/mutsu/assets/78222551/5459d54b-9974-4c20-9b1b-7d3dd4b56441)
+![mutsu-meal-plan](https://github.com/dianakarpeev/mutsu/assets/78222551/fdcf7fee-e342-4c5e-a570-3e8968b49258)
+![mutsu-logged-in](https://github.com/dianakarpeev/mutsu/assets/78222551/4cc38421-8b1b-4cf3-9f02-0c6737159926)
 
 ## ⚖️ License
 This project is licensed under the GNU License - see the LICENSE.md file for details
@@ -43,3 +44,4 @@ This project is licensed under the GNU License - see the LICENSE.md file for det
 Diana Karpeev - dianakarpeeva@gmail.com <br>
 Mel Hynes - hynesaiden02@gmail.com <br>
 Breanna de Forest - bdeforest01@gmail.com <br>
+

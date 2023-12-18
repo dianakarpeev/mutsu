@@ -8,11 +8,11 @@ import com.example.mutsu.serializers.StoredMealPlanSerializer
 import com.example.mutsu.serializers.StoredRecipesSerializer
 import java.io.File
 
+//DataStore Singleton found with GitHub Copilot Chat as a base, then refactored by Mel
 class DataStoreSingleton() {
     private var ingredientsNameStore: DataStore<IngredientsName>? = null
     private var recipesStore: DataStore<StoredRecipes>? = null
     private var mealPlanStore : DataStore<StoredMealPlan>? = null
-
 
 
     fun getIngredientsNameStore(context: Context): DataStore<IngredientsName> {

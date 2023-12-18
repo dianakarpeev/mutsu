@@ -33,19 +33,3 @@ message StoredRecipes {
 message StoredMealPlan {
   map <string, int32> recipeNamesAndCount = 1;
 }
-
-/*
-message Username {
-  string username = 1;
-  //I somehow think that storing the password's a bad idea, but like. it might work???
-  string password = 2;
-  string displayName = 3;
-}
-
-message GroceryList {
-  //Some way of storing the User
-  //Some way of storing the timestamp
-
-  repeated Ingredient ingredients = 3;
-}
-*/

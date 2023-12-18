@@ -7,6 +7,7 @@ import com.google.protobuf.InvalidProtocolBufferException
 import java.io.InputStream
 import java.io.OutputStream
 
+// Proto DataStore Serializer idea came from https://developer.android.com/codelabs/android-proto-datastore#5
 class StoredMealPlanSerializer: Serializer<StoredMealPlan> {
 override val defaultValue: StoredMealPlan = StoredMealPlan.getDefaultInstance()
 

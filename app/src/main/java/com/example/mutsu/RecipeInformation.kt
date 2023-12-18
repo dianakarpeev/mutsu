@@ -496,6 +496,7 @@ fun ButtonRow(
     var showSaveDialog by remember { mutableStateOf(false) }
 
     var confirmedDelete by remember { mutableStateOf(false) }
+    var confirmedSave by remember { mutableStateOf(false) }
 
     //Temporary hardcoded values - to be modified when implementing responsive behavior
     val spaceBetweenButtons = 4.dp
@@ -552,17 +553,21 @@ fun ButtonRow(
     }
 
     if (showSaveDialog){
-        ConfirmPopup(
-            onDismissRequest = { showSaveDialog = true },
-            onConfirmation = {
+        if (confirmedSave) {
+            LaunchedEffect(Unit) {
                 recipeViewModel.editRecipe(originalRecipe.name, recipe)
                 goToRecipeList()
-            },
-            dialogTitle = "Save changes",
-            dialogText = "Would you like to save your changes to " + recipe.name + "?",
-            icon = Icons.Default.Edit,
-            confirmText = "Save"
-        )
+            }
+        } else {
+            ConfirmPopup(
+                onDismissRequest = { showSaveDialog = false },
+                onConfirmation = { confirmedSave = true },
+                dialogTitle = "Save changes",
+                dialogText = "Would you like to save your changes to " + recipe.name + "?",
+                icon = Icons.Default.Edit,
+                confirmText = "Save"
+            )
+        }
     }
 }
 
@@ -761,6 +766,14 @@ fun IngredientInputRow(
             keyboardActions = KeyboardActions(
                 onDone = {
                     // Recompose IngredientsDisplay to show new changes
+
+                    //Adding validation to the input fields
+                    if (ingredientQuantity.isBlank() ||
+                        ingredientQuantity <= "0" ||
+                        ingredientName.isBlank()) {
+                        return@KeyboardActions
+                    }
+
                     onIngredientAdded(TemporaryIngredient(
                         name = ingredientName,
                         quantity = ingredientQuantity.toDouble(),

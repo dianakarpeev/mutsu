@@ -1,12 +1,12 @@
-name: Build & upload to Firebase App Distribution 
-
 # File was copied and modified from Firebase App Distribution from github's actions marketplace
 # link: https://github.com/marketplace/actions/firebase-app-distribution
 
 # A lot was also adapted from teacher's github workflow.
 # link: https://github.com/michaelhaaf/KotlinWithCompose/blob/main/.github/workflows/distribute.yml
-  
-on: #[push]
+
+name: Build and Upload to Firebase App Distribution 
+
+on:
   workflow_dispatch:
     inputs:
       release_notes:
@@ -21,7 +21,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-      
     - uses: actions/setup-java@v1
       with:
         distribution: 'temurin'

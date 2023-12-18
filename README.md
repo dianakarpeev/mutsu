@@ -30,11 +30,11 @@ On Android Studio (or any other IDE) open a terminal by selecting `View > Tool W
 - test the code with `./gradlew spotlessApply`
 
 ## 👀 Sneakpeek
-![Home](./assets/screenshots/mutsu-home.jpg)
-![Recipe Collection](./assets/screenshots/mutsu-recipe-collection.jpg)
-![Recipe Information](./assets/screenshots/mutsu-recipe-information.jpg)
-![Meal Plan](./assets/screenshots/mutsu-meal-plan.jpg)
-![Logged In](./assets/screenshots/mutsu-logged-in.jpg)
+![Home](assets/screenshots/mutsu-home.jpg)
+![Recipe Collection](assets/screenshots/mutsu-recipe-collection.jpg)
+![Recipe Information](assets/screenshots/mutsu-recipe-information.jpg)
+![Meal Plan](assets/screenshots/mutsu-meal-plan.jpg)
+![Logged In](assets/screenshots/mutsu-logged-in.jpg)
 
 ## ⚖️ License
 This project is licensed under the GNU License - see the LICENSE.md file for details

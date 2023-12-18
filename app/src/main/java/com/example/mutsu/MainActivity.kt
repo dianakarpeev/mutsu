@@ -407,7 +407,8 @@ class MainActivity : ComponentActivity() {
                 RecipeInformationScreen(
                     recipeViewModel = recipeViewModel,
                     recipeName = recipeName,
-                    goToRecipeList = { navController.navigateSingleTopTo(Recipes.route) }
+                    goToRecipeList = { navController.navigateSingleTopTo(Recipes.route) },
+                    windowSize
                 )
             }
             composable(
